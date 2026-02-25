@@ -1,0 +1,18 @@
+fastapi==0.115.0
+uvicorn==0.30.6
+python-multipart==0.0.9
+
+# LangChain
+langchain==0.3.19
+langgraph==0.2.74
+langchain-core==0.3.76
+langchain-google-genai==2.0.11
+
+# Google Generative AI — new unified SDK (replaces google-generativeai)
+google-genai>=1.0.0
+
+# Pydantic
+pydantic==2.11.9
+
+# Environment
+python-dotenv==1.0.1

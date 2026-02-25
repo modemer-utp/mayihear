@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" />
+  <title>MayiHear</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header>
+    <span class="dot" id="status-dot"></span>
+    <h1>MayiHear</h1>
+  </header>
+
+  <main>
+
+    <!-- Record -->
+    <div class="record-section">
+      <div id="timer">00:00</div>
+      <button id="record-btn" title="Start recording">&#9679;</button>
+      <span id="status-text">Ready to record</span>
+    </div>
+
+    <!-- Context (always visible) -->
+    <div class="context-section">
+      <span class="section-label">Meeting context (optional)</span>
+      <textarea
+        id="context-input"
+        placeholder="e.g. Weekly status meeting — Engineering Faculty. Focus on student retention risks and professor action items."
+        rows="2"
+      ></textarea>
+    </div>
+
+    <!-- Transcript output -->
+    <div class="output-section" id="transcript-section">
+      <div class="output-header">
+        <span class="section-label">Transcript</span>
+        <button class="copy-btn" id="copy-transcript">Copy</button>
+      </div>
+      <div class="output-box" id="transcript-box"></div>
+    </div>
+
+    <!-- Insights output -->
+    <div class="output-section" id="insights-section">
+      <div class="output-header">
+        <span class="section-label">Insights</span>
+        <button class="copy-btn" id="copy-insights">Copy</button>
+      </div>
+      <div class="output-box" id="insights-box"></div>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

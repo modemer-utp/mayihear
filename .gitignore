@@ -1,0 +1,26 @@
+node_modules/
+.env
+recordings/
+*.webm
+*.wav
+*.mp3
+dist/
+out/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Experto-Tematico is a separate project
+Experto-Tematico/
+
+# Archives
+*.rar
+*.zip
+*.tar.gz
+
+# IDE
+.vscode/
+.claude/

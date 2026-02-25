@@ -1,0 +1,18 @@
+{
+  "name": "mayihear",
+  "version": "0.1.0",
+  "description": "Meeting transcription and insights — UTP MVP",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --inspect"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.0",
+    "dotenv": "^16.4.5",
+    "openai": "^4.77.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}
