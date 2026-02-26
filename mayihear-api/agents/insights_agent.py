@@ -66,6 +66,12 @@ class InsightsAgent:
             config={"callbacks": [usage_cb]}
         )
 
+        if result is None:
+            raise ValueError(
+                "El modelo no pudo generar insights estructurados. "
+                "La transcripción puede ser demasiado corta o el modelo no devolvió JSON válido."
+            )
+
         usage = TokenUsage(
             model=self.model_name,
             input_tokens=usage_cb.input_tokens,
