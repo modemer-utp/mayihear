@@ -3,12 +3,12 @@ uvicorn==0.30.6
 python-multipart==0.0.9
 
 # LangChain
-langchain==0.3.19
-langgraph==0.2.74
-langchain-core==0.3.76
-langchain-google-genai==2.0.11
+langchain==1.2.10
+langgraph==1.0.9
+langchain-core==1.2.16
+langchain-google-genai==4.2.1
 
-# Google Generative AI — new unified SDK (replaces google-generativeai)
+# Google Generative AI
 google-genai==1.64.0
 
 # Word document export
