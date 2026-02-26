@@ -206,6 +206,11 @@ main {
   justify-content: space-between;
 }
 
+.output-header-actions {
+  display: flex;
+  gap: 6px;
+}
+
 .copy-btn {
   background: none;
   border: 1px solid var(--border);
@@ -220,6 +225,115 @@ main {
 .copy-btn:hover {
   color: var(--text);
   border-color: var(--text-muted);
+}
+
+/* ── Audio source toggles + level meters ── */
+.audio-sources {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  width: 100%;
+  justify-content: center;
+}
+
+.source-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 130px;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+/* Hide native checkbox */
+.toggle-label input[type="checkbox"] {
+  display: none;
+}
+
+/* Pill toggle */
+.toggle-pill {
+  width: 34px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--border);
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle-pill::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.toggle-label input:checked + .toggle-pill {
+  background: var(--accent);
+}
+
+.toggle-label input:checked + .toggle-pill::after {
+  transform: translateX(16px);
+  background: white;
+}
+
+/* Level meter bar */
+.level-meter {
+  width: 120px;
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.level-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--green);
+  border-radius: 3px;
+  transition: width 0.05s linear;
+}
+
+/* ── Acta actions ── */
+.acta-actions {
+  display: flex;
+  justify-content: center;
+}
+
+#generate-acta-btn {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+#generate-acta-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+}
+
+#generate-acta-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ── Scrollbar ── */

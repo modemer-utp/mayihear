@@ -1,23 +1,42 @@
 // ── Elements ──────────────────────────────────────────────────
-const recordBtn       = document.getElementById('record-btn')
-const statusText      = document.getElementById('status-text')
-const statusDot       = document.getElementById('status-dot')
-const timerEl         = document.getElementById('timer')
-const contextInput    = document.getElementById('context-input')
+const recordBtn         = document.getElementById('record-btn')
+const statusText        = document.getElementById('status-text')
+const statusDot         = document.getElementById('status-dot')
+const timerEl           = document.getElementById('timer')
+const contextInput      = document.getElementById('context-input')
 const transcriptSection = document.getElementById('transcript-section')
-const transcriptBox   = document.getElementById('transcript-box')
-const insightsSection = document.getElementById('insights-section')
-const insightsBox     = document.getElementById('insights-box')
-const copyTranscript  = document.getElementById('copy-transcript')
-const copyInsights    = document.getElementById('copy-insights')
+const transcriptBox     = document.getElementById('transcript-box')
+const insightsSection   = document.getElementById('insights-section')
+const insightsBox       = document.getElementById('insights-box')
+const copyTranscript    = document.getElementById('copy-transcript')
+const saveTranscript    = document.getElementById('save-transcript')
+const copyInsights      = document.getElementById('copy-insights')
+const actaActions       = document.getElementById('acta-actions')
+const generateActaBtn   = document.getElementById('generate-acta-btn')
+const actaSection       = document.getElementById('acta-section')
+const actaBox           = document.getElementById('acta-box')
+const downloadActaBtn   = document.getElementById('download-acta')
+const toggleMic         = document.getElementById('toggle-mic')
+const toggleSystem      = document.getElementById('toggle-system')
+const barMic            = document.getElementById('bar-mic')
+const barSystem         = document.getElementById('bar-system')
 
 // ── State ──────────────────────────────────────────────────────
-let mediaRecorder = null
-let audioChunks   = []
-let timerInterval = null
-let secondsElapsed = 0
-let isRecording   = false
-let audioContext  = null  // kept alive during recording, closed on stop
+let mediaRecorder     = null
+let audioChunks       = []
+let timerInterval     = null
+let secondsElapsed    = 0
+let isRecording       = false
+let audioContext      = null
+let lastTranscript    = ''
+let currentActaData   = null
+
+// Level meter animation state
+let micAnalyser       = null
+let systemAnalyser    = null
+let micAnimFrame      = null
+let systemAnimFrame   = null
+let previewContext     = null  // AudioContext for live meter preview (not recording)
 
 // ── Timer helpers ──────────────────────────────────────────────
 function formatTime(s) {
@@ -53,76 +72,187 @@ function setRecordingUI(active) {
   statusDot.classList.toggle('recording', active)
 }
 
-// ── Get mixed audio stream: system loopback + microphone ───────
-// Same approach as OBS — captures each source separately then merges them
-async function getMixedAudioStream() {
-  // ── 1. System audio (loopback) — captures Teams/Zoom remote participants ──
-  const sources = await window.electronAPI.getSources()
-  const screenSource = sources[0]
+// ── Level meter helpers ────────────────────────────────────────
+function animateMeter(analyser, barEl, frameRef) {
+  const dataArray = new Uint8Array(analyser.frequencyBinCount)
+  function draw() {
+    frameRef.current = requestAnimationFrame(draw)
+    analyser.getByteFrequencyData(dataArray)
+    const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length
+    const pct = Math.min(100, (avg / 128) * 100)
+    barEl.style.width = pct + '%'
+  }
+  draw()
+}
 
-  const desktopStream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      mandatory: {
-        chromeMediaSource: 'desktop',
-        chromeMediaSourceId: screenSource.id
-      }
-    },
-    video: {
-      mandatory: {
-        chromeMediaSource: 'desktop',
-        chromeMediaSourceId: screenSource.id,
-        maxWidth: 1,
-        maxHeight: 1,
-        maxFrameRate: 1
+function stopMeter(frameRef, barEl) {
+  if (frameRef.current) {
+    cancelAnimationFrame(frameRef.current)
+    frameRef.current = null
+  }
+  barEl.style.width = '0%'
+}
+
+// We use wrapper objects so we can pass by reference
+const micFrameRef    = { current: null }
+const systemFrameRef = { current: null }
+
+// ── Live preview meters (independent of recording) ─────────────
+async function startPreviewMeters() {
+  if (previewContext) return  // already running
+
+  try {
+    previewContext = new AudioContext()
+
+    if (toggleMic.checked) {
+      const micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+      const micSrc = previewContext.createMediaStreamSource(micStream)
+      micAnalyser = previewContext.createAnalyser()
+      micAnalyser.fftSize = 256
+      micSrc.connect(micAnalyser)
+      animateMeter(micAnalyser, barMic, micFrameRef)
+    }
+
+    if (toggleSystem.checked) {
+      const sources = await window.electronAPI.getSources()
+      const desktopStream = await navigator.mediaDevices.getUserMedia({
+        audio: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: sources[0].id } },
+        video: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: sources[0].id, maxWidth: 1, maxHeight: 1, maxFrameRate: 1 } }
+      })
+      desktopStream.getVideoTracks().forEach(t => t.stop())
+      if (desktopStream.getAudioTracks().length > 0) {
+        const sysSrc = previewContext.createMediaStreamSource(new MediaStream(desktopStream.getAudioTracks()))
+        systemAnalyser = previewContext.createAnalyser()
+        systemAnalyser.fftSize = 256
+        sysSrc.connect(systemAnalyser)
+        animateMeter(systemAnalyser, barSystem, systemFrameRef)
       }
     }
-  })
-  desktopStream.getVideoTracks().forEach(t => t.stop())
-
-  const systemTracks = desktopStream.getAudioTracks()
-  console.log(`[MayiHear] System audio tracks: ${systemTracks.length}`)
-  systemTracks.forEach((t, i) => console.log(`  System ${i}: ${t.label}`))
-
-  if (systemTracks.length === 0) {
-    throw new Error('No system audio captured. Enable "Stereo Mix" in Windows Sound settings → Recording tab.')
-  }
-
-  // ── 2. Microphone — captures your own voice ──────────────────
-  let micStream = null
-  try {
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-    console.log(`[MayiHear] Microphone: ${micStream.getAudioTracks()[0]?.label}`)
   } catch (err) {
-    console.warn('[MayiHear] Microphone not available — recording system audio only:', err.message)
-    setStatus('Recording (system audio only — mic not available)...')
+    console.warn('[MayiHear] Preview meters could not start:', err.message)
+  }
+}
+
+function stopPreviewMeters() {
+  stopMeter(micFrameRef, barMic)
+  stopMeter(systemFrameRef, barSystem)
+  if (previewContext) {
+    previewContext.close()
+    previewContext = null
+  }
+  micAnalyser = null
+  systemAnalyser = null
+}
+
+// Start preview meters on load
+startPreviewMeters()
+
+// Toggle mic
+toggleMic.addEventListener('change', async () => {
+  stopPreviewMeters()
+  if (toggleMic.checked || toggleSystem.checked) {
+    await startPreviewMeters()
+  }
+})
+
+// Toggle system audio
+toggleSystem.addEventListener('change', async () => {
+  stopPreviewMeters()
+  if (toggleMic.checked || toggleSystem.checked) {
+    await startPreviewMeters()
+  }
+})
+
+// ── Get mixed audio stream based on toggle state ───────────────
+async function getMixedAudioStream() {
+  const useMic    = toggleMic.checked
+  const useSystem = toggleSystem.checked
+
+  if (!useMic && !useSystem) {
+    throw new Error('Activa al menos una fuente de audio (micrófono o audio del sistema).')
   }
 
-  // ── 3. Mix both sources via Web Audio API (same as OBS) ──────
+  // Stop preview meters before recording takes over
+  stopPreviewMeters()
+
   audioContext = new AudioContext()
   const destination = audioContext.createMediaStreamDestination()
 
-  const systemSource = audioContext.createMediaStreamSource(new MediaStream(systemTracks))
-  systemSource.connect(destination)
+  // ── System audio (loopback) ──────────────────────────────────
+  if (useSystem) {
+    const sources = await window.electronAPI.getSources()
+    const screenSource = sources[0]
 
-  if (micStream) {
-    const micSource = audioContext.createMediaStreamSource(micStream)
-    micSource.connect(destination)
+    const desktopStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: screenSource.id
+        }
+      },
+      video: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: screenSource.id,
+          maxWidth: 1,
+          maxHeight: 1,
+          maxFrameRate: 1
+        }
+      }
+    })
+    desktopStream.getVideoTracks().forEach(t => t.stop())
+
+    const systemTracks = desktopStream.getAudioTracks()
+    console.log(`[MayiHear] Audio del sistema: ${systemTracks.length} pista(s)`)
+
+    if (systemTracks.length === 0) {
+      throw new Error('No se capturó audio del sistema. Activa "Mezcla estéreo" en Configuración de sonido de Windows → pestaña Grabación.')
+    }
+
+    // Attach live meter for system during recording
+    systemAnalyser = audioContext.createAnalyser()
+    systemAnalyser.fftSize = 256
+    const sysSrc = audioContext.createMediaStreamSource(new MediaStream(systemTracks))
+    sysSrc.connect(systemAnalyser)
+    sysSrc.connect(destination)
+    animateMeter(systemAnalyser, barSystem, systemFrameRef)
   }
 
-  console.log(`[MayiHear] Mixed stream ready — sources: system${micStream ? ' + mic' : ' only'}`)
+  // ── Microphone ───────────────────────────────────────────────
+  if (useMic) {
+    try {
+      const micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+      console.log(`[MayiHear] Micrófono: ${micStream.getAudioTracks()[0]?.label}`)
+
+      micAnalyser = audioContext.createAnalyser()
+      micAnalyser.fftSize = 256
+      const micSrc = audioContext.createMediaStreamSource(micStream)
+      micSrc.connect(micAnalyser)
+      micSrc.connect(destination)
+      animateMeter(micAnalyser, barMic, micFrameRef)
+    } catch (err) {
+      console.warn('[MayiHear] Micrófono no disponible — grabando solo audio del sistema:', err.message)
+      setStatus('Grabando (solo audio del sistema — micrófono no disponible)...')
+    }
+  }
+
+  const sources_desc = [useSystem ? 'sistema' : null, useMic ? 'micrófono' : null].filter(Boolean).join(' + ')
+  console.log(`[MayiHear] Stream mezclado listo — fuentes: ${sources_desc}`)
   return destination.stream
 }
 
 // ── Start recording ────────────────────────────────────────────
 async function startRecording() {
-  setStatus('Starting capture...')
+  setStatus('Iniciando captura...')
 
   let stream
   try {
     stream = await getMixedAudioStream()
   } catch (err) {
-    setStatus(`Could not access audio: ${err.message}`)
+    setStatus(`No se pudo acceder al audio: ${err.message}`)
     console.error(err)
+    // Restart preview meters after failed attempt
+    startPreviewMeters()
     return
   }
 
@@ -135,12 +265,11 @@ async function startRecording() {
 
   mediaRecorder.onstop = handleRecordingStop
 
-  mediaRecorder.start(1000) // collect chunks every 1s
+  mediaRecorder.start(1000)
   setRecordingUI(true)
   startTimer()
-  setStatus('Recording...')
+  setStatus('Grabando...')
 
-  // Clear previous outputs when starting a new recording
   hideOutputs()
 }
 
@@ -150,14 +279,15 @@ function stopRecording() {
     mediaRecorder.stop()
     mediaRecorder.stream.getTracks().forEach(t => t.stop())
   }
-  // Close the AudioContext used for mixing
+  stopMeter(micFrameRef, barMic)
+  stopMeter(systemFrameRef, barSystem)
   if (audioContext) {
     audioContext.close()
     audioContext = null
   }
   stopTimer()
   setRecordingUI(false)
-  setStatus('Processing...')
+  setStatus('Procesando...')
 }
 
 // ── After recording stops — transcribe then get insights ───────
@@ -165,10 +295,10 @@ async function handleRecordingStop() {
   const blob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' })
   const arrayBuffer = await blob.arrayBuffer()
 
-  // ── Transcription ──
-  setStatus('Transcribing...')
+  // ── Transcripción ──
+  setStatus('Transcribiendo...')
   showPanel(transcriptSection)
-  transcriptBox.textContent = 'Transcribing audio...'
+  transcriptBox.textContent = 'Transcribiendo audio...'
   transcriptBox.classList.add('loading')
 
   const transcribeResult = await window.electronAPI.transcribeAudio(arrayBuffer)
@@ -176,27 +306,33 @@ async function handleRecordingStop() {
   if (!transcribeResult.ok) {
     transcriptBox.textContent = `Error: ${transcribeResult.error}`
     transcriptBox.classList.remove('loading')
-    setStatus('Transcription failed.')
+    setStatus('Transcripción fallida.')
+    startPreviewMeters()
     return
   }
 
   const transcript = transcribeResult.text
-  console.log(`[MayiHear] Transcript received (${transcript.length} chars):`, transcript || '(empty)')
+  console.log(`[MayiHear] Transcripción recibida (${transcript.length} chars):`, transcript || '(vacío)')
 
   if (!transcript.trim()) {
-    transcriptBox.textContent = 'No speech detected. Make sure audio is playing through your speakers/headphones during the recording.'
+    transcriptBox.textContent = 'No se detectó voz. Asegúrate de que el audio se esté reproduciendo por los altavoces o auriculares durante la grabación.'
     transcriptBox.classList.remove('loading')
-    setStatus('No speech detected.')
+    setStatus('No se detectó voz.')
+    startPreviewMeters()
     return
   }
 
   transcriptBox.textContent = transcript
   transcriptBox.classList.remove('loading')
+  lastTranscript = transcript
+
+  // Mostrar botón de acta
+  actaActions.style.display = 'flex'
 
   // ── Insights ──
-  setStatus('Generating insights...')
+  setStatus('Generando insights...')
   showPanel(insightsSection)
-  insightsBox.textContent = 'Analyzing transcript...'
+  insightsBox.textContent = 'Analizando transcripción...'
   insightsBox.classList.add('loading')
 
   const context = contextInput.value.trim()
@@ -205,14 +341,125 @@ async function handleRecordingStop() {
   if (!insightsResult.ok) {
     insightsBox.textContent = `Error: ${insightsResult.error}`
     insightsBox.classList.remove('loading')
-    setStatus('Insights failed.')
+    setStatus('Insights fallidos.')
+    startPreviewMeters()
     return
   }
 
   const insightsText = insightsResult.text?.trim()
-  insightsBox.textContent = insightsText || 'Insights returned empty. Check the terminal logs for the raw API response.'
+  insightsBox.textContent = insightsText || 'Los insights devolvieron vacío. Revisa los logs del terminal para la respuesta cruda de la API.'
   insightsBox.classList.remove('loading')
-  setStatus('Done.')
+  setStatus('Listo.')
+
+  // Restart preview meters after processing
+  startPreviewMeters()
+}
+
+// ── Acta de Reunión ────────────────────────────────────────────
+generateActaBtn.addEventListener('click', async () => {
+  if (!lastTranscript) return
+
+  generateActaBtn.disabled = true
+  generateActaBtn.textContent = 'Generando...'
+  showPanel(actaSection)
+  actaBox.textContent = 'Generando acta de reunión...'
+  actaBox.classList.add('loading')
+  setStatus('Generando acta...')
+
+  const context = contextInput.value.trim()
+  const result = await window.electronAPI.generateMeetingAct(lastTranscript, context)
+
+  if (!result.ok) {
+    actaBox.textContent = `Error: ${result.error}`
+    actaBox.classList.remove('loading')
+    setStatus('Error al generar acta.')
+    generateActaBtn.disabled = false
+    generateActaBtn.textContent = 'Generar Acta de Reunión'
+    return
+  }
+
+  currentActaData = result.data
+  actaBox.textContent = formatMeetingAct(result.data)
+  actaBox.classList.remove('loading')
+  setStatus('Acta generada.')
+  generateActaBtn.disabled = false
+  generateActaBtn.textContent = 'Regenerar Acta'
+})
+
+downloadActaBtn.addEventListener('click', async () => {
+  if (!currentActaData) return
+  downloadActaBtn.textContent = 'Guardando...'
+  downloadActaBtn.disabled = true
+  const result = await window.electronAPI.downloadWord(currentActaData)
+  if (!result.ok) {
+    setStatus(`Error al guardar: ${result.error}`)
+  } else if (result.saved) {
+    setStatus('Acta guardada correctamente.')
+  }
+  downloadActaBtn.textContent = 'Descargar .docx'
+  downloadActaBtn.disabled = false
+})
+
+function formatMeetingAct(data) {
+  const lines = []
+
+  lines.push(`ACTA DE REUNIÓN`)
+  lines.push(`Reunión: ${data.nombre_reunion || '—'}`)
+  lines.push(`Fecha: ${data.fecha || '—'}`)
+
+  if (data.participantes?.length) {
+    lines.push(`Participantes: ${data.participantes.join(', ')}`)
+  }
+  lines.push('')
+
+  if (data.resumen_ejecutivo) {
+    lines.push('RESUMEN EJECUTIVO')
+    lines.push(data.resumen_ejecutivo)
+    lines.push('')
+  }
+
+  if (data.temas?.length) {
+    lines.push('TEMAS TRATADOS')
+    data.temas.forEach((t, i) => {
+      lines.push(`${i + 1}. ${t.titulo}`)
+      if (t.avances?.length) {
+        t.avances.forEach(a => lines.push(`  Avance: ${a}`))
+      }
+      if (t.bloqueantes?.length) {
+        t.bloqueantes.forEach(b => lines.push(`  Bloqueante: ${b}`))
+      }
+      if (t.aprendizajes?.length) {
+        t.aprendizajes.forEach(ap => lines.push(`  Aprendizaje: ${ap}`))
+      }
+    })
+    lines.push('')
+  }
+
+  if (data.acuerdos?.length) {
+    lines.push('ACUERDOS Y COMPROMISOS')
+    data.acuerdos.forEach(a => {
+      lines.push(a.responsable ? `• ${a.responsable}: ${a.accion}` : `• ${a.accion}`)
+    })
+    lines.push('')
+  }
+
+  if (data.riesgos?.length) {
+    lines.push('RIESGOS IDENTIFICADOS')
+    data.riesgos.forEach(r => lines.push(`• ${r}`))
+    lines.push('')
+  }
+
+  if (data.pendientes_reunion_anterior?.length) {
+    lines.push('PENDIENTES DE REUNIÓN ANTERIOR')
+    data.pendientes_reunion_anterior.forEach(p => lines.push(`• ${p}`))
+    lines.push('')
+  }
+
+  if (data.proxima_reunion) {
+    lines.push(`PRÓXIMA REUNIÓN: ${data.proxima_reunion}`)
+  }
+
+  return lines.join('\n').trim()
 }
 
 // ── UI helpers ─────────────────────────────────────────────────
@@ -223,8 +470,13 @@ function showPanel(el) {
 function hideOutputs() {
   transcriptSection.classList.remove('visible')
   insightsSection.classList.remove('visible')
+  actaSection.classList.remove('visible')
+  actaActions.style.display = 'none'
   transcriptBox.textContent = ''
   insightsBox.textContent = ''
+  actaBox.textContent = ''
+  lastTranscript = ''
+  currentActaData = null
 }
 
 // ── Record button toggle ───────────────────────────────────────
@@ -239,12 +491,22 @@ recordBtn.addEventListener('click', () => {
 // ── Copy buttons ───────────────────────────────────────────────
 copyTranscript.addEventListener('click', () => {
   navigator.clipboard.writeText(transcriptBox.textContent)
-  copyTranscript.textContent = 'Copied!'
-  setTimeout(() => { copyTranscript.textContent = 'Copy' }, 1500)
+  copyTranscript.textContent = '¡Copiado!'
+  setTimeout(() => { copyTranscript.textContent = 'Copiar' }, 1500)
+})
+
+saveTranscript.addEventListener('click', async () => {
+  const text = transcriptBox.textContent
+  if (!text) return
+  const result = await window.electronAPI.saveTranscript(text)
+  if (result.saved) {
+    saveTranscript.textContent = '¡Guardado!'
+    setTimeout(() => { saveTranscript.textContent = 'Guardar .txt' }, 2000)
+  }
 })
 
 copyInsights.addEventListener('click', () => {
   navigator.clipboard.writeText(insightsBox.textContent)
-  copyInsights.textContent = 'Copied!'
-  setTimeout(() => { copyInsights.textContent = 'Copy' }, 1500)
+  copyInsights.textContent = '¡Copiado!'
+  setTimeout(() => { copyInsights.textContent = 'Copiar' }, 1500)
 })

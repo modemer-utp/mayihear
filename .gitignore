@@ -16,6 +16,9 @@ __pycache__/
 # Experto-Tematico is a separate project
 Experto-Tematico/
 
+# Runtime data
+mayihear-api/data/
+
 # Archives
 *.rar
 *.zip

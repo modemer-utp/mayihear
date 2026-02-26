@@ -1,16 +1,16 @@
 import time
 
-from agents.insights_agent import InsightsAgent
-from domain.models.input.insights_request import InsightsRequest
-from domain.models.output.insights_result import InsightsResult
+from agents.meeting_act_agent import MeetingActAgent
+from domain.models.input.meeting_act_request import MeetingActRequest
+from domain.models.output.meeting_act_result import MeetingActResult
 
 
-class GenerateInsights:
+class GenerateMeetingAct:
 
     def __init__(self):
-        self.agent = InsightsAgent()
+        self.agent = MeetingActAgent()
 
-    def execute(self, request: InsightsRequest) -> InsightsResult:
+    def execute(self, request: MeetingActRequest) -> MeetingActResult:
         start = time.perf_counter()
         result = self.agent.invoke(
             transcript=request.transcript,

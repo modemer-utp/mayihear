@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron')
+const { app, BrowserWindow, ipcMain, desktopCapturer, dialog } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
@@ -73,6 +73,18 @@ ipcMain.handle('transcribe-audio', async (_event, audioBuffer) => {
   }
 })
 
+// Saves transcript text to a .txt file via save dialog
+ipcMain.handle('save-transcript', async (_event, text) => {
+  const { filePath, canceled } = await dialog.showSaveDialog({
+    title: 'Guardar transcripción',
+    defaultPath: `transcripcion_${Date.now()}.txt`,
+    filters: [{ name: 'Text file', extensions: ['txt'] }]
+  })
+  if (canceled || !filePath) return { saved: false }
+  fs.writeFileSync(filePath, text, 'utf-8')
+  return { saved: true, filePath }
+})
+
 // Sends transcript + context to Python API /insights/generate
 ipcMain.handle('generate-insights', async (_event, transcript, context) => {
   try {
@@ -98,6 +110,72 @@ ipcMain.handle('generate-insights', async (_event, transcript, context) => {
       ok: false,
       error: `Could not reach Python API.\nMake sure it is running:\n\n  cd mayihear-api\n  uvicorn api.main:app --port 8000\n\nError: ${err.message}`
     }
+  }
+})
+
+// Sends transcript + context to Python API /meeting-act/generate
+ipcMain.handle('generate-meeting-act', async (_event, transcript, context) => {
+  try {
+    const response = await fetch(`${API_BASE}/meeting-act/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript, user_context: context })
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      return { ok: false, error: `Meeting Act API error: ${error}` }
+    }
+
+    const data = await response.json()
+    console.log('[MayiHear] Meeting Act raw:', JSON.stringify(data, null, 2))
+    return { ok: true, data }
+
+  } catch (err) {
+    return {
+      ok: false,
+      error: `No se pudo conectar con la API Python.\nAsegúrate de que esté corriendo:\n\n  cd mayihear-api\n  uvicorn api.main:app --port 8000\n\nError: ${err.message}`
+    }
+  }
+})
+
+// Receives MeetingActResult, fetches .docx from API, saves via dialog
+ipcMain.handle('download-word', async (_event, actaData) => {
+  try {
+    const response = await fetch(`${API_BASE}/meeting-act/word`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(actaData)
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      return { ok: false, error: `Word API error: ${error}` }
+    }
+
+    const arrayBuffer = await response.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    const defaultName = actaData.fecha
+      ? `acta_${actaData.fecha.replace(/\//g, '-')}.docx`
+      : 'acta.docx'
+
+    const { filePath, canceled } = await dialog.showSaveDialog({
+      title: 'Guardar Acta de Reunión',
+      defaultPath: defaultName,
+      filters: [{ name: 'Word Document', extensions: ['docx'] }]
+    })
+
+    if (canceled || !filePath) {
+      return { ok: true, saved: false }
+    }
+
+    fs.writeFileSync(filePath, buffer)
+    console.log(`[MayiHear] Acta guardada en: ${filePath}`)
+    return { ok: true, saved: true, filePath }
+
+  } catch (err) {
+    return { ok: false, error: err.message }
   }
 })
 

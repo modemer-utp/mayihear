@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,16 +20,37 @@
     <!-- Record -->
     <div class="record-section">
       <div id="timer">00:00</div>
-      <button id="record-btn" title="Start recording">&#9679;</button>
-      <span id="status-text">Ready to record</span>
+
+      <!-- Audio source toggles + level meters -->
+      <div class="audio-sources">
+        <div class="source-toggle">
+          <label class="toggle-label">
+            <input type="checkbox" id="toggle-mic" checked />
+            <span class="toggle-pill"></span>
+            Micrófono
+          </label>
+          <div class="level-meter" id="meter-mic"><div class="level-bar" id="bar-mic"></div></div>
+        </div>
+        <div class="source-toggle">
+          <label class="toggle-label">
+            <input type="checkbox" id="toggle-system" checked />
+            <span class="toggle-pill"></span>
+            Audio del sistema
+          </label>
+          <div class="level-meter" id="meter-system"><div class="level-bar" id="bar-system"></div></div>
+        </div>
+      </div>
+
+      <button id="record-btn" title="Iniciar grabación">&#9679;</button>
+      <span id="status-text">Listo para grabar</span>
     </div>
 
     <!-- Context (always visible) -->
     <div class="context-section">
-      <span class="section-label">Meeting context (optional)</span>
+      <span class="section-label">Contexto de la reunión (opcional)</span>
       <textarea
         id="context-input"
-        placeholder="e.g. Weekly status meeting — Engineering Faculty. Focus on student retention risks and professor action items."
+        placeholder="ej. Reunión semanal de estado — Facultad de Ingeniería. Enfoque en riesgos de retención estudiantil y acciones de profesores."
         rows="2"
       ></textarea>
     </div>
@@ -37,8 +58,11 @@
     <!-- Transcript output -->
     <div class="output-section" id="transcript-section">
       <div class="output-header">
-        <span class="section-label">Transcript</span>
-        <button class="copy-btn" id="copy-transcript">Copy</button>
+        <span class="section-label">Transcripción</span>
+        <div class="output-header-actions">
+          <button class="copy-btn" id="save-transcript">Guardar .txt</button>
+          <button class="copy-btn" id="copy-transcript">Copiar</button>
+        </div>
       </div>
       <div class="output-box" id="transcript-box"></div>
     </div>
@@ -47,9 +71,23 @@
     <div class="output-section" id="insights-section">
       <div class="output-header">
         <span class="section-label">Insights</span>
-        <button class="copy-btn" id="copy-insights">Copy</button>
+        <button class="copy-btn" id="copy-insights">Copiar</button>
       </div>
       <div class="output-box" id="insights-box"></div>
+    </div>
+
+    <!-- Acta button (appears after transcription) -->
+    <div id="acta-actions" class="acta-actions" style="display:none">
+      <button id="generate-acta-btn">Generar Acta de Reunión</button>
+    </div>
+
+    <!-- Acta output panel -->
+    <div class="output-section" id="acta-section">
+      <div class="output-header">
+        <span class="section-label">Acta de Reunión</span>
+        <button class="copy-btn" id="download-acta">Descargar .docx</button>
+      </div>
+      <div class="output-box" id="acta-box"></div>
     </div>
 
   </main>
