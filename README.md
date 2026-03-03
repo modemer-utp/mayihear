@@ -1,6 +1,6 @@
 # MayiHear
 
-Meeting transcription and insights tool for UTP directors and high-rank employees. Captures system audio, transcribes it, and extracts structured summaries, decisions, and action items.
+Meeting transcription and insights tool for UTP directors and high-rank employees. Captures system audio, transcribes it, and extracts structured summaries, decisions, and action items.UTP
 
 ---
 
