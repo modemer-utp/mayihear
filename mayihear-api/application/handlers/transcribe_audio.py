@@ -73,25 +73,37 @@ class TranscribeAudio:
             tmp.write(file.file.read())
             tmp_path = tmp.name
 
+        file_size_mb = round(os.path.getsize(tmp_path) / 1024 / 1024, 1)
+        print(f"[transcribe] File received: {file_size_mb} MB ({mime_type})", flush=True)
+
         try:
             start = time.perf_counter()
 
             # Upload audio to Gemini File API (handles large files)
+            print(f"[transcribe] Uploading {file_size_mb} MB to Gemini File API...", flush=True)
+            upload_t0 = time.perf_counter()
             audio_file = self.client.files.upload(
                 file=tmp_path,
                 config={"mime_type": mime_type}
             )
+            print(f"[transcribe] Upload done in {time.perf_counter() - upload_t0:.1f}s — waiting for Gemini to process...", flush=True)
 
             # Wait until Gemini finishes processing the uploaded file
+            poll_count = 0
             while audio_file.state.name == "PROCESSING":
                 time.sleep(1)
+                poll_count += 1
+                if poll_count % 10 == 0:
+                    print(f"[transcribe] Still processing... ({poll_count}s elapsed)", flush=True)
                 audio_file = self.client.files.get(name=audio_file.name)
 
             if audio_file.state.name == "FAILED":
                 raise RuntimeError("Gemini failed to process the audio file.")
 
+            print(f"[transcribe] Gemini processing done ({poll_count}s). Requesting transcription with {TRANSCRIPTION_MODEL}...", flush=True)
             response, model_used = self._generate_with_retry(audio_file)
             processing_time = round(time.perf_counter() - start, 2)
+            print(f"[transcribe] Transcription complete in {processing_time}s using {model_used}", flush=True)
 
             # Clean up uploaded file from Gemini
             self.client.files.delete(name=audio_file.name)

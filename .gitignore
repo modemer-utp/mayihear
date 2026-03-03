@@ -19,6 +19,12 @@ Experto-Tematico/
 # Runtime data
 mayihear-api/data/
 
+# Build outputs
+dist-electron/
+mayihear-api/dist/
+mayihear-api/build/
+mayihear-api/run_built.py
+
 # Archives
 *.rar
 *.zip

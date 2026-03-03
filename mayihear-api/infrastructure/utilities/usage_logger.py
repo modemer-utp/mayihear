@@ -6,9 +6,13 @@ from typing import Literal, Optional
 
 from domain.models.output.token_usage import TokenUsage
 
-# Stored at mayihear-api/data/usage_log.json
-_BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-_LOG_PATH = os.path.join(_BASE_DIR, "data", "usage_log.json")
+# In packaged builds, MAYIHEAR_DATA_DIR is set to app.getPath('userData') by Electron.
+# In dev, falls back to mayihear-api/data/usage_log.json.
+_DATA_DIR = os.environ.get(
+    'MAYIHEAR_DATA_DIR',
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data")
+)
+_LOG_PATH = os.path.join(_DATA_DIR, "usage_log.json")
 
 
 def _load() -> list:

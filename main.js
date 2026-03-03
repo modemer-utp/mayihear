@@ -1,11 +1,108 @@
 require('dotenv').config()
 
 const { app, BrowserWindow, ipcMain, desktopCapturer, dialog } = require('electron')
+const { spawn, execSync } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
 
 const API_BASE = 'http://localhost:8000'
+
+let pythonProcess = null
+let isQuitting = false
+
+// Returns path to the bundled PyInstaller binary, or null in dev mode
+function getPythonBinaryPath() {
+  if (!app.isPackaged) return null
+  const bin = process.platform === 'win32' ? 'mayihear-api.exe' : 'mayihear-api'
+  return path.join(process.resourcesPath, 'mayihear-api', bin)
+}
+
+// Kills any process occupying port 8000 (stale from a previous crash)
+function killStaleProcess() {
+  try {
+    if (process.platform === 'win32') {
+      const out = execSync('netstat -ano -p TCP 2>nul', { encoding: 'utf-8' })
+      const match = out.split('\n').find(l => l.includes(':8000') && l.includes('LISTENING'))
+      if (match) {
+        const pid = match.trim().split(/\s+/).pop()
+        execSync(`taskkill /F /PID ${pid} /T 2>nul`)
+        console.log(`[MayiHear] Killed stale process on port 8000 (PID ${pid})`)
+      }
+    } else {
+      execSync("lsof -ti tcp:8000 | xargs -r kill -9")
+      console.log('[MayiHear] Killed stale process on port 8000')
+    }
+  } catch (_) {
+    // No stale process — normal path
+  }
+}
+
+// Polls GET /health every 500 ms up to 15 s; returns true when API is ready
+async function waitForApi() {
+  const deadline = Date.now() + 15000
+  while (Date.now() < deadline) {
+    try {
+      const res = await fetch(`${API_BASE}/health`)
+      if (res.ok) return true
+    } catch (_) {
+      // Not ready yet
+    }
+    await new Promise(r => setTimeout(r, 500))
+  }
+  return false
+}
+
+// Spawns the bundled Python binary; no-op in dev mode
+function startPythonApi() {
+  const binPath = getPythonBinaryPath()
+  if (!binPath) {
+    console.log('[MayiHear] Dev mode — start the Python API manually: uvicorn api.main:app --port 8000')
+    return
+  }
+
+  killStaleProcess()
+
+  const dataDir = app.getPath('userData')
+  console.log(`[MayiHear] Starting API binary: ${binPath}`)
+
+  pythonProcess = spawn(binPath, [], {
+    env: { ...process.env, MAYIHEAR_DATA_DIR: dataDir },
+    stdio: ['ignore', 'pipe', 'pipe'],
+    detached: false,
+  })
+
+  pythonProcess.stdout.on('data', d => console.log('[API]', d.toString().trimEnd()))
+  pythonProcess.stderr.on('data', d => console.error('[API]', d.toString().trimEnd()))
+  pythonProcess.on('exit', (code, signal) => {
+    console.log(`[MayiHear] API process exited (code=${code} signal=${signal})`)
+    pythonProcess = null
+    if (!isQuitting) {
+      console.log('[MayiHear] API crashed unexpectedly — restarting in 2s...')
+      setTimeout(startPythonApi, 2000)
+    }
+  })
+}
+
+// Terminates the Python API process
+function stopPythonApi() {
+  if (!pythonProcess) return
+  const pid = pythonProcess.pid
+  console.log(`[MayiHear] Stopping API (PID ${pid})...`)
+  try {
+    if (process.platform === 'win32') {
+      execSync(`taskkill /F /PID ${pid} /T 2>nul`)
+    } else {
+      pythonProcess.kill('SIGTERM')
+      setTimeout(() => {
+        if (pythonProcess) pythonProcess.kill('SIGKILL')
+      }, 3000)
+    }
+  } catch (err) {
+    console.error('[MayiHear] Error stopping API:', err.message)
+  }
+  pythonProcess = null
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -25,9 +122,20 @@ function createWindow() {
   win.loadFile('renderer/index.html')
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(async () => {
+  startPythonApi()
+  if (app.isPackaged) {
+    const ready = await waitForApi()
+    if (!ready) console.error('[MayiHear] API timeout — opening app anyway')
+  }
+  createWindow()
+})
+
+app.on('before-quit', () => { isQuitting = true; stopPythonApi() })
 
 app.on('window-all-closed', () => {
+  isQuitting = true
+  stopPythonApi()
   if (process.platform !== 'darwin') app.quit()
 })
 
@@ -40,6 +148,8 @@ ipcMain.handle('get-sources', async () => {
 // Receives raw audio buffer, sends to Python API /transcription/transcribe
 ipcMain.handle('transcribe-audio', async (_event, audioBuffer) => {
   const tmpPath = path.join(os.tmpdir(), `mayihear-${Date.now()}.webm`)
+  const fileSizeMB = (audioBuffer.byteLength / 1024 / 1024).toFixed(1)
+  console.log(`[MayiHear] transcribe-audio: ${fileSizeMB} MB — writing temp file...`)
 
   try {
     fs.writeFileSync(tmpPath, Buffer.from(audioBuffer))
@@ -49,10 +159,31 @@ ipcMain.handle('transcribe-audio', async (_event, audioBuffer) => {
     const formData = new FormData()
     formData.append('file', blob, 'audio.webm')
 
-    const response = await fetch(`${API_BASE}/transcription/transcribe`, {
-      method: 'POST',
-      body: formData
-    })
+    // 60-minute timeout — 50-minute recordings can take 25-35 min on Gemini
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 60 * 60 * 1000)
+
+    console.log(`[MayiHear] Sending ${fileSizeMB} MB to transcription API...`)
+    const t0 = Date.now()
+
+    let response
+    try {
+      response = await fetch(`${API_BASE}/transcription/transcribe`, {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal
+      })
+    } catch (fetchErr) {
+      const isAbort = fetchErr.name === 'AbortError' || fetchErr.cause?.name === 'AbortError'
+      if (isAbort) {
+        return { ok: false, error: `Transcription timed out after 60 minutes (file: ${fileSizeMB} MB). The recording may be too long for a single request.` }
+      }
+      throw fetchErr
+    } finally {
+      clearTimeout(timeoutId)
+    }
+
+    console.log(`[MayiHear] API responded in ${((Date.now() - t0) / 1000).toFixed(1)}s`)
 
     if (!response.ok) {
       const error = await response.text()

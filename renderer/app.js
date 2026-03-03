@@ -293,12 +293,19 @@ function stopRecording() {
 // ── After recording stops — transcribe then get insights ───────
 async function handleRecordingStop() {
   const blob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' })
+  const fileSizeMB = (blob.size / 1024 / 1024).toFixed(1)
+  const durationMin = Math.round(secondsElapsed / 60)
+  console.log(`[MayiHear] Audio blob: ${fileSizeMB} MB, ${durationMin} min (${secondsElapsed}s)`)
+
   const arrayBuffer = await blob.arrayBuffer()
 
   // ── Transcripción ──
-  setStatus('Transcribiendo...')
+  const sizeWarning = blob.size > 30 * 1024 * 1024
+    ? ` — archivo grande (${fileSizeMB} MB), puede tomar 5-15 min`
+    : ` (${fileSizeMB} MB)`
+  setStatus(`Transcribiendo${sizeWarning}...`)
   showPanel(transcriptSection)
-  transcriptBox.textContent = 'Transcribiendo audio...'
+  transcriptBox.textContent = `Transcribiendo audio (${durationMin} min, ${fileSizeMB} MB)...`
   transcriptBox.classList.add('loading')
 
   const transcribeResult = await window.electronAPI.transcribeAudio(arrayBuffer)

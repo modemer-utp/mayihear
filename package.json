@@ -5,14 +5,50 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --inspect"
+    "dev": "electron . --inspect",
+    "build:win": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win",
+    "build:mac": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac",
+    "build:linux": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --linux"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.36.0",
-    "dotenv": "^16.4.5",
-    "openai": "^4.77.0"
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
-    "electron": "^33.0.0"
+    "electron": "^33.0.0",
+    "cross-env": "^7.0.3",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "pe.edu.utp.mayihear",
+    "productName": "MayiHear",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "mayihear-api/dist/mayihear-api/",
+        "to": "mayihear-api/",
+        "filter": ["**/*"]
+      }
+    ],
+    "nsis": {
+      "include": "build-scripts/installer.nsh",
+      "allowElevation": true,
+      "differentialPackage": false
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
   }
 }
