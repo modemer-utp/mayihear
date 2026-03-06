@@ -23,3 +23,10 @@ def get_anthropic_api_key() -> str:
     if not key:
         raise RuntimeError("ANTHROPIC_API_KEY not set in .env")
     return key
+
+
+def get_monday_api_token() -> str:
+    key = os.getenv('MONDAY_API_TOKEN')
+    if not key:
+        raise RuntimeError("MONDAY_API_TOKEN not set in .env")
+    return key

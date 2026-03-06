@@ -310,6 +310,101 @@ ipcMain.handle('download-word', async (_event, actaData) => {
   }
 })
 
+// ── Monday.com IPC handlers ────────────────────────────────────
+
+ipcMain.handle('monday-get-boards', async () => {
+  try {
+    const resp = await fetch(`${API_BASE}/monday/boards`)
+    if (!resp.ok) return { ok: false, error: await resp.text() }
+    return { ok: true, data: await resp.json() }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.handle('monday-get-items', async (_event, boardId) => {
+  try {
+    const resp = await fetch(`${API_BASE}/monday/boards/${boardId}/items`)
+    if (!resp.ok) return { ok: false, error: await resp.text() }
+    return { ok: true, data: await resp.json() }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.handle('monday-get-columns', async (_event, boardId) => {
+  try {
+    const resp = await fetch(`${API_BASE}/monday/boards/${boardId}/columns`)
+    if (!resp.ok) return { ok: false, error: await resp.text() }
+    return { ok: true, data: await resp.json() }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.handle('monday-publish', async (_event, boardId, itemId, columnId, actaData) => {
+  try {
+    const content = formatActaForMonday(actaData)
+    const body = { board_id: boardId, item_id: itemId, content }
+    if (columnId) body.column_id = columnId
+
+    const resp = await fetch(`${API_BASE}/monday/publish`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+    if (!resp.ok) return { ok: false, error: await resp.text() }
+    return { ok: true }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  }
+})
+
+function formatActaForMonday(actaData) {
+  const lines = []
+  const name = actaData.nombre_reunion || 'Reunion'
+  const date = actaData.fecha || new Date().toLocaleDateString('es-PE')
+
+  lines.push(`${name} | ${date}`)
+  lines.push('')
+
+  if (actaData.resumen_ejecutivo) {
+    lines.push('RESUMEN EJECUTIVO')
+    lines.push(actaData.resumen_ejecutivo)
+    lines.push('')
+  }
+
+  if (actaData.temas?.length) {
+    lines.push('TEMAS TRATADOS')
+    actaData.temas.forEach(t => {
+      lines.push(`- ${t.titulo}`)
+      if (t.avances?.length) t.avances.forEach(a => lines.push(`  Avance: ${a}`))
+      if (t.bloqueantes?.length) t.bloqueantes.forEach(b => lines.push(`  Bloqueante: ${b}`))
+    })
+    lines.push('')
+  }
+
+  if (actaData.acuerdos?.length) {
+    lines.push('ACUERDOS Y COMPROMISOS')
+    actaData.acuerdos.forEach(a => {
+      lines.push(a.responsable ? `- ${a.responsable}: ${a.accion}` : `- ${a.accion}`)
+    })
+    lines.push('')
+  }
+
+  if (actaData.riesgos?.length) {
+    lines.push('RIESGOS')
+    actaData.riesgos.forEach(r => lines.push(`- ${r}`))
+    lines.push('')
+  }
+
+  if (actaData.proxima_reunion) {
+    lines.push(`Proxima reunion: ${actaData.proxima_reunion}`)
+  }
+
+  return lines.join('\n').trim()
+}
+
 // Formats the structured InsightsResult into readable text
 function formatInsights(data) {
   const lines = []

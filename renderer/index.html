@@ -62,6 +62,7 @@
         <div class="output-header-actions">
           <button class="copy-btn" id="save-transcript">Guardar .txt</button>
           <button class="copy-btn" id="copy-transcript">Copiar</button>
+          <button class="copy-btn" id="regenerate-btn" style="display:none">Regenerar</button>
         </div>
       </div>
       <div class="output-box" id="transcript-box"></div>
@@ -88,6 +89,30 @@
         <button class="copy-btn" id="download-acta">Descargar .docx</button>
       </div>
       <div class="output-box" id="acta-box"></div>
+    </div>
+
+    <!-- Monday.com publish panel (shown after acta is generated) -->
+    <div id="monday-section" class="monday-section" style="display:none">
+      <div class="monday-header">
+        <span class="section-label">Publicar en Monday.com</span>
+        <span id="monday-status-text" class="monday-status-text"></span>
+      </div>
+      <div class="monday-controls">
+        <div class="monday-row">
+          <select id="monday-board-select" class="monday-select">
+            <option value="">Cargando tableros...</option>
+          </select>
+          <select id="monday-item-select" class="monday-select" disabled>
+            <option value="">Seleccionar proyecto...</option>
+          </select>
+        </div>
+        <div class="monday-row">
+          <select id="monday-column-select" class="monday-select" disabled>
+            <option value="">Publicar como actualizacion</option>
+          </select>
+          <button id="monday-publish-btn" class="monday-btn" disabled>Publicar</button>
+        </div>
+      </div>
     </div>
 
   </main>

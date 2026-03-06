@@ -19,3 +19,6 @@ pydantic==2.11.9
 
 # Environment
 python-dotenv==1.0.1
+
+# Monday.com integration
+requests==2.32.3

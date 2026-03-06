@@ -1,25 +1,32 @@
 // ── Elements ──────────────────────────────────────────────────
-const recordBtn         = document.getElementById('record-btn')
-const statusText        = document.getElementById('status-text')
-const statusDot         = document.getElementById('status-dot')
-const timerEl           = document.getElementById('timer')
-const contextInput      = document.getElementById('context-input')
-const transcriptSection = document.getElementById('transcript-section')
-const transcriptBox     = document.getElementById('transcript-box')
-const insightsSection   = document.getElementById('insights-section')
-const insightsBox       = document.getElementById('insights-box')
-const copyTranscript    = document.getElementById('copy-transcript')
-const saveTranscript    = document.getElementById('save-transcript')
-const copyInsights      = document.getElementById('copy-insights')
-const actaActions       = document.getElementById('acta-actions')
-const generateActaBtn   = document.getElementById('generate-acta-btn')
-const actaSection       = document.getElementById('acta-section')
-const actaBox           = document.getElementById('acta-box')
-const downloadActaBtn   = document.getElementById('download-acta')
-const toggleMic         = document.getElementById('toggle-mic')
-const toggleSystem      = document.getElementById('toggle-system')
-const barMic            = document.getElementById('bar-mic')
-const barSystem         = document.getElementById('bar-system')
+const recordBtn           = document.getElementById('record-btn')
+const statusText          = document.getElementById('status-text')
+const statusDot           = document.getElementById('status-dot')
+const timerEl             = document.getElementById('timer')
+const contextInput        = document.getElementById('context-input')
+const transcriptSection   = document.getElementById('transcript-section')
+const transcriptBox       = document.getElementById('transcript-box')
+const insightsSection     = document.getElementById('insights-section')
+const insightsBox         = document.getElementById('insights-box')
+const copyTranscript      = document.getElementById('copy-transcript')
+const saveTranscript      = document.getElementById('save-transcript')
+const copyInsights        = document.getElementById('copy-insights')
+const regenerateBtn       = document.getElementById('regenerate-btn')
+const actaActions         = document.getElementById('acta-actions')
+const generateActaBtn     = document.getElementById('generate-acta-btn')
+const actaSection         = document.getElementById('acta-section')
+const actaBox             = document.getElementById('acta-box')
+const downloadActaBtn     = document.getElementById('download-acta')
+const toggleMic           = document.getElementById('toggle-mic')
+const toggleSystem        = document.getElementById('toggle-system')
+const barMic              = document.getElementById('bar-mic')
+const barSystem           = document.getElementById('bar-system')
+const mondaySection       = document.getElementById('monday-section')
+const mondayBoardSelect   = document.getElementById('monday-board-select')
+const mondayItemSelect    = document.getElementById('monday-item-select')
+const mondayColumnSelect  = document.getElementById('monday-column-select')
+const mondayPublishBtn    = document.getElementById('monday-publish-btn')
+const mondayStatusText    = document.getElementById('monday-status-text')
 
 // ── State ──────────────────────────────────────────────────────
 let mediaRecorder     = null
@@ -332,9 +339,29 @@ async function handleRecordingStop() {
   transcriptBox.textContent = transcript
   transcriptBox.classList.remove('loading')
   lastTranscript = transcript
+  regenerateBtn.style.display = 'inline-block'
 
-  // Mostrar botón de acta
+  await runInsights(transcript)
+
+  // Restart preview meters after processing
+  startPreviewMeters()
+}
+
+// ── Insights pipeline (reusable) ───────────────────────────────
+async function runInsights(transcript) {
+  // Reset downstream outputs
+  insightsBox.textContent = ''
+  actaBox.textContent = ''
+  insightsSection.classList.remove('visible')
+  actaSection.classList.remove('visible')
+  mondaySection.style.display = 'none'
+  mondayStatusText.textContent = ''
+  currentActaData = null
+
+  // Show acta button (always available once transcript exists)
   actaActions.style.display = 'flex'
+  generateActaBtn.disabled = false
+  generateActaBtn.textContent = 'Generar Acta de Reunión'
 
   // ── Insights ──
   setStatus('Generando insights...')
@@ -349,7 +376,6 @@ async function handleRecordingStop() {
     insightsBox.textContent = `Error: ${insightsResult.error}`
     insightsBox.classList.remove('loading')
     setStatus('Insights fallidos.')
-    startPreviewMeters()
     return
   }
 
@@ -357,9 +383,6 @@ async function handleRecordingStop() {
   insightsBox.textContent = insightsText || 'Los insights devolvieron vacío. Revisa los logs del terminal para la respuesta cruda de la API.'
   insightsBox.classList.remove('loading')
   setStatus('Listo.')
-
-  // Restart preview meters after processing
-  startPreviewMeters()
 }
 
 // ── Acta de Reunión ────────────────────────────────────────────
@@ -391,6 +414,8 @@ generateActaBtn.addEventListener('click', async () => {
   setStatus('Acta generada.')
   generateActaBtn.disabled = false
   generateActaBtn.textContent = 'Regenerar Acta'
+
+  showMondaySection()
 })
 
 downloadActaBtn.addEventListener('click', async () => {
@@ -484,7 +509,125 @@ function hideOutputs() {
   actaBox.textContent = ''
   lastTranscript = ''
   currentActaData = null
+  mondaySection.style.display = 'none'
+  mondayStatusText.textContent = ''
+  regenerateBtn.style.display = 'none'
 }
+
+regenerateBtn.addEventListener('click', async () => {
+  if (!lastTranscript) return
+  regenerateBtn.disabled = true
+  await runInsights(lastTranscript)
+  regenerateBtn.disabled = false
+})
+
+// ── Monday.com ─────────────────────────────────────────────────
+async function showMondaySection() {
+  mondaySection.style.display = 'flex'
+  mondayStatusText.textContent = ''
+  mondayPublishBtn.disabled = true
+
+  // Reset selects
+  mondayBoardSelect.innerHTML = '<option value="">Cargando tableros...</option>'
+  mondayItemSelect.innerHTML = '<option value="">Seleccionar proyecto...</option>'
+  mondayItemSelect.disabled = true
+  mondayColumnSelect.innerHTML = '<option value="">Publicar como actualizacion</option>'
+  mondayColumnSelect.disabled = true
+
+  const result = await window.electronAPI.mondayGetBoards()
+  if (!result.ok) {
+    mondayBoardSelect.innerHTML = '<option value="">Error al cargar tableros</option>'
+    mondayStatusText.textContent = result.error
+    return
+  }
+
+  mondayBoardSelect.innerHTML = '<option value="">Seleccionar tablero...</option>'
+  result.data.forEach(board => {
+    const opt = document.createElement('option')
+    opt.value = board.id
+    opt.textContent = board.name
+    mondayBoardSelect.appendChild(opt)
+  })
+}
+
+mondayBoardSelect.addEventListener('change', async () => {
+  const boardId = mondayBoardSelect.value
+  mondayItemSelect.innerHTML = '<option value="">Seleccionar proyecto...</option>'
+  mondayItemSelect.disabled = true
+  mondayColumnSelect.innerHTML = '<option value="">Publicar como actualizacion</option>'
+  mondayColumnSelect.disabled = true
+  mondayPublishBtn.disabled = true
+  mondayStatusText.textContent = ''
+
+  if (!boardId) return
+
+  mondayItemSelect.innerHTML = '<option value="">Cargando proyectos...</option>'
+  mondayColumnSelect.innerHTML = '<option value="">Cargando columnas...</option>'
+
+  const [itemsResult, colsResult] = await Promise.all([
+    window.electronAPI.mondayGetItems(boardId),
+    window.electronAPI.mondayGetColumns(boardId)
+  ])
+
+  if (!itemsResult.ok) {
+    mondayItemSelect.innerHTML = '<option value="">Error al cargar proyectos</option>'
+    mondayStatusText.textContent = itemsResult.error
+    return
+  }
+
+  mondayItemSelect.innerHTML = '<option value="">Seleccionar proyecto...</option>'
+  itemsResult.data.forEach(item => {
+    const opt = document.createElement('option')
+    opt.value = item.id
+    opt.textContent = item.name
+    mondayItemSelect.appendChild(opt)
+  })
+  mondayItemSelect.disabled = false
+
+  mondayColumnSelect.innerHTML = '<option value="">Publicar como actualizacion</option>'
+  if (colsResult.ok) {
+    const textCols = colsResult.data.filter(c => c.type === 'text' || c.type === 'long_text')
+    textCols.forEach(col => {
+      const opt = document.createElement('option')
+      opt.value = col.id
+      opt.textContent = col.title
+      mondayColumnSelect.appendChild(opt)
+    })
+    mondayColumnSelect.disabled = textCols.length === 0
+  }
+})
+
+mondayItemSelect.addEventListener('change', () => {
+  mondayPublishBtn.disabled = !mondayItemSelect.value
+})
+
+mondayPublishBtn.addEventListener('click', async () => {
+  if (!currentActaData) return
+  const boardId  = mondayBoardSelect.value
+  const itemId   = mondayItemSelect.value
+  const columnId = mondayColumnSelect.value || null
+
+  mondayPublishBtn.disabled = true
+  mondayPublishBtn.textContent = 'Publicando...'
+  mondayStatusText.textContent = ''
+
+  const result = await window.electronAPI.mondayPublish(boardId, itemId, columnId, currentActaData)
+
+  mondayPublishBtn.disabled = false
+  mondayPublishBtn.textContent = 'Publicar'
+
+  if (!result.ok) {
+    mondayStatusText.textContent = `Error: ${result.error}`
+    mondayStatusText.classList.add('error')
+    mondayStatusText.classList.remove('success')
+  } else {
+    mondayStatusText.textContent = columnId
+      ? 'Columna actualizada correctamente.'
+      : 'Actualizacion publicada en Monday.com.'
+    mondayStatusText.classList.add('success')
+    mondayStatusText.classList.remove('error')
+  }
+})
 
 // ── Record button toggle ───────────────────────────────────────
 recordBtn.addEventListener('click', () => {
