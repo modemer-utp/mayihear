@@ -1,4 +1,8 @@
-from infrastructure.monday_client import get_boards, get_items, get_columns, post_update, update_column
+from infrastructure.monday_client import (
+    get_boards, get_items, get_columns, get_board_items,
+    post_update, update_column, update_long_text_column
+)
+from infrastructure.utilities import secret_manager
 from domain.models.input.monday_publish_request import MondayPublishRequest
 from domain.models.output.monday_result import BoardInfo, ItemInfo, ColumnInfo, MondayPublishResult
 
@@ -14,12 +18,25 @@ class MondayService:
     def list_columns(self, board_id: str) -> list:
         return [ColumnInfo(id=c["id"], title=c["title"], type=c["type"]) for c in get_columns(board_id)]
 
+    def list_projects(self) -> list:
+        board_id = secret_manager.get_monday_board_id()
+        return [ItemInfo(id=str(i["id"]), name=i["name"]) for i in get_board_items(board_id)]
+
     def publish(self, request: MondayPublishRequest) -> MondayPublishResult:
         try:
             if request.column_id:
                 uid = update_column(request.board_id, request.item_id, request.column_id, request.content)
             else:
                 uid = post_update(request.item_id, request.content)
+            return MondayPublishResult(ok=True, update_id=uid)
+        except Exception as e:
+            return MondayPublishResult(ok=False, error=str(e))
+
+    def publish_acta(self, item_id: str, content: str) -> MondayPublishResult:
+        try:
+            board_id  = secret_manager.get_monday_board_id()
+            column_id = secret_manager.get_monday_column_id()
+            uid = update_long_text_column(board_id, item_id, column_id, content)
             return MondayPublishResult(ok=True, update_id=uid)
         except Exception as e:
             return MondayPublishResult(ok=False, error=str(e))

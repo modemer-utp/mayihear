@@ -6,13 +6,13 @@ from domain.models.output.token_usage import TokenUsage
 
 class ActionItem(BaseModel):
     person: Optional[str] = None
-    task: str
+    task: Optional[str] = None
 
 
 class InsightsResult(BaseModel):
-    summary: List[str]
-    decisions: List[str]
-    action_items: List[ActionItem]
-    open_questions: List[str]
+    summary: List[str] = []
+    decisions: List[str] = []
+    action_items: List[ActionItem] = []
+    open_questions: List[str] = []
     usage: Optional[TokenUsage] = None
     processing_time_seconds: Optional[float] = None

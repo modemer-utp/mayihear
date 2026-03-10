@@ -6,10 +6,17 @@ const path = require('path')
 const fs = require('fs')
 const os = require('os')
 
-const API_BASE = 'http://localhost:8000'
+const API_BASE = 'http://localhost:8001'
+const RECORDINGS_DIR = path.join(__dirname, 'recordings')
 
 let pythonProcess = null
 let isQuitting = false
+
+// Ensure recordings folder exists
+if (!fs.existsSync(RECORDINGS_DIR)) {
+  fs.mkdirSync(RECORDINGS_DIR, { recursive: true })
+  console.log(`[MayiHear] Created recordings folder: ${RECORDINGS_DIR}`)
+}
 
 // Returns path to the bundled PyInstaller binary, or null in dev mode
 function getPythonBinaryPath() {
@@ -23,7 +30,7 @@ function killStaleProcess() {
   try {
     if (process.platform === 'win32') {
       const out = execSync('netstat -ano -p TCP 2>nul', { encoding: 'utf-8' })
-      const match = out.split('\n').find(l => l.includes(':8000') && l.includes('LISTENING'))
+      const match = out.split('\n').find(l => l.includes(':8001') && l.includes('LISTENING'))
       if (match) {
         const pid = match.trim().split(/\s+/).pop()
         execSync(`taskkill /F /PID ${pid} /T 2>nul`)
@@ -57,7 +64,7 @@ async function waitForApi() {
 function startPythonApi() {
   const binPath = getPythonBinaryPath()
   if (!binPath) {
-    console.log('[MayiHear] Dev mode — start the Python API manually: uvicorn api.main:app --port 8000')
+    console.log('[MayiHear] Dev mode — start the Python API manually: uvicorn api.main:app --port 8001')
     return
   }
 
@@ -145,62 +152,87 @@ ipcMain.handle('get-sources', async () => {
   return sources.map(s => ({ id: s.id, name: s.name }))
 })
 
-// Receives raw audio buffer, sends to Python API /transcription/transcribe
-ipcMain.handle('transcribe-audio', async (_event, audioBuffer) => {
-  const tmpPath = path.join(os.tmpdir(), `mayihear-${Date.now()}.webm`)
+// Receives raw audio buffer, saves to recordings folder, starts chunked transcription job, polls for result
+ipcMain.handle('transcribe-audio', async (event, audioBuffer) => {
   const fileSizeMB = (audioBuffer.byteLength / 1024 / 1024).toFixed(1)
-  console.log(`[MayiHear] transcribe-audio: ${fileSizeMB} MB — writing temp file...`)
+  console.log(`[MayiHear] transcribe-audio: ${fileSizeMB} MB`)
 
   try {
-    fs.writeFileSync(tmpPath, Buffer.from(audioBuffer))
+    // Save to recordings folder
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+    const savedPath = path.join(RECORDINGS_DIR, `recording_${timestamp}.webm`)
+    fs.writeFileSync(savedPath, Buffer.from(audioBuffer))
+    console.log(`[MayiHear] Recording saved: ${savedPath} (${fileSizeMB} MB)`)
 
-    const fileBuffer = fs.readFileSync(tmpPath)
-    const blob = new Blob([fileBuffer], { type: 'audio/webm' })
-    const formData = new FormData()
-    formData.append('file', blob, 'audio.webm')
+    // Start background transcription job — returns immediately with job_id
+    const startResp = await fetch(`${API_BASE}/transcription/transcribe-file`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_path: savedPath })
+    })
+    if (!startResp.ok) {
+      const err = await startResp.text()
+      return { ok: false, error: `Transcription API error: ${err}` }
+    }
+    const { job_id } = await startResp.json()
+    console.log(`[MayiHear] Transcription job started: ${job_id}`)
 
-    // 60-minute timeout — 50-minute recordings can take 25-35 min on Gemini
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 60 * 60 * 1000)
+    // Poll status every 5s, send progress updates to renderer
+    const POLL_INTERVAL = 5000
+    const MAX_WAIT_MS = 4 * 60 * 60 * 1000  // 4 hours max
+    const deadline = Date.now() + MAX_WAIT_MS
 
-    console.log(`[MayiHear] Sending ${fileSizeMB} MB to transcription API...`)
-    const t0 = Date.now()
+    while (Date.now() < deadline) {
+      await new Promise(r => setTimeout(r, POLL_INTERVAL))
 
-    let response
-    try {
-      response = await fetch(`${API_BASE}/transcription/transcribe`, {
-        method: 'POST',
-        body: formData,
-        signal: controller.signal
-      })
-    } catch (fetchErr) {
-      const isAbort = fetchErr.name === 'AbortError' || fetchErr.cause?.name === 'AbortError'
-      if (isAbort) {
-        return { ok: false, error: `Transcription timed out after 60 minutes (file: ${fileSizeMB} MB). The recording may be too long for a single request.` }
+      let status
+      try {
+        const statusResp = await fetch(`${API_BASE}/transcription/status/${job_id}`)
+        if (!statusResp.ok) {
+          console.warn(`[MayiHear] Status poll failed: ${statusResp.status}`)
+          continue
+        }
+        status = await statusResp.json()
+      } catch (pollErr) {
+        console.warn(`[MayiHear] Poll error (API down?): ${pollErr.message}`)
+        continue
       }
-      throw fetchErr
-    } finally {
-      clearTimeout(timeoutId)
+
+      // Send progress to renderer
+      event.sender.send('transcribe-progress', {
+        chunks_done: status.chunks_done,
+        total_chunks: status.total_chunks
+      })
+
+      if (status.status === 'done') {
+        console.log(`[MayiHear] Job ${job_id} done — ${status.text?.length} chars`)
+        return { ok: true, text: status.text, savedPath }
+      }
+      if (status.status === 'error') {
+        return { ok: false, error: status.error || 'Transcription failed' }
+      }
     }
 
-    console.log(`[MayiHear] API responded in ${((Date.now() - t0) / 1000).toFixed(1)}s`)
-
-    if (!response.ok) {
-      const error = await response.text()
-      return { ok: false, error: `Transcription API error: ${error}` }
-    }
-
-    const data = await response.json()
-    console.log('[MayiHear] Transcript:', data.text?.slice(0, 200) || '(empty)')
-    return { ok: true, text: data.text }
+    return { ok: false, error: `Transcription timed out after 4 hours. Recording saved at: ${savedPath}` }
 
   } catch (err) {
     return {
       ok: false,
-      error: `Could not reach Python API.\nMake sure it is running:\n\n  cd mayihear-api\n  uvicorn api.main:app --port 8000\n\nError: ${err.message}`
+      error: `Could not reach Python API.\nMake sure it is running:\n\n  cd mayihear-api\n  uvicorn api.main:app --port 8001\n\nError: ${err.message}`
     }
-  } finally {
-    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath)
+  }
+})
+
+// Returns the list of saved recordings in the recordings folder
+ipcMain.handle('list-recordings', async () => {
+  try {
+    const files = fs.readdirSync(RECORDINGS_DIR)
+      .filter(f => f.endsWith('.webm'))
+      .map(f => ({ name: f, path: path.join(RECORDINGS_DIR, f) }))
+      .sort((a, b) => b.name.localeCompare(a.name))
+    return { ok: true, files }
+  } catch (err) {
+    return { ok: false, error: err.message }
   }
 })
 
@@ -239,7 +271,7 @@ ipcMain.handle('generate-insights', async (_event, transcript, context) => {
   } catch (err) {
     return {
       ok: false,
-      error: `Could not reach Python API.\nMake sure it is running:\n\n  cd mayihear-api\n  uvicorn api.main:app --port 8000\n\nError: ${err.message}`
+      error: `Could not reach Python API.\nMake sure it is running:\n\n  cd mayihear-api\n  uvicorn api.main:app --port 8001\n\nError: ${err.message}`
     }
   }
 })
@@ -265,7 +297,7 @@ ipcMain.handle('generate-meeting-act', async (_event, transcript, context) => {
   } catch (err) {
     return {
       ok: false,
-      error: `No se pudo conectar con la API Python.\nAsegúrate de que esté corriendo:\n\n  cd mayihear-api\n  uvicorn api.main:app --port 8000\n\nError: ${err.message}`
+      error: `No se pudo conectar con la API Python.\nAsegúrate de que esté corriendo:\n\n  cd mayihear-api\n  uvicorn api.main:app --port 8001\n\nError: ${err.message}`
     }
   }
 })
@@ -311,6 +343,42 @@ ipcMain.handle('download-word', async (_event, actaData) => {
 })
 
 // ── Monday.com IPC handlers ────────────────────────────────────
+
+ipcMain.handle('monday-get-projects', async () => {
+  try {
+    const resp = await fetch(`${API_BASE}/monday/projects`)
+    if (!resp.ok) return { ok: false, error: await resp.text() }
+    return { ok: true, data: await resp.json() }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.handle('monday-publish-acta', async (_event, itemId, actaData) => {
+  try {
+    const content = formatActaForMonday(actaData)
+    const resp = await fetch(`${API_BASE}/monday/publish-acta`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item_id: itemId, content })
+    })
+    if (!resp.ok) return { ok: false, error: await resp.text() }
+    return { ok: true }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.handle('load-transcript-file', async () => {
+  const { filePath, canceled } = await dialog.showOpenDialog({
+    title: 'Cargar transcripcion',
+    filters: [{ name: 'Text file', extensions: ['txt'] }],
+    properties: ['openFile']
+  })
+  if (canceled || !filePath) return { ok: false }
+  const text = fs.readFileSync(filePath[0], 'utf-8')
+  return { ok: true, text }
+})
 
 ipcMain.handle('monday-get-boards', async () => {
   try {

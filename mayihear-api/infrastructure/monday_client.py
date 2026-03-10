@@ -62,6 +62,40 @@ def post_update(item_id: str, body: str) -> str:
     return str(_gql(mutation, {"item_id": item_id, "body": body})["create_update"]["id"])
 
 
+def get_board_items(board_id: str) -> list:
+    query = """
+    query($ids: [ID!]!) {
+      boards(ids: $ids) {
+        items_page(limit: 200) {
+          items { id name }
+        }
+      }
+    }
+    """
+    data = _gql(query, {"ids": [board_id]})
+    return data["boards"][0]["items_page"]["items"]
+
+
+def update_long_text_column(board_id: str, item_id: str, column_id: str, text: str) -> str:
+    import json as _json
+    mutation = """
+    mutation($board_id: ID!, $item_id: ID!, $column_id: String!, $value: JSON!) {
+      change_column_value(
+        board_id: $board_id
+        item_id: $item_id
+        column_id: $column_id
+        value: $value
+      ) { id }
+    }
+    """
+    return str(_gql(mutation, {
+        "board_id": board_id,
+        "item_id": item_id,
+        "column_id": column_id,
+        "value": _json.dumps({"text": text}),
+    })["change_column_value"]["id"])
+
+
 def update_column(board_id: str, item_id: str, column_id: str, value: str) -> str:
     mutation = """
     mutation($board_id: ID!, $item_id: ID!, $column_id: String!, $value: String!) {

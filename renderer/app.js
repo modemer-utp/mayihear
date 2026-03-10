@@ -21,12 +21,15 @@ const toggleMic           = document.getElementById('toggle-mic')
 const toggleSystem        = document.getElementById('toggle-system')
 const barMic              = document.getElementById('bar-mic')
 const barSystem           = document.getElementById('bar-system')
+const projectPreSelect    = document.getElementById('project-pre-select')
 const mondaySection       = document.getElementById('monday-section')
-const mondayBoardSelect   = document.getElementById('monday-board-select')
-const mondayItemSelect    = document.getElementById('monday-item-select')
-const mondayColumnSelect  = document.getElementById('monday-column-select')
+const mondayProjectSelect = document.getElementById('monday-project-select')
 const mondayPublishBtn    = document.getElementById('monday-publish-btn')
 const mondayStatusText    = document.getElementById('monday-status-text')
+const importTextarea      = document.getElementById('import-textarea')
+const loadTxtBtn          = document.getElementById('load-txt-btn')
+const clearImportBtn      = document.getElementById('clear-import-btn')
+const generateFromTextBtn = document.getElementById('generate-from-text-btn')
 
 // ── State ──────────────────────────────────────────────────────
 let mediaRecorder     = null
@@ -150,6 +153,36 @@ function stopPreviewMeters() {
   micAnalyser = null
   systemAnalyser = null
 }
+
+// Listen for chunked transcription progress from main process
+window.electronAPI.onTranscribeProgress(({ chunks_done, total_chunks }) => {
+  if (total_chunks > 0) {
+    const msg = `Transcribiendo fragmento ${chunks_done} de ${total_chunks}...`
+    setStatus(msg)
+    transcriptBox.textContent = msg + '\nLa grabacion fue guardada como backup en recordings/.'
+  }
+})
+
+// Load Monday.com projects on startup — retries until API is ready
+async function loadProjectsWithRetry(attemptsLeft = 10) {
+  const result = await window.electronAPI.mondayGetProjects()
+  if (!result.ok) {
+    if (attemptsLeft > 1) {
+      setTimeout(() => loadProjectsWithRetry(attemptsLeft - 1), 1500)
+    } else {
+      projectPreSelect.innerHTML = '<option value="">Sin conexion — reinicia la app</option>'
+    }
+    return
+  }
+  projectPreSelect.innerHTML = '<option value="">Seleccionar proyecto...</option>'
+  result.data.forEach(item => {
+    const opt = document.createElement('option')
+    opt.value = item.id
+    opt.textContent = item.name
+    projectPreSelect.appendChild(opt)
+  })
+}
+loadProjectsWithRetry()
 
 // Start preview meters on load
 startPreviewMeters()
@@ -307,12 +340,17 @@ async function handleRecordingStop() {
   const arrayBuffer = await blob.arrayBuffer()
 
   // ── Transcripción ──
-  const sizeWarning = blob.size > 30 * 1024 * 1024
-    ? ` — archivo grande (${fileSizeMB} MB), puede tomar 5-15 min`
-    : ` (${fileSizeMB} MB)`
+  let sizeWarning
+  if (blob.size > 200 * 1024 * 1024)
+    sizeWarning = ` — grabacion muy larga (${fileSizeMB} MB), puede tomar 60-90 min`
+  else if (blob.size > 30 * 1024 * 1024)
+    sizeWarning = ` — archivo grande (${fileSizeMB} MB), puede tomar 15-40 min`
+  else
+    sizeWarning = ` (${fileSizeMB} MB)`
+
   setStatus(`Transcribiendo${sizeWarning}...`)
   showPanel(transcriptSection)
-  transcriptBox.textContent = `Transcribiendo audio (${durationMin} min, ${fileSizeMB} MB)...`
+  transcriptBox.textContent = `Transcribiendo audio (${durationMin} min, ${fileSizeMB} MB)...\nEsto puede tomar bastante tiempo para grabaciones largas. La grabacion fue guardada como backup en la carpeta recordings/.`
   transcriptBox.classList.add('loading')
 
   const transcribeResult = await window.electronAPI.transcribeAudio(arrayBuffer)
@@ -326,6 +364,9 @@ async function handleRecordingStop() {
   }
 
   const transcript = transcribeResult.text
+  if (transcribeResult.savedPath) {
+    console.log(`[MayiHear] Audio backup: ${transcribeResult.savedPath}`)
+  }
   console.log(`[MayiHear] Transcripción recibida (${transcript.length} chars):`, transcript || '(vacío)')
 
   if (!transcript.trim()) {
@@ -522,96 +563,29 @@ regenerateBtn.addEventListener('click', async () => {
 })
 
 // ── Monday.com ─────────────────────────────────────────────────
-async function showMondaySection() {
+function showMondaySection() {
   mondaySection.style.display = 'flex'
   mondayStatusText.textContent = ''
-  mondayPublishBtn.disabled = true
 
-  // Reset selects
-  mondayBoardSelect.innerHTML = '<option value="">Cargando tableros...</option>'
-  mondayItemSelect.innerHTML = '<option value="">Seleccionar proyecto...</option>'
-  mondayItemSelect.disabled = true
-  mondayColumnSelect.innerHTML = '<option value="">Publicar como actualizacion</option>'
-  mondayColumnSelect.disabled = true
-
-  const result = await window.electronAPI.mondayGetBoards()
-  if (!result.ok) {
-    mondayBoardSelect.innerHTML = '<option value="">Error al cargar tableros</option>'
-    mondayStatusText.textContent = result.error
-    return
-  }
-
-  mondayBoardSelect.innerHTML = '<option value="">Seleccionar tablero...</option>'
-  result.data.forEach(board => {
-    const opt = document.createElement('option')
-    opt.value = board.id
-    opt.textContent = board.name
-    mondayBoardSelect.appendChild(opt)
-  })
+  // Mirror options from the pre-selector (already loaded at startup)
+  mondayProjectSelect.innerHTML = projectPreSelect.innerHTML
+  mondayProjectSelect.value = projectPreSelect.value
+  mondayPublishBtn.disabled = !mondayProjectSelect.value
 }
 
-mondayBoardSelect.addEventListener('change', async () => {
-  const boardId = mondayBoardSelect.value
-  mondayItemSelect.innerHTML = '<option value="">Seleccionar proyecto...</option>'
-  mondayItemSelect.disabled = true
-  mondayColumnSelect.innerHTML = '<option value="">Publicar como actualizacion</option>'
-  mondayColumnSelect.disabled = true
-  mondayPublishBtn.disabled = true
+mondayProjectSelect.addEventListener('change', () => {
+  mondayPublishBtn.disabled = !mondayProjectSelect.value
   mondayStatusText.textContent = ''
-
-  if (!boardId) return
-
-  mondayItemSelect.innerHTML = '<option value="">Cargando proyectos...</option>'
-  mondayColumnSelect.innerHTML = '<option value="">Cargando columnas...</option>'
-
-  const [itemsResult, colsResult] = await Promise.all([
-    window.electronAPI.mondayGetItems(boardId),
-    window.electronAPI.mondayGetColumns(boardId)
-  ])
-
-  if (!itemsResult.ok) {
-    mondayItemSelect.innerHTML = '<option value="">Error al cargar proyectos</option>'
-    mondayStatusText.textContent = itemsResult.error
-    return
-  }
-
-  mondayItemSelect.innerHTML = '<option value="">Seleccionar proyecto...</option>'
-  itemsResult.data.forEach(item => {
-    const opt = document.createElement('option')
-    opt.value = item.id
-    opt.textContent = item.name
-    mondayItemSelect.appendChild(opt)
-  })
-  mondayItemSelect.disabled = false
-
-  mondayColumnSelect.innerHTML = '<option value="">Publicar como actualizacion</option>'
-  if (colsResult.ok) {
-    const textCols = colsResult.data.filter(c => c.type === 'text' || c.type === 'long_text')
-    textCols.forEach(col => {
-      const opt = document.createElement('option')
-      opt.value = col.id
-      opt.textContent = col.title
-      mondayColumnSelect.appendChild(opt)
-    })
-    mondayColumnSelect.disabled = textCols.length === 0
-  }
-})
-
-mondayItemSelect.addEventListener('change', () => {
-  mondayPublishBtn.disabled = !mondayItemSelect.value
+  projectPreSelect.value = mondayProjectSelect.value
 })
 
 mondayPublishBtn.addEventListener('click', async () => {
-  if (!currentActaData) return
-  const boardId  = mondayBoardSelect.value
-  const itemId   = mondayItemSelect.value
-  const columnId = mondayColumnSelect.value || null
-
+  if (!currentActaData || !mondayProjectSelect.value) return
   mondayPublishBtn.disabled = true
   mondayPublishBtn.textContent = 'Publicando...'
   mondayStatusText.textContent = ''
 
-  const result = await window.electronAPI.mondayPublish(boardId, itemId, columnId, currentActaData)
+  const result = await window.electronAPI.mondayPublishActa(mondayProjectSelect.value, currentActaData)
 
   mondayPublishBtn.disabled = false
   mondayPublishBtn.textContent = 'Publicar'
@@ -621,12 +595,50 @@ mondayPublishBtn.addEventListener('click', async () => {
     mondayStatusText.classList.add('error')
     mondayStatusText.classList.remove('success')
   } else {
-    mondayStatusText.textContent = columnId
-      ? 'Columna actualizada correctamente.'
-      : 'Actualizacion publicada en Monday.com.'
+    mondayStatusText.textContent = 'Acta publicada en Monday.com correctamente.'
     mondayStatusText.classList.add('success')
     mondayStatusText.classList.remove('error')
   }
+})
+
+// ── Import transcription ────────────────────────────────────────
+importTextarea.addEventListener('input', () => {
+  const hasText = importTextarea.value.trim().length > 0
+  generateFromTextBtn.disabled = !hasText
+  clearImportBtn.style.display = hasText ? 'inline-block' : 'none'
+})
+
+loadTxtBtn.addEventListener('click', async () => {
+  const result = await window.electronAPI.loadTranscriptFile()
+  if (!result.ok) return
+  importTextarea.value = result.text
+  importTextarea.dispatchEvent(new Event('input'))
+})
+
+clearImportBtn.addEventListener('click', () => {
+  importTextarea.value = ''
+  importTextarea.dispatchEvent(new Event('input'))
+})
+
+generateFromTextBtn.addEventListener('click', async () => {
+  const text = importTextarea.value.trim()
+  if (!text) return
+
+  generateFromTextBtn.disabled = true
+  generateFromTextBtn.textContent = 'Generando...'
+
+  // Show transcript panel with the imported text
+  lastTranscript = text
+  transcriptBox.textContent = text
+  transcriptBox.classList.remove('loading')
+  showPanel(transcriptSection)
+  regenerateBtn.style.display = 'inline-block'
+
+  await runInsights(text)
+  startPreviewMeters()
+
+  generateFromTextBtn.disabled = false
+  generateFromTextBtn.textContent = 'Generar Insights desde texto'
 })
 
 // ── Record button toggle ───────────────────────────────────────

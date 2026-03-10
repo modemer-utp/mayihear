@@ -1,0 +1,713 @@
+0: Archivo de audio
+1: Emergentes Gabi-20260302_120729-Grabación de la reunión.mp3
+3: Transcripción
+4: 00:00:01 Gabriela
+5: Desde el área, el primer digamoscito donde se definen las evaluaciones de los estudiantes, excepto en el sílabo, donde se especifican donde se especifica cuál cuál va a ser la forma de evaluar cada uno de los cursos.
+6: 00:00:18 Gabriela
+7: no?
+8: 00:00:18 Gabriela
+9: Entonces nosotros tenemos una serie de elementos de evaluación, tenemos una guía donde se donde se colocan los elementos de evaluación posibles de utilizarse.
+10: 00:00:28 Gabriela
+11: y en la definición del sílabo el director según el aprendizaje de cada curso selecciona cuál es el sistema más ideal, ¿No?
+12: 00:00:35 Gabriela
+13: Ya sea cuáles son los elementos, los pesos de evaluación, las semanas de evaluación y alguna otra observación adicional que se que se requiera precisar.
+14: 00:00:45 Gabriela
+15: Ahorita actualmente estamos trabajando mucho eh la forma de la evaluación si si es una evaluación individual, grupal o flexible ¿No?
+16: 00:00:51 Gabriela
+17: Que es así como que les pensamos a los directores que que esos puntos y los señalen y adicionalmente pueden alguna otra precisión
+18: 00:00:58 Gabriela
+19: De si la evaluación va a requerir algún otro tipo de requerimiento para el estudiante, ¿no?
+20: 00:01:02 Gabriela
+21: Entonces, ese es el primer, digamos, este hito de definición de los sistemas de evaluación y esos sistemas de evaluación.
+22: 00:01:09 Gabriela
+23: Además, en algunos casos, hay sistemas que tienen reglas de reemplazo que ya están, que ya están dadas por el sistema, el sistema de del portal del estudiante, el portal donde se suben las notas.
+24: 00:01:21 Gabriela
+25: Que ya están como configuradas así, ¿no?
+26: 00:01:23 Gabriela
+27: Entonces hay ciertas evaluaciones que la evaluación también puede reemplazar sus notas si es la prueba.
+28: 00:01:28 Gabriela
+29: Esto se hace de todo en las PCs, cuando el sistema de evaluación está compuesto por PCs y examen final.
+30: 00:01:34 Gabriela
+31: Si el alumno deja de dar una PC, está es reemplazado automáticamente por la nota del examen final.
+32: 00:01:40 Gabriela
+33: Y lo mismo el examen final cuando el sistema de evaluación tiene examen final, si el alumno lo da, tiene una opción de dar el examen rezagado que reemplazaría la nota del examen final.
+34: 00:01:50 Gabriela
+35: Y en el caso de que también tenga una PC no dada, también reemplazaría la nota de la PC, ¿no?
+36: 00:01:55 Gabriela
+37: Es un reglamento que ya está configurado y aplica.
+38: 00:01:58 Gabriela
+39: El alumno quiere, no quiere decir, igual se aplica porque está dado de esa manera.
+40: 00:02:03 Gabriela
+41: Ahora, eso solamente es para una evaluación no dada.
+42: 00:02:05 Gabriela
+43: Si el alumno, si el curso tiene 3 evaluaciones, 3 PCs y no da las 3, igual la nota solamente le va a reemplazar una nada más, ¿no?
+44: 00:02:13 Gabriela
+45: No sé si se tiene alguna duda con los sistemas de evaluación.
+46: 00:02:18 Alessandra
+47: ¿Esos sistemas los diseñan ustedes o ya vienen de otra área de evaluaciones o algo así?
+48: 00:02:25 Gabriela
+49: No, en realidad quien diseña el sistema más es el director.
+50: 00:02:28 Gabriela
+51: Nosotros hemos definido lineamientos, como les decía de cuáles son los elementos que pueden utilizar, porque antes, como hace más de un año, había demasiados elementos de evaluación posibles de utilizarse y había traslape entre algunos, porque como hicimos una definición de cada elemento.
+52: 00:02:45 Gabriela
+53: Habían elementos que eran muy similares o elementos que eran también muy genéricos al momento de elegirlos.
+54: 00:02:51 Gabriela
+55: Entonces hicimos una limpieza y nos quedamos con ciertos elementos y además vamos a pasar unos lineamientos básicos, como por ejemplo el sistema de evaluación tiene que sumar 100% el sistema de evaluación.
+56: 00:03:01 Gabriela
+57: Se sugiere que no sean tantos elementos entre 6 y 7 dependiendo del.
+58: 00:03:08 Gabriela
+59: del curso, por la cantidad de unidades del curso, entre otros elementos.
+60: 00:03:12 Gabriela
+61: Entonces, esos lineamientos nos hemos puesto para que el director pueda diseñar sus sistemas, pero ya los sistemas están creados, o sea, en algún momento el director creó esos sistemas y ya están creados.
+62: 00:03:22 Gabriela
+63: Lo que está faltando es este para cursos nuevos, por ejemplo, ahí el director sí tiene que crear un sistema nuevo.
+64: 00:03:29 Gabriela
+65: Ahora, hay un tema importante que a partir de este año todo el tema de
+66: 00:03:34 Gabriela
+67: Todos los temas de evaluación también van a ser este validados por el equipo de evaluación de aprendizajes, como el sistema de evaluación es parte del sílabo, porque gestión curricular tiene a cargo, digamos, esta labor, pero a partir de este año también se va a sumar el equipo de Erika para la parte de validación del sistema.
+68: 00:03:50 Gabriela
+69: Entonces ellos han diseñado los lineamientos que ya teníamos de GC han diseñado unos lineamientos más específicos para darles pautas al director de cómo saber qué elemento elegir, si tu aprendizaje es más orientado, por ejemplo, la práctica.
+70: 00:04:03 Gabriela
+71: sugerimos estos y tu aprendizaje está al diseño de un material etcétera te sugerimos estos tipos de elementos ¿No?
+72: 00:04:10 Gabriela
+73: Han complementado los elementos ecosistentes ahora?
+74: 00:04:14 Alessandra
+75: Ya eso sabes si eso ya lo o sea si eso ya está público en algún lado para preguntarle a Erika en todo caso que me lo.
+76: 00:04:21 Gabriela
+77: Eh no sé si esté en público pero ahorita lo vamos a incluir en la capacitación como ya vamos a empezar a trabajar los sílados en
+78: 00:04:29 Gabriela
+79: por ejemplo el equipo de CI que es el primer equipo que está empezando con el diseño de carpetas, la primera etapa están los sílabos y hemos incluido en la capacitación que normalmente hacíamos de sílabos, en la sesión de evaluaciones hemos agregado estos requerimientos adicionales que el equipo de Erika ha trabajado.
+80: 00:04:44 Gabriela
+81: Entonces se lo podrían pedir mejor directamente a ella porque no sé si aparte de la capacitación los haya puesto en algún otro lugar.
+82: 00:04:51 Alessandra
+83: Ya, entiendo.
+84: 00:04:55 Alessandra
+85: Y entonces tu equipo se encarga más del sílabo como
+86: 00:04:59 Alessandra
+87: Un todo, digamos, no solamente evaluaciones en eso entre el equipo de Erika.
+88: 00:05:03 Alessandra
+89: .
+90: 00:05:03 Alessandra
+91: Cuéntame un poco cómo hacen que, por ejemplo, haya esta interrelación entre el logro principal del curso, los logros como por unidad y las competencias de la carrera, porque ahí yo creo que es un nivel que más arriba, ¿no?
+92: 00:05:19 Gabriela
+93: Sí, de hecho, claro, ese es un nivel antes de empezar la evaluación, no nosotros, nosotros tenemos una matriz de definición de competencias.
+94: 00:05:29 Gabriela
+95: Las carreras de la universidad tienen competencias generales y competencias específicas del programa.
+96: 00:05:35 Gabriela
+97: Entonces, cuando se definieron las carreras para definir los cursos, nosotros nos aseguramos de que cada curso tenga un aprendizaje final, o sea un resultado, un resultado final que articule con la competencia.
+98: 00:05:53 Gabriela
+99: Entonces, esta definición de estos resultados lo hacemos junto con el director de diseño.
+100: 00:05:58 Gabriela
+101: Y de esa manera paralizamos la alineación, competencia, curso de la carrera.
+102: 00:06:03 Gabriela
+103: La idea es que todos los cursos estén asociados a uno o más competencias.
+104: 00:06:08 Gabriela
+105: Y para eso, como digo, realizamos mucho logro general.
+106: 00:06:11 Gabriela
+107: Esto de acá lo tenemos en una matriz de alineación que se llama matriz de atención de competencias, donde están competencias y cursos.
+108: 00:06:18 Gabriela
+109: Una vez definida esa etapa y al momento de diseñar el sílabo, al momento de definir los logros de unidad, hacemos la misma alineación, así como hemos alineado competencias, cursos,
+110: 00:06:27 Gabriela
+111: La siguiente alineación que hay que hacer es curso, logros de unidad, y para eso seguimos también en los lineamientos de sílagos también hay precisiones para saber cómo garantizar que los logros guarden coherencia entre sí, porque tiene que haber una secuencia lógica de aprendizaje y una lógica también global de esos logros contra el logro de aprendizaje general.
+112: 00:06:50 Alessandra
+113: ¿Tú crees que podemos ver esos lineamientos si me los puedes pasar para revisarlos?
+114: 00:06:58 Gabriela
+115: Sí, les puedo pasar el lineamiento de sílabos donde están todas las secciones y para que puedan ahondar en todo caso en las de logros de unidad y logros generales del curso.
+116: 00:07:08 Alessandra
+117: Sería lo máximo.
+118: 00:07:10 Alessandra
+119: Y de ahí, Gaby, no sé si tú también o si tu equipo se mete, digamos, ok, ya tenemos como el curso alineado, tenemos las competencias, tenemos los logros de las unidades, todo como corresponde uno al otro.
+120: 00:07:26 Alessandra
+121: No sé si ahí tú entras a ver lo que ya es la creación de las evaluaciones como tal, o sea, ¿cómo eso se trasplanta a una consigna a veces a una rúbrica o a un instrumento de evaluación.
+122: 00:07:37 Gabriela
+123: Actualmente ganó, lo que pasa es que el año antepasado, antes sí lo hacía, ¿no?
+124: 00:07:42 Gabriela
+125: para ciertos puntos nada más para los cursos evidentes que son los cursos que evalúan al final las competencias, pero desde el año hace dos años hicimos una
+126: 00:07:53 Gabriela
+127: Digamos una fusión con el equipo de Erika de evaluaciones que ellos también diseñaban consignas, instrumentos de evaluación para otros tipos de costos como los tratadores.
+128: 00:08:02 Gabriela
+129: Entonces identificamos que había este común entre ambos equipos, así que el proceso de creación de carpeta que le llamamos, que dentro de eso está la creación de instrumentos, entre otros elementos.
+130: 00:08:13 Gabriela
+131: Fusionamos un proceso hacia afuera donde jalamos gente de ambos equipos, no es un curricular de evaluación para que hagan el proceso juntos y ya no cada uno por su lado y atiendan.
+132: 00:08:23 Gabriela
+133: Cualquier tipo de curso, no solamente los que evidencian los tratadores, no otro tipo de cursos que la universidad necesite y se forma ese grupo que se llama diseño de contenido instruccional DCI, no, y actualmente ya incluso ya este año ya se han separado ya DCI Evaluación, ya no es un grupo como el año pasado que está todavía trabajando en sus equipos y no se ha formado un área, se está formando varias partes.
+134: 00:08:45 Gabriela
+135: Entonces en DCI ahí es donde trabajan todo el tema de carpetas igual.
+136: 00:08:49 Gabriela
+137: Cuando ellos cuando DSI trabaja su proceso de elaboración de carpetas instruccionales, igual que sea o ella tienen que participar para validar en la etapa que corresponda, no si es sílabo que se cuando toca instrumentos de evaluación y evaluación tiene que entrar también a mirar los instrumentos que han trabajado desde DSI, pero quien lleva, digamos, la batuta de qué curso se van a trabajar cada ciclo es CCI.
+138: 00:09:09 Gabriela
+139: Ya nos avisan cuál es la lista.
+140: 00:09:11 Gabriela
+141: ¿Cuál es su programa de trabajo y en qué fechas vamos a dar cada etapa, en qué fechas acaban sílabos, en qué fecha acaban instrumentos, en qué fecha acaban PPT y en cada una de esas etapas quien corresponda?
+142: 00:09:23 Gabriela
+143: La idea es que haga una capacitación al equipo que trabaja, porque no solamente son de si no hay un montón de externos, profesores especialistas.
+144: 00:09:30 Gabriela
+145: Entonces la idea es capacitar cada uno de los equipos, darle los lineamientos y al final validar el producto que se ha elaborado, cumpla con los estándares que hemos este definido, ¿no?
+146: 00:09:40 Alessandra
+147: Claro.
+148: 00:09:41 Alessandra
+149: Y hablando ya tal vez un poquito antes de ese proceso específico, no de las evaluaciones de las carpetas, no sé si tú sabes si es que en el sistema total, no en la creación de los cursos desde el sílabo hasta el final, si en algún momento se toma en cuenta, por ejemplo, estas formas de identificar o hacer seguimiento, o sea, se se piensa también en esa parte de seguimiento mientras van creando estos instrumentos, estos documentos.
+150: 00:10:09 Alessandra
+151: sobre todo a nivel ciclo.
+152: 00:10:11 Alessandra
+153: Me interesa más entenderlo a nivel como programa o carrera.
+154: 00:10:18 Alessandra
+155: ¿Corto.
+156: 00:10:23 Sebastián
+157: Parece que este.
+158: 00:10:24 Alessandra
+159: Sí, se hace la pregunta.
+160: 00:10:26 Gabriela
+161: Si pues perdí un ratito la conexión.
+162: 00:10:35 Alessandra
+163: ¿Ahí nos escuchas bien.
+164: 00:10:36 Gabriela
+165: Ahora sí, ya.
+166: 00:10:38 Gabriela
+167: No escuché la pregunta, perdón.
+168: 00:10:40 Alessandra
+169: Chévere.
+170: 00:10:41 Alessandra
+171: No, no, tranqui.
+172: 00:10:42 Alessandra
+173: Es una pregunta medio rara, igual.
+174: 00:10:45 Alessandra
+175: No sé si tú, por ejemplo, has visto si es que hay maneras de, en este proceso no de creación del sílabo, creación de los cursos, se introducen formas de, dentro de todo el curso, hacer como seguimiento de las brechas, pero a nivel programa, o sea, a nivel ciclo o perdón, a nivel como carrera, porque ya hablamos como de competencias y a lo largo del curso vas como que.
+176: 00:11:09 Alessandra
+177: Llegando a cierto nivel de esa competencia, pero no me queda muy claro ver, por ejemplo, cómo se puede usar un curso o los resultados de un curso para hacer seguimiento a estas al nivel que está llegando el alumno.
+178: 00:11:24 Gabriela
+179: O sea, desde nuestro frente, curricular lo que hacemos es, aparte de lo que nosotros vemos de este diseño de la alineación, competencias, cursos y luego alineación, cursos, logros y unidad del curso.
+180: 00:11:38 Gabriela
+181: que incluye el sistema de evaluación, donde también entre evaluación, como decía.
+182: 00:11:41 Gabriela
+183: Cuando inicia el libro académico, nosotros hacemos seguimiento a los cursos que nos permiten evaluar las competencias del perfil de egreso que son los cursos de evidencia.
+184: 00:11:52 Gabriela
+185: Esos cursos de evidencia tienen instrumentos de evaluación, rúbricas, consignas, etcétera, donde nos permite evaluar el avance del estudiante para
+186: 00:12:01 Gabriela
+187: Perdón, permite de valores, el aprendizaje alcanzado por el estudiante, no es la aprendizaje que alcanzó el estudiante en cada una de las oraciones de recursos, ¿no?
+188: 00:12:08 Gabriela
+189: Y lo que hacemos es hacer el análisis de la data al finalizar el ciclo, no durante el ciclo, sino al cierre del ciclo, analizamos los resultados finales de cómo le fueron a los todos los estudiantes matriculados en cada uno de estos para saber.
+190: 00:12:24 Gabriela
+191: porcentaje de alumnos alcanzó el aprendizaje en su máximo nivel, que porcentaje de chicos alcanzó en términos intermedios, digamos, y qué alumnos, qué cantidad de alumnos se quedaron al inicio del desarrollo de este aprendizaje, ¿no?
+192: 00:12:38 Gabriela
+193: Pero es un análisis más global, no tanto como persona cada uno, igual sacamos la data de cada alumno, eso sí, porque por eso se construye el total, ¿no?
+194: 00:12:47 Gabriela
+195: Pero no es que durante el ciclo hagamos un seguimiento de
+196: 00:12:52 Gabriela
+197: que esperábamos y dónde se encuentra el alumno.
+198: 00:12:54 Gabriela
+199: O sea, si tiene la data, ¿no?
+200: 00:12:55 Gabriela
+201: Pero no la analizamos en todo caso.
+202: 00:12:57 Gabriela
+203: Durante el punto.
+204: 00:12:58 Gabriela
+205: Para como para ver, este alumno le falta esta cuestión, para que en el curso puedan apuntalar o el coordinador, el profesor, esa no hacemos esa información, no hacemos el cierre del ciclo.
+206: 00:13:09 Gabriela
+207: Como digo, los resultados son globales, ¿no?
+208: 00:13:11 Gabriela
+209: Tenemos un reporte de BI donde figuran todas las competencias de todos los programas y todas las modalidades también.
+210: 00:13:18 Gabriela
+211: Si no puedes filtrar la carrera, la modalidad y puedes ver cómo le fue acá a programas según sus competencias generales y específicas.
+212: 00:13:25 Gabriela
+213: Y no tenemos también por sedes que queremos mirar la info, pero ya la intervención es para el siguiente grupo, porque el grupo, este grupo de alumnos ya acabó el curso, ya cerró, no aprobó, no aprobó, no sé, pero ya la data se usa, pero para la mejora de la de los cursos, de la evaluación, de los aprendizajes, pero del siguiente periodo.
+214: 00:13:45 Alessandra
+215: Gaby, ¿qué tipo de datos es eso?
+216: 00:13:47 Alessandra
+217: realmente en notas o en algo más?
+218: 00:13:50 Gabriela
+219: ¿Cómo?
+220: 00:13:51 Alessandra
+221: ¿Qué tipo de data es esa?
+222: 00:14:01 Gabriela
+223: ¿Cómo lo miden?
+224: 00:14:02 Gabriela
+225: O sea, cada, a ver, de manera resumida, cada curso evidencia tiene un instrumento de evaluación, cierto que es una rúbrica y la rúbrica está compuesta por criterios, entonces
+226: 00:14:16 Gabriela
+227: ¿No?
+228: 00:14:16 Gabriela
+229: Ehh por ejemplo ¿No?
+230: 00:14:17 Gabriela
+231: El curso de gestión general está vinculado a la competencia que también se llama gestión general tiene su rúbrica con ocho criterios y cada uno de esos criterios responden a la competencia la que está vinculada en ese caso solo una gestión general.
+232: 00:14:30 Gabriela
+233: Entonces al momento de hacer el análisis se hace no de la nota final del alumno sino de los criterios vinculados a la competencia ¿No?
+234: 00:14:37 Gabriela
+235: En ese caso si los ocho están vinculados entonces los ocho criterios asociados a la competencia se
+236: 00:14:46 Gabriela
+237: Porque por cada criterio el alumno va a ser ubicado en un nivel de la rúbrica, ¿no?
+238: 00:14:50 Gabriela
+239: Criterio uno está en el estándar esperado, en el criterio dos, en inicial, en el criterio tres, claro, hay distintos lados ubicados por criterio, por lo que la nota no nos ayuda mucho.
+240: 00:14:59 Gabriela
+241: Entonces, lo que hacemos este para calcular es este transformamos estos criterios en códigos y sacamos un promedio.
+242: 00:15:06 Gabriela
+243: Como el alumno en cada criterio está en un nivel distinto, lo que nos tiene saber es entonces.
+244: 00:15:12 Gabriela
+245: Digamos en conjunto en donde ubicamos el alumno porque tiene un desempeño distinto por criterio.
+246: 00:15:17 Gabriela
+247: Con esa codificación nos ayuda a obtener ya a partir de estos puntajes, el alumno entonces está en nivel en proceso, por ejemplo, se saca un promedio con los códigos y así se codifica cada estudiante y ya luego sabemos cuántos alumnos son en inicial, cuántos alumnos en proceso, cuántos alumnos en el estándar esperado.
+248: 00:15:36 Gabriela
+249: No, lo complicado es cuando el curso tiene más de una competencia que es.
+250: 00:15:41 Gabriela
+251: La mayor parte de clasificas son estas.
+252: 00:15:43 Gabriela
+253: El mismo curso imaginémonos que no solamente responda la gestión general, sino también a emprendimiento.
+254: 00:15:48 Gabriela
+255: Entonces algunos criterios de la rúbrica serán de función general, otros criterios de emprendimiento y entonces hay que hacer el ejercicio, el mismo ejercicio, solamente codificar y promediar los puntajes de la competencia uno y luego de la dos para sacar el desempeño de cada alumno por separado.
+256: 00:16:06 Alessandra
+257: Claro.
+258: 00:16:08 Alessandra
+259: Gaby, hay forma de poder ver esa
+260: 00:16:10 Alessandra
+261: Ese cálculo, o sea, por ejemplo, cómo hacen ese análisis, porque justamente esto es lo que también estábamos sospechando.
+262: 00:16:18 Alessandra
+263: Era como que no me suena que mucho a nota total porque la nota total no te da mucho detalle.
+264: 00:16:22 Alessandra
+265: Me suena que este tema de competencias está más alineado como a niveles específicos de la rúbrica, criterios específicos.
+266: 00:16:29 Alessandra
+267: Me encantaría ver cómo hacen ese cálculo, no, porque si ya lo hacen ustedes sería mejor guiarnos de eso que inventarnos una nueva forma de medirlo.
+268: 00:16:39 Gabriela
+269: ¿Te refieres a ahorita vamos a un ejemplo?
+270: 00:16:43 Alessandra
+271: O sea si lo tienes pero si si no si me pasas un excel o un dashboard lo que tengan después de esto no hay ningún problema.
+272: 00:16:51 Gabriela
+273: O sea ahorita tengo o sea tengo digamos lo que les he explicado en un ejemplo en una lámina pero si ustedes quieren ver la data la data per se real de los estudiantes eso sí tendríamos que compartírselos No sé qué es lo que necesitan.
+274: 00:17:07 Alessandra
+275: Me gustaría más la data
+276: 00:17:09 Alessandra
+277: tal.
+278: 00:17:09 Gabriela
+279: La data como tal.
+280: 00:17:11 Gabriela
+281: Sí.
+282: 00:17:11 Gabriela
+283: Ahora tú lo adquieres en en bruto porque nosotros ah ya ya porque mira a ver te comparto un ratito nada más el toque esto.
+284: 00:17:19 Alessandra
+285: Hola.
+286: 00:17:21 Gabriela
+287: El BI.
+288: 00:17:32 Gabriela
+289: Compartir pantalla.
+290: 00:17:53 Gabriela
+291: Ya.
+292: 00:17:53 Gabriela
+293: Mira.
+294: 00:17:55 Gabriela
+295: O sea esta información es lo que el digamos es el resultado final de esto que les comentaba ¿No?
+296: 00:18:03 Gabriela
+297: Por ejemplo tenemos acá la carrera de ingeniería administración de empresas ya elegimos acá el periodo académico el último es dos mil veinticinco tres ya y
+298: 00:18:20 Gabriela
+299: Bueno, todos los campos y acá nosotros podemos ver, como les digo, acá están las competencias generales.
+300: 00:18:26 Gabriela
+301: Ah, bueno, otro punto importante es que tenemos, las competencias se desarrollan en 3 niveles en nuestra alineación.
+302: 00:18:32 Gabriela
+303: Hay competencias, las competencias se desarrollan en nivel uno, nivel 2 y nivel 3.
+304: 00:18:35 Gabriela
+305: Eso también lo tenemos apiado en esa alineación que les contaba de competencia curso, ¿no?
+306: 00:18:40 Gabriela
+307: Entonces y la evaluación de del perfil de egreso lo hacemos a nivel en N 2 y en N 3.
+308: 00:18:45 Gabriela
+309: Entonces en esa tabla de abajo como ustedes ven.
+310: 00:18:48 Gabriela
+311: dan los resultados de nivel dos por cada competencia.
+312: 00:18:51 Gabriela
+313: Entonces tenemos gestión general.
+314: 00:18:53 Gabriela
+315: El sesenta por ciento que es lo verde más oscuro son alumnos que se han ubicado en estándar esperado.
+316: 00:18:59 Gabriela
+317: Mhm.
+318: 00:19:00 Gabriela
+319: El diecisiete por ciento en el proceso dos.
+320: 00:19:02 Gabriela
+321: Y si ven estas líneas rositas son las el punto de corte que hemos salido como universidad que al menos el setenta por ciento se ubique en los dos primeros niveles de la rúbrica ¿No?
+322: 00:19:12 Gabriela
+323: Que es estándar esperado y en proceso dos.
+324: 00:19:14 Gabriela
+325: Si eso se da entonces podemos asumir que la competencia se ha alcanzado en los niveles que la universidad ha definido de manera satisfactoria.
+326: 00:19:21 Gabriela
+327: Entonces si vemos acá por donde todas las competencias estarían dentro de ese rasgo, salvo la de capital humano que es un poquito la que está la que casi casi llegó pero así como que raspando digamos y más abajo y si tú quieres saber eh qué curso es el que está midiendo gestión general pues puedes acá bajito encontrar gestión general por ejemplo el nivel 3 se evalúa a través del curso integrador.
+328: 00:19:43 Gabriela
+329: Entonces acá puedes ver además del detalle de acá ya no están por porcentajes sino el número de alumnos que se ubican en cada uno de los niveles de la rública y es lo que te da el total.
+330: 00:19:54 Gabriela
+331: Y así está por cada competencia de las carreras de la universidad, ¿no?
+332: 00:19:58 Gabriela
+333: Entonces esto de acá ya digamos está procesada la data, pero si ustedes quieren ver el detrás de cámaras, esta información no estoy muy segura si la tendríamos o hay que pedirle a más clases porque ahora ese día ahí se construye sobre los reportes
+334: 00:20:13 Gabriela
+335: que te da una vez más clase cuando acabe el ciclo, cómo se han ubicados los estudiantes según la calificación que ha hecho el profesor de cada alumno?
+336: 00:20:21 Alessandra
+337: Claro, o sea, si me pasas un BI, yo creo que con el BI me ayudo y sí sería muy chévere poder tener letras de escenas, honestamente, o sea, la data cruda para ver más o menos cómo se recopila, qué es lo que existe en los sistemas, porque sería bueno, si es que necesitamos engancharnos de algo, engancharnos de eso y no de un BI, como que ya
+338: 00:20:42 Alessandra
+339: Configurado.
+340: 00:20:44 Gabriela
+341: Ya, le voy a decir en vano y le digo a Isa si tiene esa información, de repente al menos de un programa, porque haciendo que es un montón de data que está detrás.
+342: 00:20:54 Alessandra
+343: Si ya lo tienen, como que mejor.
+344: 00:20:56 Gabriela
+345: Un detalle importante es que esta información, por si acaso, estos resultados solamente se obtienen de la última evaluación del curso, de la evaluación final.
+346: 00:21:05 Gabriela
+347: O sea, todo el curso de evidencia suele tener
+348: 00:21:08 Gabriela
+349: todas las evaluaciones diseñadas ¿No?
+350: 00:21:10 Gabriela
+351: Casi todos por ahí que alguno solo tiene la final pero la mayoría tiene todas las evaluaciones pero estos reportes de logros se construyen solo sobre la evaluación final porque entendamos que el modelo de bajo de competencias es la última evaluación que da cuenta de hasta dónde llegó el estudiante con su aprendizaje ¿No?
+352: 00:21:25 Gabriela
+353: Ehh no significa que de las de proceso también si si si pedimos el reporte se pueden hacer los restos sí sobre todo por lo que ustedes están
+354: 00:21:37 Gabriela
+355: Pero por ahora, como les comento, esas de ahí no se han analizado, ¿no?
+356: 00:21:42 Alessandra
+357: Claro.
+358: 00:21:42 Alessandra
+359: Es más un post curso que.
+360: 00:21:45 Gabriela
+361: Exacto, aunque sería interesante, ¿no?
+362: 00:21:47 Gabriela
+363: Para poder enfocar esfuerzos durante el siglo y no al final.
+364: 00:21:50 Gabriela
+365: Pero bueno, plata debe estar.
+366: 00:21:52 Alessandra
+367: Esa es más o menos la idea que tenemos, o sea, poder hacer algo como lo que están haciendo acá, pero antes de llegar al final, a ver si es que se pueden como que intervenir en ciertos momentos para que los alumnos lleguen, ¿no?
+368: 00:22:05 Alessandra
+369: Al final.
+370: 00:22:08 Alessandra
+371: Pero a mí sí me quedan unas preguntas más, sobre todo relacionadas a ese BI.
+372: 00:22:11 Alessandra
+373: Mencionaste que a partir de esa info ustedes como modifican ciertas cosas.
+374: 00:22:17 Alessandra
+375: Cuéntame un poco de cómo, por ejemplo, ese dashboard se traduce ya a ajustes curriculares.
+376: 00:22:23 Alessandra
+377: ¿A qué cosas, por ejemplo, modifican ustedes?
+378: 00:22:27 Gabriela
+379: Ya estos reportes que se presentan además después de un par de meses de acabado el ciclo académico, pues no, ese es otro tema que tenemos, no son reportes.
+380: 00:22:35 Gabriela
+381: No se acaba el ciclo y al día siguiente ya están listos, no porque hay todavía información que limpiar, porque la esto que les contaba de cursos.
+382: 00:22:45 Gabriela
+383: competencia en más clases está cargado, en más clases se carga la rúbrica.
+384: 00:22:50 Gabriela
+385: O sea, criterios y todos los niveles.
+386: 00:22:52 Gabriela
+387: Pero para que tú eso lo puedas juntar con las competencias y puedas sacar el reporte, tienes tenemos otra base que le llamamos motriz de rúbricas, donde están todas las competencias, con los cursos, con los criterios para que luego podamos hacer cruces de las dos bases y salga este video que les he mostrado, ¿No?
+388: 00:23:08 Gabriela
+389: Entonces,
+390: 00:23:09 Gabriela
+391: por la por la demora que tenemos en los reportes todavía porque solamente suelen ser más o menos dos meses de demora nosotros hacemos primero presentaciones eh hacemos este ¿Cómo se llama?
+392: 00:23:24 Gabriela
+393: Reuniones de presentación a los coordinadores académicos de los campus y luego a los DDAs de cada carrera para mostrarles los resultados y analizar la información ¿No?
+394: 00:23:33 Gabriela
+395: El caso que les mostré es un caso que está bien pero hay otras carreras donde su mayor porcentaje de alumnos
+396: 00:23:38 Gabriela
+397: está en los niveles más bajos, está al revés, digamos la la la carga este desarrollo de competencia, entonces nos juntamos con los DDA, con los coordinadores, analizamos qué podría, qué podría explicar estos resultados, ¿No?
+398: 00:23:51 Gabriela
+399: Es un tema de diseño del curso, de de prerrequisitos del curso, podría ser incluso hasta toda la línea de competencia no está, no está bien trabajado, por eso los alumnos no han alcanzado el nivel que esperábamos, etcétera.
+400: 00:24:02 Gabriela
+401: Es una revisión y se toman acuerdos, ¿No?
+402: 00:24:05 Gabriela
+403: Que los acuerdos pueden ir desde cuestiones más
+404: 00:24:08 Gabriela
+405: Menores, digamos, de ajustar el curso nada más, acomodar el contenido, mejorar el instrumento de evaluación hasta cuestiones un poco más radicales como cambiar el curso de evidencia, ya no ese, sino que sea otro o incluir un nuevo curso en la malla.
+406: 00:24:21 Gabriela
+407: no, Entonces las acciones pueden ser distintas, no ajuste en contenido, ajuste en sílabo o ajuste ya curricular que mueva el plan de estudios, cambiar este curso por otro distinto porque no sé, hay un aprendizaje no está cubriendo en la malla y que es importante incorporarlo, etcétera.
+408: 00:24:37 Gabriela
+409: Ahora.
+410: 00:24:37 Gabriela
+411: Sí, pero en verdad el último escenario de cambiar el plan de estudios es el menos el que menos tenemos.
+412: 00:24:43 Gabriela
+413: Normalmente las cosas siempre se mueve, ya sea en contenido del sila o evaluaciones, o cambiar el curso de evidencia por otro, elegir, dejar de evaluar ese curso y elegir uno distinto de la mano.
+414: 00:24:58 Alessandra
+415: Esto se hace, digamos, curso a curso, o sea, este BI lo tienes para un curso, después puedes seleccionar otro.
+416: 00:25:07 Alessandra
+417: ¿También se puede hacer esa revisión como a lo largo de varios cursos o a nivel carrera, por ejemplo.
+418: 00:25:15 Gabriela
+419: No, no entendí las preguntas.
+420: 00:25:18 Alessandra
+421: O sea, esta vía que me has mostrado, tú puedes seleccionar, por ejemplo, un curso y ves cómo están los alumnos como grupo en el examen final de ese curso específico con respecto a las competencias que se evalúan.
+422: 00:25:31 Alessandra
+423: Pero las competencias que se evalúan, como tú has dicho, están en diferentes niveles
+424: 00:25:36 Alessandra
+425: se desarrollan a lo largo de la carrera, o sea, un alumno como que desarrolla la competencia A durante 5 años en 10 cursos, me invento.
+426: 00:25:47 Alessandra
+427: ¿Hay alguna forma de también hacer esa observación, ese seguimiento a ese nivel, o sea, escala carrera, escala plan curricular o algo así?
+428: 00:25:57 Gabriela
+429: No, o sea, el día que les he mostrado más que elegir cursos es estar por competencia, solamente que en la parte final,
+430: 00:26:04 Gabriela
+431: como siempre nos pedían cuando hacíamos las presentaciones eh saber qué qué curso está detrás de esa competencia es que le damos esta tabla final donde figuran lo los cursos que están midiendo las competencias pero el core principal de este día ahí son las competencias no tanto los cursos ¿No?
+432: 00:26:21 Gabriela
+433: Porque el curso puede cambiar pero el curso es el que alimenta el resultado de la competencia entonces este en realidad son las competencias del plan de estudios entonces en ese sentido sí o sea está cubriendo digamos
+434: 00:26:33 Gabriela
+435: a nivel de carreras todas las competencias, pero como nuestro modelo actual, las competencias se evalúan a través de ciertos cursos.
+436: 00:26:42 Gabriela
+437: Si no es ese curso el que alimenta la competencia, no estamos mirándolo aquí, por ejemplo, entonces no es que yo pueda elegir cualquier otro curso que no esté vinculado a la competencia para para medirla, para saber cómo le han ido a los estudiantes, no es que ahí solamente está alimentado con los cursos, evidencias vinculados a cada uno de las competencias, y esa categoría de cursos es una categoría
+438: 00:27:02 Gabriela
+439: una categoría nuestra y es una elección también de la dirección.
+440: 00:27:05 Gabriela
+441: O sea, no es que esté en tabla, que solamente puede ser ese curso el que mida.
+442: 00:27:10 Gabriela
+443: Como digo, el resultado puede ser diferente si tú dejas de medir en un curso y dices ahora voy a medirlo en el otro, probablemente el resultado de la competencia varía totalmente.
+444: 00:27:18 Gabriela
+445: Entonces, ese es como un poquito el tema de este modelo.
+446: 00:27:21 Gabriela
+447: El modelo solamente lo evalúa a través de ciertos cursos.
+448: 00:27:24 Gabriela
+449: Todos los demás cursos que no sean evidencia no están en este vía y el comportamiento tampoco sabemos porque esos otros cursos
+450: 00:27:32 Gabriela
+451: necesariamente se evalúan con un instrumento estandarizado a nivel de toda la universidad.
+452: 00:27:37 Gabriela
+453: Eso es casi todos los cursos, todos los campos evaluó con el instrumento, pero nos permite tener esa data, pero si tú agarras cualquier otro curso que no esté diseñado centralmente, vas a tener problema que un profesor lo evaluó de una forma, el otro profesor usó otro instrumento, otro profesor calificó nomás sin poner sin amarrarlo a una rúbrica, etcétera.
+454: 00:27:56 Gabriela
+455: Entonces por eso es que en esos cursos sí es necesario tener una intervención centralizada y
+456: 00:28:01 Gabriela
+457: Y los reportes son de la carrera, porque las competencias son el elemento central, digamos, de las carreras, ¿no?
+458: 00:28:07 Alessandra
+459: Claro, ahí que hay como, o sea, ustedes toman una muestra bien específica que está hecha precisamente para medir esas competencias, que es distinto a muchos otros cursos que a veces son como, o sea, los docentes tienen mucha más potestad de decidir cómo evalúan, cómo se diseña el material incluso.
+460: 00:28:24 Gabriela
+461: Sí, pero ojo, no es una muestra, es, o sea, son todos los.
+462: 00:28:28 Gabriela
+463: Claro, se evalúa a todos los.
+464: 00:28:31 Gabriela
+465: a todas las secciones de ese curso que se ha elegido no solamente una otra por ejemplo si regreso acá al ejemplo para que quede claro el ya estos resultados están por eso que arriba primero están los paneles de competencia ¿No?
+466: 00:28:48 Gabriela
+467: Eso de acá abajito es algo que hemos agregado con el tiempo porque muchos nos pedían saber de qué curso están jalando la evaluación o sea gestión financiera ¿Qué curso es el que te qué curso estás usando para medir
+468: 00:29:00 Gabriela
+469: esa competencia, por eso es que abajo está el curso vinculado con el que se evalúa, por ejemplo, cuestión financiera se evalúa a través de dirección financiera y acá están los resultados de todos los estudiantes que fueron evaluados porque eh no, hay un temita acá, que esto de acá se aplica como les digo, a nivel de todo UTP, todos los campos, todas las secciones, todos los cursos que se han abierto de este curso.
+470: 00:29:22 Gabriela
+471: Pero luego contamos con que el docente
+472: 00:29:24 Gabriela
+473: que ha que dicta el curso en en los distintos campus utilice la evaluación y califique en la plataforma con el instrumento estandarizado ¿No?
+474: 00:29:32 Gabriela
+475: Si un docente califica por su lado, no usa, obviamente no va a aparecer aquí, acá están todos los todos los resultados de los profesores que sí usaron la rúbrica y la completaron en en ahora igual es casi cien por ciento porque actualmente estamos en un noventa y ocho por ciento de uso de rúbrica quiere decir que la gran mayoría de profesores
+476: 00:29:50 Gabriela
+477: de estos cursos sí están calificando a los alumnos con el instrumento estandarizado, pero se presta la info de todas las secciones, no es una muestra nada más, sino de todas las secciones.
+478: 00:29:59 Gabriela
+479: A lo que voy es que si yo quiero saber, oye, y cómo le va a los chicos de cualquier otro curso que no esté acá, no lo voy a poder saber porque aquí solamente tengo los resultados de los cursos evidencia que son los que alimentan la competencia.
+480: 00:30:12 Alessandra
+481: Ya, claro, es ya, si no mejor.
+482: 00:30:17 Alessandra
+483: Acá también mencionas bastante el tema de rúbricas.
+484: 00:30:19 Alessandra
+485: ¿Las rúbricas son el único instrumento de evaluación que se usan para los cursos de evidencia?
+486: 00:30:24 Alessandra
+487: ¿O también hay listas de cotejo, por ejemplo, que estén 100% estandarizadas o algo así.
+488: 00:30:31 Gabriela
+489: Sí, hay otros cursos también, o sea, hay los cursos de evidencia o se usan instrumentos, el instrumento que las cosas son las rúbricas, pero también tenemos
+490: 00:30:42 Gabriela
+491: Este otros tipos de curso, los retadores, por ejemplo, cursos masivos, cursos de primeros ciclos que también tienen instrumentos de evaluación estandarizados, así como los evidencia, tienen instrumentos que esperamos que todos los profesores que usen el instrumento y usan también listas de contexto escalas de valoración, creo, pero lo malo que me parece es que en UTP más class no hay un desarrollo para que el profesor pueda hacer uso de esa evaluación como la rúbrica, no donde tú puedes entrar y puntuar.
+492: 00:31:10 Gabriela
+493: En cambio, para las listas de cotejo, las escalas para los estandarizados que le sube el archivo en PDF para que el profesor tenga el instrumento y bueno, no sé, pues lo lo imprimirá o era un Excel para calificar, pero no hay forma de extraer luego la data como como los evidencia, no que el profesor califica y eso te alimenta una base de datos que sale atrás y tú puedes descargar y hacer cruces analizar.
+494: 00:31:31 Gabriela
+495: En el caso de los otros instrumentos no están diseñados en más clases, no, entonces es difícil.
+496: 00:31:36 Gabriela
+497: hacer luego un rastreo de cómo le fue a los alumnos a nivel general, como en los cursos de evidencia.
+498: 00:31:42 Alessandra
+499: Claro, ya a mí me quedan solo algunas preguntas como para entender un poco mejor desde tu equipo, o sea, de gestión curricular, ¿qué consideras una brecha?
+500: 00:31:56 Alessandra
+501: Si es, por ejemplo, una brecha de conocimientos, en este caso de las competencias, en este caso sería que menos del 70% de los alumnos
+502: 00:32:06 Alessandra
+503: ¿No alcancen estos 2 principales niveles o algo así, o tendría otra definición, otra otra?
+504: 00:32:13 Alessandra
+505: ¿Me puedes repetir la pregunta?
+506: 00:32:16 Alessandra
+507: Sí, porque estamos tratando de mapear un poco lo que diferentes equipos consideran una brecha en el aprendizaje del alumno, no, porque para un docente puede ser simplemente que no llegaron al logro de la unidad en esta evaluación, , pero contigo estamos hablando como un nivel un poco más arriba, que es más al finalizar el curso.
+508: 00:32:34 Alessandra
+509: Entonces quería saber, por ejemplo, para ti, ¿qué es una brecha en el conocimiento del alumno con respecto a las competencias?
+510: 00:32:44 Alessandra
+511: ¿Cómo lo definen?
+512: 00:32:45 Alessandra
+513: ¿Cómo tú te das cuenta de que este grupo de alumnos no está llegando a lo que ustedes buscan?
+514: 00:32:52 Alessandra
+515: ¿Es sólo ese 70%.
+516: 00:32:54 Gabriela
+517: Ah, ya no.
+518: 00:32:55 Gabriela
+519: O sea, eso es como grupo, ¿no?
+520: 00:32:57 Gabriela
+521: O sea, es como grupo con respecto, es de manera institucional, digamos.
+522: 00:33:04 Gabriela
+523: ¿Cuánto es?
+524: 00:33:05 Gabriela
+525: ¿Cuánto es lo que podemos señalar que es un porcentaje ideal de que los alumnos alcancen las competencias?
+526: 00:33:11 Gabriela
+527: No considerando que dentro de la curva de aprendizaje, siempre este de manera global, mirando Diego, la curva siempre hay una tendencia, digamos, donde la gente se ubica normalmente hacia la parte central y las esquinas están por los alumnos muy destacados o los alumnos este que.
+528: 00:33:29 Gabriela
+529: que que requieren mucho este ayuda para lograr avanzar en el aprendizaje ¿No?
+530: 00:33:33 Gabriela
+531: Entonces es raro que tengamos pues una curva muy tirada hacia la percepción ¿No?
+532: 00:33:36 Gabriela
+533: La mayoría hacia adelante ni la mayoría hacia atrás ¿No?
+534: 00:33:39 Gabriela
+535: Considerando que hay diferentes tipos de alumnos es lo que se esperaría ¿No?
+536: 00:33:42 Gabriela
+537: Nos hemos basado en eso para poder definir el setenta por ciento pero es de manera institucional como para tomar acción pero a nivel individual de cada estudiante como o sea como equipo no tenemos una exhibición de de brecha pero de
+538: 00:33:58 Gabriela
+539: Usando un poco lo que hay definido en la universidad, está definido por si el alumno logra superar el estándar que ha definido la universidad para poder aprobar el curso, que es la nota ahorita, el único estándar que tenemos ahorita para saber que un alumno logra o no la aprendizaje fuera del modelo de competencia, es la nota que tiene al finalizar el curso.
+540: 00:34:17 Gabriela
+541: Se aprueba o no aprueba, no, porque basta que el alumno apruebe.
+542: 00:34:21 Gabriela
+543: Obviamente sabemos que si no es igual aprobar con 12 que con 18 o 19, no, pero igual el alumno sobrepasa.
+544: 00:34:28 Gabriela
+545: el estándar mínimo que se le ha pedido entonces yo creo que ahí está como que el diferencial ¿No?
+546: 00:34:32 Gabriela
+547: Hay alumnos que si pasan con doce han podido alcanzar un aprendizaje muy distinto a alguien que aprueba con una nota superior ¿No?
+548: 00:34:39 Gabriela
+549: Pero esa diferenciación no no la tenemos este como que establecida cuáles son los puntos de corte hasta donde podríamos decir este alumno sí alcanza no importa que haya probado con diecisiete pero sí alcanzó los aprendizajes que esperábamos es otro que sacó menos nota pero igual aprobó que brechas que aprendizajes se le quedaron fuera ¿No?
+550: 00:34:57 Gabriela
+551: en verdad en un en un modelo basado en competencias que se aplica así a raja tabla es el alumno es competente o no es competente no no hay esa variación de notas de doce a veinte y es otra escala de misión pero el sistema todavía peruano está muy acostumbrado a las notas numéricas ¿No?
+552: 00:35:11 Gabriela
+553: Entonces lo que lo que tú tienes al final es un alumno competente pero en varios matices ¿No?
+554: 00:35:16 Gabriela
+555: Competencias a medias, intermedias, finales, pero igual la prueba y tú estás declarando que ese alumno alcanzó el aprendizaje ¿No?
+556: 00:35:26 Gabriela
+557: Yo diría que la brecha está más bien desde la parte más cualitativa, pero no hay forma de saberlo, porque no están todas esas notas, no están, no están necesariamente vinculadas a un instrumento, a unas competencias.
+558: 00:35:43 Gabriela
+559: Salvo los cursos que están estandarizados, que sí tienen todo ese detrás, la mayoría de cursos no lo tienen.
+560: 00:35:48 Gabriela
+561: Entonces, ni siquiera sabemos cómo están hablando los profesores.
+562: 00:35:51 Gabriela
+563: O sea, ¿qué están evaluando los profesores?
+564: 00:35:53 Gabriela
+565: en los cursos que no están estandarizados, como para saber si de repente la diferencia de notas de uno que ha sacado 12 contra 20 quizás no es el aprendizaje, sino la forma de evaluación.
+566: 00:36:02 Gabriela
+567: Una evaluación menos compleja, menos detallada también del profesor, etcétera.
+568: 00:36:06 Gabriela
+569: También podría explicar una variación en la nota.
+570: 00:36:11 Alessandra
+571: Claro, la nota no es necesariamente equivalente a si el alumno realmente ha alcanzado ciertas competencias.
+572: 00:36:21 Alessandra
+573: Tiene sentido porque son ahí.
+574: 00:36:22 Alessandra
+575: Creo que justamente me entran muchas dudas de, o sea, la universidad sigue un modelo por competencias, pero estamos teniendo justamente ese problema de entender cómo podemos medir esas competencias en un curso, por ejemplo, que sé que es difícil porque al final un curso no construye toda la competencia, ni siquiera construye solo un nivel de la competencia.
+576: 00:36:45 Alessandra
+577: Es como que hay muchas partes y no necesariamente uno se traduce perfectamente al.
+578: 00:36:50 Alessandra
+579: Al otro está complejo.
+580: 00:36:57 Alessandra
+581: Bien, no tengo muchas más preguntas, o sea, tengo un montón, pero son ya más de procesos y creo que eso lo dejo para cuando sea un poco más relevante, que la verdad que no es ahorita.
+582: 00:37:07 Alessandra
+583: Ahorita me interesa más entender las brechas, como ustedes, como toman esas decisiones a partir de la data que tienen para mejorar el curso futuro, ¿no?
+584: 00:37:20 Alessandra
+585: Sabes, no sé si tienes alguna duda extra.
+586: 00:37:23 Sebastián
+587: Justo lo que habías preguntado último, yo iba a preguntarle algo similar como, o sea, dirías que si no hay evidencia o el nivel es muy bajo en las competencias, ¿no?
+588: 00:37:36 Sebastián
+589: O sea, si ahí ves que las competencias son muy bajas, podrías decir que las brechas de aprendizaje sería que, o sea, son altas, ¿no?
+590: 00:37:45 Sebastián
+591: O sea, que por ese curso no hay una forma de decir
+592: 00:37:49 Sebastián
+593: Exactamente, aunque sabes que yo lo pienso y digo, quizá esa brecha de aprendizaje, es decir, que en esa competencia específica, digamos que sea gestión de finanzas, está en el porcentaje tal, ¿no?
+594: 00:38:06 Sebastián
+595: Porque así lo ven ustedes en el viaje, según lo que veo, ¿no?
+596: 00:38:10 Alessandra
+597: El problema es que eso es ya agrupado, o sea, es como a nivel ciclo, básicamente, ¿no, Gaby?
+598: 00:38:17 Alessandra
+599: O sea, ni siquiera es que sea una promoción, los que han llevado ese curso en ese ciclo.
+600: 00:38:22 Gabriela
+601: Exacto, son todos los que están atriculados en ese ciclo.
+602: 00:38:26 Gabriela
+603: Incluso podrían haber alumnos que han desaprobado el curso, o sea, hay data esplendida que son alumnos que podrían hacer reincidentes, alumnos por primera vez, etcétera.
+604: 00:38:35 Gabriela
+605: Estamos como dice Ale sacando una foto de los alumnos atriculados en este periodo.
+606: 00:38:39 Alessandra
+607: Pero las datas sí lo tienen, o sea, porque es un agregado, sí tienen esa data a nivel alumnos, o sea, de algún
+608: 00:38:46 Alessandra
+609: En algún momento se podría entrar a hacer doble triple click a ver, por ejemplo, cómo le está yendo a tal alumno o a tal sección como que con respecto a estas rúbricas.
+610: 00:38:58 Gabriela
+611: Te refieres como para, por ejemplo, saber cómo le fue a Gabriela Fidel en todos sus puros evidencia, algo así.
+612: 00:39:06 Gabriela
+613: O sea, yo creo que sí se podría tener esa data, pero, pero desde que está más class, porque antes de que quita más class.
+614: 00:39:15 Gabriela
+615: No había ese el reporte que lo botaba Canvas y ese reporte lo nosotros lo trabajábamos, limpiamos y lo hacíamos a través de un Google, este de cómo se llama un dashboard en Google, Looker Studio.
+616: 00:39:29 Gabriela
+617: hace Me parece que hace 1 año hemos empezado a usar el BI donde ya sale la info y se construye el histórico.
+618: 00:39:36 Gabriela
+619: Entonces hay siglos pasados, cuando vean el reporte van a ver siglos anteriores que no se no se visualizó, no porque no se hiciera la evaluación, sino porque se hacía por otros lados.
+620: 00:39:45 Gabriela
+621: Y es mucho muy complicado poder jalar la info de este reporte actual.
+622: 00:39:49 Gabriela
+623: No sabemos en algún momento lo vamos a completar con la info del pasado, pero de lo que hay ahora en adelante sí podría ser interesante ver ya el avance de cada estudiante.
+624: 00:40:00 Alessandra
+625: Claro, justamente lo que queremos es individualizarlo lo más posible y poder hacerlo lo más cerca en vivo.
+626: 00:40:10 Alessandra
+627: O sea, que el alumno como que termine una evaluación y nosotros poder tener
+628: 00:40:15 Alessandra
+629: un reporte, no sé si de la sección todavía o como del mismo alumno de como le he estado yendo, en qué está fallando, ese tipo de cosas, ¿no?
+630: 00:40:22 Sebastián
+631: Las competencias, porque ahí supongo que ahí podemos medir las brechas de aprendizaje.
+632: 00:40:27 Sebastián
+633: Por ahora, creo, eso es lo más cercano a lo que tendríamos.
+634: 00:40:33 Alessandra
+635: Gaby, una consulta ya como para ir cerrando.
+636: 00:40:36 Alessandra
+637: Entiendo que los cursos de evidencia son esos que específicamente miden, o sea, los que usan para medir las competencias,
+638: 00:40:44 Alessandra
+639: Pero me queda la duda de si otros cursos que no son evidencia, las rúblicas, el proceso de diseño sigue esos mismos lineamientos.
+640: 00:40:55 Alessandra
+641: O sea, ¿podríamos hacer un análisis similar con cursos que no son evidencia para entender cómo van los alumnos con respecto a las competencias que están como metidas en esos cursos, a pesar de que tal vez no sean representativas de la misma forma.
+642: 00:41:10 Gabriela
+643: Sí, o sea, se puede decir, pero
+644: 00:41:12 Gabriela
+645: como les digo uno de los puntos para para poder tener una una evaluación de los demás cursos que sería interesante primero es que los cursos tengan un instrumento centralizado ¿No?
+646: 00:41:22 Gabriela
+647: Para que ustedes estén seguros lo que están midiendo porque como les comento ahora cada curso que no no tiene estandarización depende de cada profesor cómo hace la evaluación o sea puede decir hay un sistema de evaluación en el o sí por ejemplo ¿No?
+648: 00:41:34 Gabriela
+649: PS uno, PC dos, puede que el curso no esté estandarizado pero podría ser que algunos profesores
+650: 00:41:42 Gabriela
+651: Eso ya no te da ese detalle para los cursos, entonces ya cada profesor hace su PC como desee.
+652: 00:41:49 Gabriela
+653: En cambio, un curso estandarizado tú le das, tú le das a las indicaciones, qué tipo de preguntas tienes que hacer en la PC, preguntas de análisis de casos, entonces como que ordenas mejor el proceso para que luego puedas extraer la información.
+654: 00:42:01 Gabriela
+655: Entonces, si los cursos tuvieran instrumentos estandarizados, pienso yo, si los cursos tuvieran instrumentos estandarizados se podría y luego lo siguiente es que la plataforma permite al profesor.
+656: 00:42:12 Gabriela
+657: este calificar dentro de la plataforma y no como ahora que hay instrumentos que no están y que están en PDF ¿No?
+658: 00:42:17 Gabriela
+659: Y no tendrías o tendrías una forma muy difícil de pedirle a cada profesor su reporte para que puedas hacer la evaluación etcétera ¿No?
+660: 00:42:23 Gabriela
+661: Entonces eso como que creo yo que se requería para que puedas luego extraer data de otros cursos ¿No?
+662: 00:42:28 Gabriela
+663: Y al toque hacer análisis globales y por estudiantes ¿No?
+664: 00:42:31 Gabriela
+665: Y puedas comparar incluso porque mientras los instrumentos sean distintos cada profesor evaluando como considera
+666: 00:42:37 Gabriela
+667: que tú puedas comparar porque tienes que poner un hijo estándar de brecha para que puedas decir oye, están llegando, están llegando, pero con una misma medida, ¿no?
+668: 00:42:44 Gabriela
+669: Si no, se vuelve medio subjetivo también.
+670: 00:42:47 Alessandra
+671: Claro.
+672: 00:42:50 Alessandra
+673: Creo que con eso me queda un poco más clara la cosa, Gaby.
+674: 00:42:53 Alessandra
+675: No tengo más preguntas, no sé si Sebastián o algún otro.
+676: 00:42:58 Sebastián
+677: Claro, sí.
+678: 00:42:59 Alessandra
+679: Entonces, nada, te dejamos.
+680: 00:43:01 Alessandra
+681: Muchas gracias, la verdad, porque.
+682: 00:43:03 Gabriela
+683: En todo caso, mandarles la guía de sílabos de los lineamientos y el BI que les he mostrado y ver si tenemos la data detrás.
+684: 00:43:12 Gabriela
+685: Sí, ya y en todo caso igual mientras sigan armando nos avisan porque hay un tema importante que no les comenté, estamos haciendo una revisión nosotros también este año del modelo de evaluación, es decir, realmente está está bien que miramos las competencias a través de ciertos cursos, no los evidencia o podríamos.
+686: 00:43:33 Gabriela
+687: este hacerlo de repente a través de todos los cursos asociados en la matriz ¿No?
+688: 00:43:37 Gabriela
+689: Les contaba que cada curso está vinculado cada competencia tiene un grupo de cursos nosotros solamente estamos agarrando un curso para evaluar la competencia pero hay más cursos ¿No?
+690: 00:43:45 Gabriela
+691: Entonces eh estamos haciendo un proceso de revisión hacen un digamos de experiencias de evaluación en educación superior en otros contextos como hacen otras universidades la misión de competencias a través de un curso de todo y también el tema de las notas ¿No?
+692: 00:43:59 Gabriela
+693: Porque sí muchas
+694: 00:44:03 Gabriela
+695: Por por qué en el curso sale la competencia sale baja si el curso han muchos aprobados como les expliqué es porque está detrás de los criterios de evaluación ¿No?
+696: 00:44:11 Gabriela
+697: Entonces como también esa es una pregunta siempre que nos hacen también estamos mirando si es la mejor la mejor forma, si hay una forma de hacerlo más simple quizás en este año tenemos previsto hacer este análisis, vamos a hacer algunas mesas de trabajo también con con otros especialistas en evaluación para recoger info y a final de
+698: 00:44:31 Gabriela
+699: una mejora en la propuesta actual que tenemos para el próximo año implementarla, no parece años, pero como ustedes saben están trabajando esto, quizás cuando tengamos algo ya más elaborado de recojo de hipo les podemos también contar cómo estamos avanzando.
+700: 00:44:43 Gabriela
+701: Tres años sí tenemos este tema de poder evaluar nuestro propio sistema, si es que está vigente, si se puede seguir mejorando y fortaleciéndolo.
+702: 00:44:54 Alessandra
+703: Sí, sería súper útil que nos incluyan una vez que tengan algunos resultados porque justo ahorita este proyecto
+704: 00:45:01 Alessandra
+705: implica como que adaptarnos lo más posible al sistema existente, entonces si ese sistema se va a mover tenemos que adaptarnos también a eso Ya pues Gaby, me pasas la voz, eso nos va a servir bastante Sí.
+706: 00:45:14 Gabriela
+707: Igual ustedes se van bajando y nos cuentan como tienen más ganas con confianza, ahí nos escribimos para darle.
+708: 00:45:19 Alessandra
+709: El espacio de conversar Ya, genial, muchas gracias.
+710: 00:45:22 Gabriela
+711: Gracias, cuídense chicos, que tengan buena tarde, adiós.
+712: 00:45:26 Sebastián
+713: Igualmente

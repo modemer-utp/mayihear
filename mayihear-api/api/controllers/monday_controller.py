@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from typing import List
 
 from application.services.monday_service import MondayService
@@ -31,6 +32,27 @@ def list_columns(board_id: str):
         return service.list_columns(board_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/projects", response_model=List[ItemInfo])
+def list_projects():
+    try:
+        return service.list_projects()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class PublishActaRequest(BaseModel):
+    item_id: str
+    content: str
+
+
+@router.post("/publish-acta", response_model=MondayPublishResult)
+def publish_acta(request: PublishActaRequest):
+    result = service.publish_acta(request.item_id, request.content)
+    if not result.ok:
+        raise HTTPException(status_code=500, detail=result.error)
+    return result
 
 
 @router.post("/publish", response_model=MondayPublishResult)

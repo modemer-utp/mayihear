@@ -1,0 +1,134 @@
+================================================================================
+MAYIHEAR — UTP MVP  |  REGISTRO DE ACTUALIZACIONES
+================================================================================
+Ultima actualizacion: 2026-03-06
+================================================================================
+
+
+--------------------------------------------------------------------------------
+INTEGRACION CON MONDAY.COM
+--------------------------------------------------------------------------------
+
+QUE HACE
+  Despues de generar el acta de una reunion, la aplicacion puede publicar
+  automaticamente el resumen en el tablero de Monday.com del equipo.
+  Los managers pueden consultar el estado de cada proyecto directamente
+  en Monday.com, sin necesidad de asistir a las reuniones ni pedir resumen
+  al Product Owner.
+
+COMO FUNCIONA
+  1. El PO graba la reunion y genera el acta como siempre
+  2. Aparece un panel "Publicar en Monday.com" con un selector de proyectos
+  3. El PO elige el proyecto al que pertenece la reunion
+     (Evaluacion Recurrente / Contenido adaptativo / Personalizacion)
+  4. Hace clic en "Publicar"
+  5. El acta queda guardada en la columna "Acta/resumen Ultima reunion"
+     del proyecto en Monday.com
+
+QUE SE CONFIGURO EN MONDAY.COM
+  - Tablero creado: "Proyectos"
+  - Columna creada: "Acta/resumen Ultima reunion"
+  - Proyectos creados como items:
+      * Evaluacion Recurrente
+      * Contenido adaptativo
+      * Personalizacion
+
+
+--------------------------------------------------------------------------------
+REGENERAR DESDE LA TRANSCRIPCION
+--------------------------------------------------------------------------------
+
+QUE HACE
+  Si el PO quiere mejorar los insights o el acta (por ejemplo, agregando
+  mas contexto), puede regenerar todo el analisis sin tener que volver
+  a grabar la reunion.
+
+COMO FUNCIONA
+  1. Despues de transcribir, aparece un boton "Regenerar" en la seccion
+     de transcripcion
+  2. El PO puede ajustar el campo de contexto y hacer clic en "Regenerar"
+  3. La aplicacion vuelve a analizar la misma transcripcion y genera
+     nuevos insights y un nuevo acta
+
+
+--------------------------------------------------------------------------------
+IMPORTAR TRANSCRIPCION DESDE TEXTO
+--------------------------------------------------------------------------------
+
+QUE HACE
+  Permite generar insights y actas a partir de transcripciones que ya
+  existen, sin necesidad de grabar nada. Util si el PO tiene notas
+  de una reunion anterior o una transcripcion hecha por otra herramienta.
+
+COMO FUNCIONA
+  1. En la parte superior de la aplicacion hay una seccion
+     "Importar transcripcion" siempre visible
+  2. El PO puede pegar el texto directamente o cargar un archivo .txt
+  3. Al hacer clic en "Generar Insights desde texto", la aplicacion
+     analiza el contenido y genera los insights y el acta como si
+     hubiera grabado la reunion normalmente
+
+
+--------------------------------------------------------------------------------
+RESPALDO AUTOMATICO DE GRABACIONES + SOPORTE PARA REUNIONES LARGAS
+--------------------------------------------------------------------------------
+
+QUE HACE
+  Cada grabacion se guarda automaticamente en una carpeta de respaldo
+  antes de iniciar la transcripcion. Si algo falla durante el proceso,
+  el audio nunca se pierde y se puede intentar de nuevo.
+
+  Ademas, la aplicacion ahora soporta reuniones de hasta 3 horas sin
+  que el proceso se interrumpa por tiempo de espera.
+
+COMO FUNCIONA
+  - Al detener la grabacion, el archivo de audio se guarda en la carpeta
+    "recordings/" dentro de la aplicacion, con la fecha y hora en el nombre
+  - La transcripcion puede tomar entre 15 y 90 minutos dependiendo
+    de la duracion de la reunion (normal para archivos grandes)
+  - La aplicacion muestra mensajes informativos sobre el tiempo estimado
+    de espera para que el usuario sepa que el proceso sigue corriendo
+
+RECUPERACION EN CASO DE FALLO
+  Si la transcripcion falla por cualquier motivo:
+  1. El archivo .webm estara en la carpeta recordings/
+  2. Se puede transcribir manualmente con otra herramienta
+  3. Pegar el texto en "Importar transcripcion" y continuar el proceso
+
+
+================================================================================
+PLAN SIGUIENTE: ALMACENAMIENTO EN LA NUBE (S3)
+================================================================================
+
+QUE SE QUIERE LOGRAR
+  Guardar todos los artefactos de cada reunion en Amazon S3, para que
+  exista un historial permanente y accesible de todas las reuniones.
+
+QUE SE GUARDARIA POR CADA REUNION
+  - Grabacion de audio (.webm)
+  - Transcripcion completa (.txt)
+  - Insights estructurados (.json)
+  - Acta de reunion (.docx)
+
+COMO SE ORGANIZARIA EN S3
+  Cada reunion tendria su propia carpeta identificada por fecha y hora:
+    utp/reuniones/2026-03-06/1741234567/
+      recording.webm
+      transcript.txt
+      insights.json
+      acta.docx
+
+COMO LO USARIA EL PO
+  Al finalizar una reunion, apareceria un boton "Guardar en la nube"
+  junto al panel de Monday.com. Con un solo clic, los 4 archivos
+  se suben automaticamente a S3 y quedan disponibles para siempre.
+
+NOTA SOBRE CREDENCIALES
+  Para las pruebas iniciales se usara la cuenta AWS personal del equipo.
+  Una vez que UTP proporcione sus credenciales, se migrara a su cuenta.
+
+ESFUERZO ESTIMADO: 4-6 horas de desarrollo
+
+================================================================================
+FIN DEL REGISTRO DE ACTUALIZACIONES
+================================================================================

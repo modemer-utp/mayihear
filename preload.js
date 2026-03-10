@@ -29,5 +29,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('monday-get-columns', boardId),
 
   mondayPublish: (boardId, itemId, columnId, actaData) =>
-    ipcRenderer.invoke('monday-publish', boardId, itemId, columnId, actaData)
+    ipcRenderer.invoke('monday-publish', boardId, itemId, columnId, actaData),
+
+  mondayGetProjects: () =>
+    ipcRenderer.invoke('monday-get-projects'),
+
+  mondayPublishActa: (itemId, actaData) =>
+    ipcRenderer.invoke('monday-publish-acta', itemId, actaData),
+
+  loadTranscriptFile: () =>
+    ipcRenderer.invoke('load-transcript-file'),
+
+  onTranscribeProgress: (callback) =>
+    ipcRenderer.on('transcribe-progress', (_event, data) => callback(data))
 })

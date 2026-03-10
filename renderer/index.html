@@ -45,6 +45,27 @@
       <span id="status-text">Listo para grabar</span>
     </div>
 
+    <!-- Import transcription (always visible) -->
+    <div class="import-section">
+      <div class="import-header">
+        <span class="section-label">Importar transcripcion</span>
+        <div class="import-header-actions">
+          <button class="copy-btn" id="load-txt-btn">Cargar .txt</button>
+          <button class="copy-btn" id="clear-import-btn" style="display:none">Limpiar</button>
+        </div>
+      </div>
+      <textarea id="import-textarea" placeholder="Pega aqui una transcripcion existente o carga un archivo .txt..." rows="3"></textarea>
+      <button id="generate-from-text-btn" class="generate-btn" disabled>Generar Insights desde texto</button>
+    </div>
+
+    <!-- Project selector (always visible) -->
+    <div class="context-section">
+      <span class="section-label">Proyecto Monday.com</span>
+      <select id="project-pre-select" class="monday-select" style="width:100%">
+        <option value="">Cargando proyectos...</option>
+      </select>
+    </div>
+
     <!-- Context (always visible) -->
     <div class="context-section">
       <span class="section-label">Contexto de la reunión (opcional)</span>
@@ -99,16 +120,8 @@
       </div>
       <div class="monday-controls">
         <div class="monday-row">
-          <select id="monday-board-select" class="monday-select">
-            <option value="">Cargando tableros...</option>
-          </select>
-          <select id="monday-item-select" class="monday-select" disabled>
-            <option value="">Seleccionar proyecto...</option>
-          </select>
-        </div>
-        <div class="monday-row">
-          <select id="monday-column-select" class="monday-select" disabled>
-            <option value="">Publicar como actualizacion</option>
+          <select id="monday-project-select" class="monday-select">
+            <option value="">Cargando proyectos...</option>
           </select>
           <button id="monday-publish-btn" class="monday-btn" disabled>Publicar</button>
         </div>

@@ -336,6 +336,70 @@ main {
   cursor: not-allowed;
 }
 
+/* ── Import transcription section ── */
+.import-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.import-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.import-header-actions {
+  display: flex;
+  gap: 6px;
+}
+
+#import-textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 13px;
+  padding: 10px 14px;
+  resize: vertical;
+  min-height: 72px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+#import-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+#import-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.generate-btn {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  align-self: flex-start;
+}
+
+.generate-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+}
+
+.generate-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ── Monday.com section ── */
 .monday-section {
   flex-direction: column;

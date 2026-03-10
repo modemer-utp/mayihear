@@ -30,6 +30,10 @@ mayihear-api/run_built.py
 *.zip
 *.tar.gz
 
+# Bundled binaries (large — download via download_ffmpeg.ps1)
+mayihear-api/bin/ffmpeg.exe
+mayihear-api/bin/ffprobe.exe
+
 # IDE
 .vscode/
 .claude/

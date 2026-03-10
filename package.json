@@ -33,6 +33,7 @@
         "filter": ["**/*"]
       }
     ],
+    "compression": "store",
     "nsis": {
       "include": "build-scripts/installer.nsh",
       "allowElevation": true,

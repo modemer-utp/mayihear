@@ -1,0 +1,249 @@
+<mxfile host="app.diagrams.net" modified="2026-03-09T00:00:00.000Z" agent="Claude" version="21.0.0">
+  <diagram name="MayiHear" id="mayihear-combined">
+    <mxGraphModel dx="1600" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1050" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- TÍTULO -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="title" value="MayiHear — Cómo funciona" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=24;fontStyle=1;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="350" y="18" width="700" height="36" as="geometry" />
+        </mxCell>
+
+        <!-- HEADERS -->
+        <mxCell id="h-user" value="👤  Lo que hace el usuario" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=13;fontStyle=1;fontColor=#1d4ed8;" vertex="1" parent="1">
+          <mxGeometry x="60" y="60" width="340" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="h-app" value="🖥️  Aplicación Electron" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=13;fontStyle=1;fontColor=#0369a1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="60" width="260" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="h-back" value="⚙️  Servicios de IA" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=13;fontStyle=1;fontColor=#7c3aed;" vertex="1" parent="1">
+          <mxGeometry x="770" y="60" width="260" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="h-result" value="📌  Resultado" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=13;fontStyle=1;fontColor=#065f46;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="60" width="240" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- Línea separadora de headers -->
+        <mxCell id="hline" value="" style="line;strokeColor=#cbd5e1;fillColor=none;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="40" y="93" width="1320" height="10" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- PASO 1: Selecciona proyecto -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="u1" value="1️⃣  Selecciona el proyecto&lt;br&gt;&lt;font style='font-size:11px;font-weight:normal;'&gt;¿Para qué reunión es esto?&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;strokeWidth=2;fontSize=13;fontStyle=1;arcSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="110" width="320" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a1" value="Carga la lista de proyectos&lt;br&gt;desde Monday.com al iniciar" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="450" y="118" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1" value="Monday.com API&lt;br&gt;&lt;font style='font-size:10px'&gt;GET /monday/projects&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce7f3;strokeColor=#f6385a;strokeWidth=2;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="770" y="118" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r1" value="Lista de proyectos&lt;br&gt;disponible en pantalla" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1fae5;strokeColor=#059669;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="118" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-u1-a1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#3b82f6;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="u1" target="a1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-a1-s1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0284c7;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="a1" target="s1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-s1-r1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#059669;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s1" target="r1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Separador 1 -->
+        <mxCell id="sep1" value="" style="line;strokeColor=#e2e8f0;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="185" width="1320" height="10" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- PASO 2: Graba la reunión -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="u2" value="2️⃣  Graba la reunión&lt;br&gt;&lt;font style='font-size:11px;font-weight:normal;'&gt;Presiona ● para iniciar&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;strokeWidth=2;fontSize=13;fontStyle=1;arcSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="200" width="320" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a2" value="Captura el audio del sistema&lt;br&gt;(lo que suena en los parlantes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="450" y="208" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2" value="MediaRecorder + WASAPI&lt;br&gt;&lt;font style='font-size:10px'&gt;Audio loopback del sistema&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;strokeWidth=2;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="770" y="208" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r2" value="Temporizador visible&lt;br&gt;y medidor de audio activo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1fae5;strokeColor=#059669;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="208" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-u2-a2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#ef4444;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="u2" target="a2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-a2-s2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0284c7;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="a2" target="s2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-s2-r2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#059669;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s2" target="r2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Separador 2 -->
+        <mxCell id="sep2" value="" style="line;strokeColor=#e2e8f0;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="275" width="1320" height="10" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- PASO 3: Detiene y guarda -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="u3" value="3️⃣  Detiene la grabación&lt;br&gt;&lt;font style='font-size:11px;font-weight:normal;'&gt;Presiona ■ al terminar la reunión&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;strokeWidth=2;fontSize=13;fontStyle=1;arcSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="290" width="320" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a3" value="Guarda el archivo de audio&lt;br&gt;como respaldo en el equipo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="450" y="298" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3" value="recordings/grabacion.webm&lt;br&gt;&lt;font style='font-size:10px'&gt;Archivo guardado localmente&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;strokeWidth=2;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="770" y="298" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r3" value="Audio guardado ✓&lt;br&gt;No se pierde nada" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1fae5;strokeColor=#059669;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="298" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-u3-a3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#ef4444;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="u3" target="a3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-a3-s3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0284c7;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="a3" target="s3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-s3-r3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#059669;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s3" target="r3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Separador 3 -->
+        <mxCell id="sep3" value="" style="line;strokeColor=#e2e8f0;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="365" width="1320" height="10" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- PASO 4: Transcripción (automático) -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="auto-badge1" value="⚡ Automático" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="60" y="375" width="100" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="u4" value="4️⃣  Esperando transcripción&lt;br&gt;&lt;font style='font-size:11px;font-weight:normal;'&gt;Ve el progreso fragmento a fragmento&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e8ff;strokeColor=#a855f7;strokeWidth=2;fontSize=13;fontStyle=1;arcSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="400" width="320" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a4" value="Divide el audio en fragmentos&lt;br&gt;de 30 min y envía a la IA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="450" y="408" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s4" value="Gemini 2.5 Pro&lt;br&gt;&lt;font style='font-size:10px'&gt;Transcribe cada fragmento de audio&lt;br&gt;y los une en un solo texto&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;strokeWidth=2;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="770" y="400" width="260" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r4" value="Texto completo de todo&lt;br&gt;lo que se habló en la reunión" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1fae5;strokeColor=#059669;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="408" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-u4-a4" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#a855f7;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="u4" target="a4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-a4-s4" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0284c7;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="a4" target="s4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-s4-r4" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#059669;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s4" target="r4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Separador 4 -->
+        <mxCell id="sep4" value="" style="line;strokeColor=#e2e8f0;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="480" width="1320" height="10" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- PASO 5: Insights y Acta (automático) -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="auto-badge2" value="⚡ Automático" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="60" y="490" width="100" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="u5" value="5️⃣  Revisa insights y acta&lt;br&gt;&lt;font style='font-size:11px;font-weight:normal;'&gt;Resumen · Decisiones · Tareas · Acta completa&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#22c55e;strokeWidth=2;fontSize=13;fontStyle=1;arcSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="515" width="320" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a5" value="Muestra resumen, decisiones,&lt;br&gt;tareas y acta en pantalla" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="450" y="523" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s5" value="Gemini 2.5 Flash&lt;br&gt;&lt;font style='font-size:10px'&gt;Analiza el texto y genera:&lt;br&gt;insights estructurados + acta formal&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;strokeWidth=2;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="770" y="515" width="260" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r5" value="Acta lista para revisar&lt;br&gt;y opcionalmente descargar .docx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1fae5;strokeColor=#059669;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="523" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-u5-a5" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#22c55e;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="u5" target="a5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-a5-s5" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0284c7;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="a5" target="s5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-s5-r5" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#059669;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s5" target="r5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Separador 5 -->
+        <mxCell id="sep5" value="" style="line;strokeColor=#e2e8f0;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="595" width="1320" height="10" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- PASO 6: Publica en Monday -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="u6" value="6️⃣  Publica el acta en Monday.com&lt;br&gt;&lt;font style='font-size:11px;font-weight:normal;'&gt;Un clic y el gerente ya puede verla&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#eab308;strokeWidth=2;fontSize=13;fontStyle=1;arcSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="610" width="320" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a6" value="Envía el acta al proyecto&lt;br&gt;seleccionado en el paso 1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="450" y="618" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s6" value="Monday.com API&lt;br&gt;&lt;font style='font-size:10px'&gt;POST /monday/publish-acta&lt;br&gt;→ actualiza columna del proyecto&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce7f3;strokeColor=#f6385a;strokeWidth=2;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="770" y="610" width="260" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r6" value="✅  Acta publicada&lt;br&gt;El gerente la ve en Monday.com" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#0f172a;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="618" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-u6-a6" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#eab308;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="u6" target="a6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-a6-s6" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0284c7;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="a6" target="s6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="arr-s6-r6" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#f6385a;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s6" target="r6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- FLECHAS VERTICALES entre pasos de usuario -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="v1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#94a3b8;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="u1" target="u2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="v2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#94a3b8;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="u2" target="u3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="v3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#94a3b8;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="u3" target="u4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="v4" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#94a3b8;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="u4" target="u5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="v5" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#94a3b8;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="u5" target="u6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- CAMINO ALTERNATIVO -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="alt" value="💡 Atajo: si ya tienes la transcripción&lt;br&gt;&lt;font style='font-size:10px'&gt;Pega el texto o carga un .txt → salta directo al paso 5&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#86efac;strokeWidth=1.5;dashed=1;fontSize=11;fontStyle=0;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="700" width="320" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="arr-alt" value="salta aquí" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#86efac;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#166534;exitX=1;exitY=0.5;entryX=0;entryY=1;" edge="1" source="alt" target="u5" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- LEYENDA -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="leg-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="695" width="880" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-title" value="Leyenda:" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="465" y="705" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" value="🔵 Electron (interfaz del escritorio)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="550" y="705" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="🟣 Servicios de IA (Gemini / Monday)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="800" y="705" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="⚡ Automático = sin acción del usuario" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1065" y="705" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="- - - Camino alternativo (opcional)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#166534;" vertex="1" parent="1">
+          <mxGeometry x="550" y="727" width="260" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

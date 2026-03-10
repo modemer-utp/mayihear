@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import List, Optional
 
 from domain.models.output.token_usage import TokenUsage
@@ -12,15 +12,15 @@ class TopicItem(BaseModel):
 
 
 class AcuerdoItem(BaseModel):
-    accion: str
+    accion: Optional[str] = None
     responsable: Optional[str] = None
 
 
 class MeetingActResult(BaseModel):
-    nombre_reunion: str
-    fecha: str
+    nombre_reunion: str = ""
+    fecha: str = ""
     participantes: List[str] = []
-    resumen_ejecutivo: str
+    resumen_ejecutivo: str = ""
     temas: List[TopicItem] = []
     acuerdos: List[AcuerdoItem] = []
     riesgos: List[str] = []
@@ -28,3 +28,10 @@ class MeetingActResult(BaseModel):
     proxima_reunion: Optional[str] = None
     usage: Optional[TokenUsage] = None
     processing_time_seconds: Optional[float] = None
+
+    @field_validator('acuerdos', mode='before')
+    @classmethod
+    def filter_empty_acuerdos(cls, v):
+        if isinstance(v, list):
+            return [a for a in v if isinstance(a, dict) and a.get('accion')]
+        return v

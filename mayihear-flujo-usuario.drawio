@@ -1,0 +1,94 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.5.2 Chrome/142.0.7444.265 Electron/39.6.1 Safari/537.36" version="29.5.2">
+  <diagram name="Flujo MayiHear" id="mayihear-flujo">
+    <mxGraphModel dx="1426" dy="841" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;fontColor=#1e293b;" value="¿Cómo funciona MayiHear?" vertex="1">
+          <mxGeometry height="40" width="600" x="125" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontColor=#64748b;" value="De la reunión al acta en Monday.com, de forma automática." vertex="1">
+          <mxGeometry height="25" width="600" x="125" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="p1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;verticalAlign=middle;arcSize=15;" value="1️⃣  Elige el proyecto" vertex="1">
+          <mxGeometry height="60" width="300" x="275" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontColor=#374151;" value="Selecciona en qué proyecto de Monday.com&lt;br&gt;se va a publicar el acta." vertex="1">
+          <mxGeometry height="30" width="450" x="200" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="arr1" edge="1" parent="1" source="p1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94a3b8;strokeWidth=2;" target="p2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;fontStyle=1;verticalAlign=middle;arcSize=15;" value="2️⃣  Graba la reunión" vertex="1">
+          <mxGeometry height="60" width="300" x="275" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontColor=#374151;" value="Presiona el botón rojo ● y MayiHear captura&lt;br&gt;el audio de la reunión en tu computadora." vertex="1">
+          <mxGeometry height="30" width="450" x="200" y="275" as="geometry" />
+        </mxCell>
+        <mxCell id="arr2" edge="1" parent="1" source="p2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94a3b8;strokeWidth=2;" target="p3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;fontStyle=1;verticalAlign=middle;arcSize=15;" value="3️⃣  Detén la grabación" vertex="1">
+          <mxGeometry height="60" width="300" x="275" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontColor=#374151;" value="Presiona ■ al terminar. El audio se guarda&lt;br&gt;automáticamente como respaldo." vertex="1">
+          <mxGeometry height="30" width="450" x="200" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="arr3" edge="1" parent="1" source="p3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94a3b8;strokeWidth=2;" target="p4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="auto-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;fontColor=#6366f1;" value="⚡ Automático" vertex="1">
+          <mxGeometry height="20" width="100" x="590" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="p4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;fontStyle=1;verticalAlign=middle;arcSize=15;" value="4️⃣  Transcripción del audio" vertex="1">
+          <mxGeometry height="60" width="300" x="275" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontColor=#374151;" value="La IA convierte todo lo que se habló en texto.&lt;br&gt;Reuniones largas se procesan por fragmentos." vertex="1">
+          <mxGeometry height="30" width="450" x="200" y="495" as="geometry" />
+        </mxCell>
+        <mxCell id="arr4" edge="1" parent="1" source="p4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94a3b8;strokeWidth=2;" target="p5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="auto-label2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;fontColor=#6366f1;" value="⚡ Automático" vertex="1">
+          <mxGeometry height="20" width="100" x="590" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="p5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1;verticalAlign=middle;arcSize=15;" value="5️⃣  Generación de Insights y Acta" vertex="1">
+          <mxGeometry height="60" width="300" x="275" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontColor=#374151;" value="La IA analiza la transcripción y extrae:&lt;br&gt;resumen, decisiones, tareas y acta completa." vertex="1">
+          <mxGeometry height="30" width="450" x="200" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="arr5" edge="1" parent="1" source="p5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94a3b8;strokeWidth=2;" target="p6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;verticalAlign=middle;arcSize=15;" value="6️⃣  Revisa y publica en Monday.com" vertex="1">
+          <mxGeometry height="60" width="300" x="275" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="p6-desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontColor=#374151;" value="Verifica el acta generada y con un clic&lt;br&gt;se publica directamente en el proyecto." vertex="1">
+          <mxGeometry height="30" width="450" x="200" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="arr6" edge="1" parent="1" source="p6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94a3b8;strokeWidth=2;" target="p7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#0f172a;fontColor=#ffffff;fontSize=15;fontStyle=1;verticalAlign=middle;arcSize=15;" value="✅  El usuario ya puede ver el acta en monday" vertex="1">
+          <mxGeometry height="65" width="350" x="250" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="p7-desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontColor=#374151;" value="El acta aparece en Monday.com sin que el PO&lt;br&gt;tenga que escribir ni enviar nada manualmente." vertex="1">
+          <mxGeometry height="30" width="500" x="175" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#86efac;strokeWidth=1.5;dashed=1;" value="" vertex="1">
+          <mxGeometry height="200" width="200" x="40" y="415" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=12;fontColor=#166534;" value="💡 ¿Ya tienes la&lt;br&gt;transcripción?" vertex="1">
+          <mxGeometry height="35" width="180" x="50" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-text" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontColor=#374151;" value="Pega el texto o carga&lt;br&gt;un archivo .txt y salta&lt;br&gt;directo a generar&lt;br&gt;insights y acta." vertex="1">
+          <mxGeometry height="80" width="190" x="45" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="arr-alt" edge="1" parent="1" source="alt-bg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#86efac;strokeWidth=2;dashed=1;fontSize=10;fontColor=#166534;" target="p5" value="salta al paso 5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
