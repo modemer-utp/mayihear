@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: mayihear Teams transcript pipeline
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 300
+    MemorySize: 512
+    Environment:
+      Variables:
+        AZURE_TENANT_ID: !Sub "{{resolve:secretsmanager:mayihear/azure:SecretString:tenant_id}}"
+        AZURE_CLIENT_ID: !Sub "{{resolve:secretsmanager:mayihear/azure:SecretString:client_id}}"
+        AZURE_CLIENT_SECRET: !Sub "{{resolve:secretsmanager:mayihear/azure:SecretString:client_secret}}"
+        LLM_API_KEY: !Sub "{{resolve:secretsmanager:mayihear/llm:SecretString:api_key}}"
+        MONDAY_API_TOKEN: !Sub "{{resolve:secretsmanager:mayihear/monday:SecretString:api_token}}"
+        MONDAY_BOARD_ID: !Sub "{{resolve:secretsmanager:mayihear/monday:SecretString:board_id}}"
+
+Resources:
+
+  # ── SQS Queue ──────────────────────────────────────────────────────────────
+  TranscriptQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: mayihear-transcripts
+      VisibilityTimeout: 360
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt TranscriptDLQ.Arn
+        maxReceiveCount: 3
+
+  TranscriptDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: mayihear-transcripts-dlq
+
+  # ── S3 Bucket (transcripts + results) ─────────────────────────────────────
+  TranscriptsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "mayihear-transcripts-${AWS::AccountId}"
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-after-90-days
+            Status: Enabled
+            ExpirationInDays: 90
+
+  # ── Webhook Receiver Lambda ────────────────────────────────────────────────
+  WebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mayihear-webhook-receiver
+      CodeUri: lambda_functions/
+      Handler: webhook_receiver.handler
+      Environment:
+        Variables:
+          SQS_QUEUE_URL: !Ref TranscriptQueue
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt TranscriptQueue.QueueName
+      Events:
+        WebhookApi:
+          Type: Api
+          Properties:
+            Path: /webhook
+            Method: post
+
+  # ── Transcript Processor Lambda ────────────────────────────────────────────
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mayihear-transcript-processor
+      CodeUri: lambda_functions/
+      Handler: transcript_processor.handler
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt TranscriptQueue.QueueName
+        - S3WritePolicy:
+            BucketName: !Ref TranscriptsBucket
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:mayihear/*"
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt TranscriptQueue.Arn
+            BatchSize: 1
+
+Outputs:
+  WebhookUrl:
+    Description: "Graph API webhook endpoint"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/webhook"
+
+  QueueUrl:
+    Description: "SQS Queue URL"
+    Value: !Ref TranscriptQueue
