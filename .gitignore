@@ -1,5 +1,8 @@
 node_modules/
 .env
+.env.dev
+teams-agent/.env.dev
+teams-agent/appsettings.json
 recordings/
 *.webm
 *.wav

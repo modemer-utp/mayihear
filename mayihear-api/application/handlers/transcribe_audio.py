@@ -29,7 +29,17 @@ TRANSCRIPTION_PROMPT = (
 class TranscribeAudio:
 
     def __init__(self):
-        self.client = genai.Client(api_key=secret_manager.get_gemini_api_key())
+        self._client = None  # Lazy — initialized on first use so key can be set via Settings
+
+    @property
+    def client(self):
+        if self._client is None:
+            self._client = genai.Client(api_key=secret_manager.get_gemini_api_key())
+        return self._client
+
+    def _reset_client(self):
+        """Call after updating the API key so the next request picks up the new key."""
+        self._client = None
 
     def _generate_with_retry(self, audio_file) -> tuple:
         """Calls generate_content with retry on 503/429 and falls back to a stable model.

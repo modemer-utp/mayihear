@@ -96,6 +96,22 @@ def update_long_text_column(board_id: str, item_id: str, column_id: str, text: s
     })["change_column_value"]["id"])
 
 
+def get_board_details(board_id: str) -> dict:
+    query = """
+    query($ids: [ID!]!) {
+      boards(ids: $ids) {
+        name
+        description
+        items_count
+        groups { id title color }
+        columns { id title type }
+      }
+    }
+    """
+    board = _gql(query, {"ids": [board_id]})["boards"][0]
+    return board
+
+
 def update_column(board_id: str, item_id: str, column_id: str, value: str) -> str:
     mutation = """
     mutation($board_id: ID!, $item_id: ID!, $column_id: String!, $value: String!) {

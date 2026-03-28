@@ -13,7 +13,195 @@
   <header>
     <span class="dot" id="status-dot"></span>
     <h1>MayiHear</h1>
+    <button id="settings-btn" class="settings-btn" title="Configuración">⚙</button>
   </header>
+
+  <!-- Settings panel overlay -->
+  <div id="settings-overlay" class="settings-overlay hidden"></div>
+  <aside id="settings-panel" class="settings-panel hidden">
+    <div class="settings-panel-header">
+      <span class="settings-panel-title">Configuración</span>
+      <button id="settings-close-btn" class="settings-close-btn">✕</button>
+    </div>
+
+    <div class="settings-body">
+
+      <!-- Gemini API Key -->
+      <div class="settings-section">
+        <div class="settings-section-label">Google Gemini — API Key</div>
+
+        <div class="settings-field">
+          <label class="settings-field-label">Gemini API Key</label>
+          <div class="settings-field-row">
+            <input type="password" id="s-gemini-key" class="settings-input" placeholder="AIzaSy..." />
+            <button id="s-gemini-toggle" class="settings-icon-btn" title="Mostrar/ocultar">👁</button>
+          </div>
+          <span id="s-gemini-hint" class="settings-hint"></span>
+          <span class="settings-hint">Obtén tu clave en <strong>aistudio.google.com</strong> → Get API Key. Requerida para transcripción e insights.</span>
+        </div>
+
+        <div class="settings-field-row settings-actions-row">
+          <button id="s-gemini-save-btn" class="settings-btn-primary">Guardar clave</button>
+        </div>
+        <span id="s-gemini-status" class="settings-status-text"></span>
+      </div>
+
+      <!-- Monday.com API -->
+      <div class="settings-section">
+        <div class="settings-section-label">Monday.com — Credenciales</div>
+
+        <div class="settings-field">
+          <label class="settings-field-label">API Token</label>
+          <div class="settings-field-row">
+            <input type="password" id="s-monday-token" class="settings-input" placeholder="eyJhbGciOiJ..." />
+            <button id="s-token-toggle" class="settings-icon-btn" title="Mostrar/ocultar">👁</button>
+          </div>
+          <span class="settings-hint">Obtén tu token en monday.com → Perfil → Developers → API</span>
+        </div>
+
+        <div class="settings-field">
+          <label class="settings-field-label">Board ID del tablero de proyectos</label>
+          <input type="text" id="s-monday-board-id" class="settings-input" placeholder="ej. 1234567890" />
+          <span class="settings-hint">ID del tablero donde están los proyectos (URL del tablero)</span>
+        </div>
+
+        <div class="settings-field">
+          <label class="settings-field-label">Column ID para el acta</label>
+          <input type="text" id="s-monday-column-id" class="settings-input" placeholder="ej. long_text" />
+          <span class="settings-hint">ID de la columna de texto donde se publica el acta</span>
+        </div>
+
+        <div class="settings-field-row settings-actions-row">
+          <button id="s-test-btn" class="settings-btn-secondary">Probar conexión</button>
+          <button id="s-save-btn" class="settings-btn-primary">Guardar</button>
+        </div>
+        <span id="s-save-status" class="settings-status-text"></span>
+      </div>
+
+      <!-- Transcription mode -->
+      <div class="settings-section">
+        <div class="settings-section-label">Modo de transcripción</div>
+        <div class="settings-toggle-row">
+          <div class="settings-toggle-info">
+            <span class="settings-toggle-name">Usar Whisper local</span>
+            <span class="settings-toggle-desc">El audio nunca sale de tu PC. Requiere ~244MB de descarga la primera vez que actives este modo.</span>
+          </div>
+          <label class="toggle-label">
+            <input type="checkbox" id="s-local-whisper" />
+            <span class="toggle-pill"></span>
+          </label>
+        </div>
+        <div id="s-whisper-model-row" class="settings-field" style="margin-top:10px;display:none">
+          <label class="settings-field-label">Modelo Whisper</label>
+          <select id="s-whisper-model" class="monday-select" style="width:100%">
+            <option value="tiny">tiny — más rápido, menos preciso (~75MB)</option>
+            <option value="small" selected>small — equilibrio recomendado (~244MB)</option>
+            <option value="medium">medium — más preciso, más lento (~1.5GB)</option>
+            <option value="large-v3">large-v3 — máxima precisión (~3GB)</option>
+          </select>
+        </div>
+        <div class="settings-field-row settings-actions-row" style="margin-top:8px">
+          <button id="s-transcription-save-btn" class="settings-btn-primary">Guardar modo</button>
+        </div>
+        <span id="s-transcription-status" class="settings-status-text"></span>
+      </div>
+
+      <!-- Auto-publish toggle -->
+      <div class="settings-section">
+        <div class="settings-section-label">Publicación automática</div>
+        <div class="settings-toggle-row">
+          <div class="settings-toggle-info">
+            <span class="settings-toggle-name">Publicar en Monday.com automáticamente</span>
+            <span class="settings-toggle-desc">Publica el acta en Monday.com sin confirmación manual al terminar de generarla</span>
+          </div>
+          <label class="toggle-label">
+            <input type="checkbox" id="s-auto-publish" />
+            <span class="toggle-pill"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Board explorer -->
+      <div class="settings-section">
+        <div class="settings-section-label">Explorador de tableros</div>
+        <span class="settings-hint">Selecciona un tablero para ver sus métricas y columnas disponibles.</span>
+
+        <div class="settings-field" style="margin-top:10px">
+          <select id="s-board-select" class="monday-select">
+            <option value="">Seleccionar tablero...</option>
+          </select>
+        </div>
+
+        <div id="s-board-metrics" class="board-metrics hidden">
+          <div class="board-metrics-header">
+            <span id="s-board-name" class="board-metrics-name"></span>
+            <span id="s-board-count" class="board-metrics-count"></span>
+          </div>
+          <div id="s-board-desc" class="board-metrics-desc"></div>
+
+          <div class="board-metrics-grid">
+            <div class="board-metrics-block">
+              <div class="board-metrics-block-label">Grupos</div>
+              <div id="s-board-groups" class="board-metrics-list"></div>
+            </div>
+            <div class="board-metrics-block">
+              <div class="board-metrics-block-label">Columnas disponibles</div>
+              <div id="s-board-columns" class="board-metrics-list"></div>
+            </div>
+          </div>
+
+          <div class="settings-hint board-metrics-tip">
+            💡 Usa el <strong>Column ID</strong> de una columna de tipo <em>long_text</em> como "Column ID para el acta" arriba.
+          </div>
+        </div>
+
+        <div id="s-board-loading" class="board-loading hidden">Cargando métricas...</div>
+      </div>
+
+      <!-- Monday.com info -->
+      <div class="settings-section">
+        <div class="settings-section-label">¿Cómo funciona Monday.com?</div>
+        <div class="monday-info-box">
+          <div class="monday-info-item">
+            <span class="monday-info-icon">📋</span>
+            <div>
+              <strong>Tableros (Boards)</strong>
+              <p>Cada tablero es un proyecto o área de trabajo. Contiene grupos, columnas e ítems.</p>
+            </div>
+          </div>
+          <div class="monday-info-item">
+            <span class="monday-info-icon">📁</span>
+            <div>
+              <strong>Grupos</strong>
+              <p>Secciones dentro del tablero (ej. "Activo", "Completado", "Bloqueado").</p>
+            </div>
+          </div>
+          <div class="monday-info-item">
+            <span class="monday-info-icon">📌</span>
+            <div>
+              <strong>Ítems (Pulses)</strong>
+              <p>Filas del tablero. Cada ítem representa un proyecto, tarea o entregable.</p>
+            </div>
+          </div>
+          <div class="monday-info-item">
+            <span class="monday-info-icon">🗂</span>
+            <div>
+              <strong>Columnas</strong>
+              <p>Campos tipados de cada ítem: Estado, Responsable, Fecha, Texto largo, etc. MayiHear escribe en una columna de tipo <em>long_text</em>.</p>
+            </div>
+          </div>
+          <div class="monday-info-item">
+            <span class="monday-info-icon">💬</span>
+            <div>
+              <strong>Updates (Actualizaciones)</strong>
+              <p>Comentarios en un ítem. Alternativa a escribir en columnas; útil para historial de actas.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
 
   <main>
 

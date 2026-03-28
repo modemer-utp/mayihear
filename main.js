@@ -8,6 +8,26 @@ const os = require('os')
 
 const API_BASE = 'http://localhost:8001'
 const RECORDINGS_DIR = path.join(__dirname, 'recordings')
+const SETTINGS_PATH = path.join(app.getPath ? app.getPath('userData') : __dirname, 'settings.json')
+
+// ── Settings helpers ─────────────────────────────────────────
+function getSettingsPath() {
+  try { return path.join(app.getPath('userData'), 'settings.json') } catch (_) { return path.join(__dirname, 'settings.json') }
+}
+
+function loadSettings() {
+  const p = getSettingsPath()
+  try {
+    if (fs.existsSync(p)) return JSON.parse(fs.readFileSync(p, 'utf-8'))
+  } catch (_) {}
+  return { gemini_api_key: '', monday_token: '', monday_board_id: '', monday_column_id: '', monday_auto_publish: false }
+}
+
+function saveSettingsFile(data) {
+  const merged = { ...loadSettings(), ...data }
+  fs.writeFileSync(getSettingsPath(), JSON.stringify(merged, null, 2), 'utf-8')
+  return merged
+}
 
 let pythonProcess = null
 let isQuitting = false
@@ -129,6 +149,26 @@ function createWindow() {
   win.loadFile('renderer/index.html')
 }
 
+async function pushSettingsToApi() {
+  const s = loadSettings()
+  const body = {}
+  if (s.gemini_api_key)   body.gemini_api_key   = s.gemini_api_key
+  if (s.monday_token)     body.monday_token     = s.monday_token
+  if (s.monday_board_id)  body.monday_board_id  = s.monday_board_id
+  if (s.monday_column_id) body.monday_column_id = s.monday_column_id
+  if (s.transcription_mode) body.transcription_mode = s.transcription_mode
+  if (s.whisper_model)      body.whisper_model      = s.whisper_model
+  if (Object.keys(body).length === 0) return
+  try {
+    await fetch(`${API_BASE}/settings/api-keys`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+    console.log('[MayiHear] Settings pushed to API')
+  } catch (_) {}
+}
+
 app.whenReady().then(async () => {
   startPythonApi()
   if (app.isPackaged) {
@@ -136,6 +176,8 @@ app.whenReady().then(async () => {
     if (!ready) console.error('[MayiHear] API timeout — opening app anyway')
   }
   createWindow()
+  // Push saved API keys to Python once ready (3s delay to let API start)
+  setTimeout(pushSettingsToApi, 3000)
 })
 
 app.on('before-quit', () => { isQuitting = true; stopPythonApi() })
@@ -366,6 +408,63 @@ ipcMain.handle('monday-publish-acta', async (_event, itemId, actaData) => {
     return { ok: true }
   } catch (err) {
     return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.handle('get-settings', () => {
+  const s = loadSettings()
+  // Return masked hints instead of raw keys for display
+  const mask = v => v && v.length >= 8 ? `...${v.slice(-4)}` : (v ? '••••' : '')
+  return {
+    ...s,
+    gemini_api_key: '',          // never send key back to renderer
+    gemini_configured: !!s.gemini_api_key,
+    gemini_hint: mask(s.gemini_api_key),
+    monday_token: '',
+    monday_configured: !!s.monday_token,
+    monday_hint: mask(s.monday_token),
+    monday_board_id: s.monday_board_id || '',
+    monday_column_id: s.monday_column_id || '',
+    monday_auto_publish: !!s.monday_auto_publish,
+    transcription_mode: s.transcription_mode || 'gemini',
+    whisper_model: s.whisper_model || 'small'
+  }
+})
+
+ipcMain.handle('save-settings', async (_event, data) => {
+  const settings = saveSettingsFile(data)
+  await pushSettingsToApi()
+  return { ok: true }
+})
+
+ipcMain.handle('monday-board-details', async (_event, boardId) => {
+  try {
+    const resp = await fetch(`${API_BASE}/monday/boards/${boardId}/details`)
+    if (!resp.ok) return { ok: false, error: await resp.text() }
+    return { ok: true, data: await resp.json() }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.handle('monday-test-connection', async () => {
+  try {
+    const resp = await fetch(`${API_BASE}/monday/boards`)
+    if (!resp.ok) return { ok: false, error: await resp.text() }
+    const boards = await resp.json()
+    return { ok: true, boards_count: boards.length }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.handle('settings-status', async () => {
+  try {
+    const resp = await fetch(`${API_BASE}/settings/status`)
+    if (!resp.ok) return { ok: false }
+    return { ok: true, ...(await resp.json()) }
+  } catch (_) {
+    return { ok: false }
   }
 })
 

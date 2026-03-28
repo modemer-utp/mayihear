@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 from application.services.monday_service import MondayService
 from domain.models.input.monday_publish_request import MondayPublishRequest
-from domain.models.output.monday_result import BoardInfo, ItemInfo, ColumnInfo, MondayPublishResult
+from domain.models.output.monday_result import BoardInfo, ItemInfo, ColumnInfo, BoardDetails, MondayPublishResult
 
 router = APIRouter(prefix="/monday", tags=["monday"])
 service = MondayService()
@@ -38,6 +38,29 @@ def list_columns(board_id: str):
 def list_projects():
     try:
         return service.list_projects()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/boards/{board_id}/details", response_model=BoardDetails)
+def board_details(board_id: str):
+    try:
+        return service.get_board_details(board_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class UpdateMondaySettingsRequest(BaseModel):
+    token: str
+    board_id: Optional[str] = None
+    column_id: Optional[str] = None
+
+
+@router.post("/settings")
+def update_monday_settings(request: UpdateMondaySettingsRequest):
+    try:
+        service.update_monday_settings(request.token, request.board_id, request.column_id)
+        return {"ok": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

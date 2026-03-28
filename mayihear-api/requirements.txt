@@ -22,3 +22,6 @@ python-dotenv==1.0.1
 
 # Monday.com integration
 requests==2.32.3
+
+# Local transcription (optional — used when transcription_mode = "local")
+faster-whisper==1.1.1

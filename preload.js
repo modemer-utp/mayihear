@@ -41,5 +41,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('load-transcript-file'),
 
   onTranscribeProgress: (callback) =>
-    ipcRenderer.on('transcribe-progress', (_event, data) => callback(data))
+    ipcRenderer.on('transcribe-progress', (_event, data) => callback(data)),
+
+  getSettings: () =>
+    ipcRenderer.invoke('get-settings'),
+
+  saveSettings: (data) =>
+    ipcRenderer.invoke('save-settings', data),
+
+  mondayBoardDetails: (boardId) =>
+    ipcRenderer.invoke('monday-board-details', boardId),
+
+  mondayTestConnection: () =>
+    ipcRenderer.invoke('monday-test-connection'),
 })

@@ -457,6 +457,7 @@ generateActaBtn.addEventListener('click', async () => {
   generateActaBtn.textContent = 'Regenerar Acta'
 
   showMondaySection()
+  await autoPublishIfEnabled(result.data)
 })
 
 downloadActaBtn.addEventListener('click', async () => {
@@ -640,6 +641,278 @@ generateFromTextBtn.addEventListener('click', async () => {
   generateFromTextBtn.disabled = false
   generateFromTextBtn.textContent = 'Generar Insights desde texto'
 })
+
+// ── Settings panel ─────────────────────────────────────────────
+const settingsBtn     = document.getElementById('settings-btn')
+const settingsPanel   = document.getElementById('settings-panel')
+const settingsOverlay = document.getElementById('settings-overlay')
+const settingsCloseBtn = document.getElementById('settings-close-btn')
+const sAutoPublish    = document.getElementById('s-auto-publish')
+const sMondayToken    = document.getElementById('s-monday-token')
+const sMondayBoardId  = document.getElementById('s-monday-board-id')
+const sMondayColumnId = document.getElementById('s-monday-column-id')
+const sGeminiKey      = document.getElementById('s-gemini-key')
+const sGeminiToggle   = document.getElementById('s-gemini-toggle')
+const sGeminiSaveBtn  = document.getElementById('s-gemini-save-btn')
+const sGeminiStatus   = document.getElementById('s-gemini-status')
+const sGeminiHint     = document.getElementById('s-gemini-hint')
+const sTokenToggle    = document.getElementById('s-token-toggle')
+const sSaveBtn        = document.getElementById('s-save-btn')
+const sTestBtn        = document.getElementById('s-test-btn')
+const sSaveStatus     = document.getElementById('s-save-status')
+const sLocalWhisper         = document.getElementById('s-local-whisper')
+const sWhisperModelRow      = document.getElementById('s-whisper-model-row')
+const sWhisperModel         = document.getElementById('s-whisper-model')
+const sTranscriptionSaveBtn = document.getElementById('s-transcription-save-btn')
+const sTranscriptionStatus  = document.getElementById('s-transcription-status')
+const sBoardSelect    = document.getElementById('s-board-select')
+const sBoardMetrics   = document.getElementById('s-board-metrics')
+const sBoardLoading   = document.getElementById('s-board-loading')
+const sBoardName      = document.getElementById('s-board-name')
+const sBoardCount     = document.getElementById('s-board-count')
+const sBoardDesc      = document.getElementById('s-board-desc')
+const sBoardGroups    = document.getElementById('s-board-groups')
+const sBoardColumns   = document.getElementById('s-board-columns')
+
+let settingsOpen = false
+let appSettings  = {}
+
+function openSettings() {
+  settingsPanel.classList.remove('hidden')
+  settingsOverlay.classList.remove('hidden')
+  settingsOpen = true
+}
+
+function closeSettings() {
+  settingsPanel.classList.add('hidden')
+  settingsOverlay.classList.add('hidden')
+  settingsOpen = false
+}
+
+settingsCloseBtn.addEventListener('click', closeSettings)
+settingsOverlay.addEventListener('click', closeSettings)
+
+sGeminiToggle.addEventListener('click', () => {
+  sGeminiKey.type = sGeminiKey.type === 'password' ? 'text' : 'password'
+})
+
+sGeminiSaveBtn.addEventListener('click', async () => {
+  const key = sGeminiKey.value.trim()
+  if (!key) {
+    sGeminiStatus.textContent = 'Ingresa tu Gemini API Key.'
+    sGeminiStatus.className = 'settings-status-text error'
+    return
+  }
+  sGeminiStatus.textContent = 'Guardando...'
+  sGeminiStatus.className = 'settings-status-text'
+  const result = await window.electronAPI.saveSettings({ gemini_api_key: key })
+  if (result.ok) {
+    sGeminiKey.value = ''
+    sGeminiHint.textContent = `Clave configurada: ...${key.slice(-4)}`
+    sGeminiStatus.textContent = 'Clave guardada. Ya puedes transcribir.'
+    sGeminiStatus.className = 'settings-status-text success'
+    appSettings.gemini_configured = true
+  } else {
+    sGeminiStatus.textContent = 'Error al guardar.'
+    sGeminiStatus.className = 'settings-status-text error'
+  }
+  setTimeout(() => { sGeminiStatus.textContent = '' }, 3000)
+})
+
+sLocalWhisper.addEventListener('change', () => {
+  sWhisperModelRow.style.display = sLocalWhisper.checked ? 'block' : 'none'
+})
+
+sTranscriptionSaveBtn.addEventListener('click', async () => {
+  const mode = sLocalWhisper.checked ? 'local' : 'gemini'
+  const model = sWhisperModel.value
+  sTranscriptionStatus.textContent = 'Guardando...'
+  sTranscriptionStatus.className = 'settings-status-text'
+  const result = await window.electronAPI.saveSettings({ transcription_mode: mode, whisper_model: model })
+  if (result.ok) {
+    sTranscriptionStatus.textContent = mode === 'local'
+      ? `Modo local activo (${model}). El modelo se descargará al transcribir por primera vez.`
+      : 'Modo Gemini activo.'
+    sTranscriptionStatus.className = 'settings-status-text success'
+  } else {
+    sTranscriptionStatus.textContent = 'Error al guardar.'
+    sTranscriptionStatus.className = 'settings-status-text error'
+  }
+  setTimeout(() => { sTranscriptionStatus.textContent = '' }, 4000)
+})
+
+sTokenToggle.addEventListener('click', () => {
+  sMondayToken.type = sMondayToken.type === 'password' ? 'text' : 'password'
+})
+
+async function loadSettingsIntoPanel() {
+  const s = await window.electronAPI.getSettings()
+  appSettings = s
+  sGeminiKey.value = ''
+  sGeminiHint.textContent = s.gemini_configured
+    ? `Clave configurada: ${s.gemini_hint}`
+    : 'Sin configurar — requerida para transcribir.'
+  sMondayToken.value    = ''
+  sMondayBoardId.value  = s.monday_board_id  || ''
+  sMondayColumnId.value = s.monday_column_id || ''
+  sAutoPublish.checked  = !!s.monday_auto_publish
+  sLocalWhisper.checked = s.transcription_mode === 'local'
+  sWhisperModel.value   = s.whisper_model || 'small'
+  sWhisperModelRow.style.display = sLocalWhisper.checked ? 'block' : 'none'
+}
+
+settingsBtn.addEventListener('click', async () => {
+  openSettings()
+  await loadSettingsIntoPanel()
+  loadBoardsIntoExplorer()
+})
+
+sSaveBtn.addEventListener('click', async () => {
+  sSaveStatus.textContent = 'Guardando...'
+  sSaveStatus.className = 'settings-status-text'
+
+  const result = await window.electronAPI.saveSettings({
+    monday_token:     sMondayToken.value.trim(),
+    monday_board_id:  sMondayBoardId.value.trim(),
+    monday_column_id: sMondayColumnId.value.trim(),
+    monday_auto_publish: sAutoPublish.checked
+  })
+
+  if (result.ok) {
+    appSettings = result.settings
+    sSaveStatus.textContent = 'Guardado correctamente.'
+    sSaveStatus.className = 'settings-status-text success'
+  } else {
+    sSaveStatus.textContent = 'Error al guardar.'
+    sSaveStatus.className = 'settings-status-text error'
+  }
+  setTimeout(() => { sSaveStatus.textContent = '' }, 3000)
+})
+
+sTestBtn.addEventListener('click', async () => {
+  sTestBtn.textContent = 'Probando...'
+  sTestBtn.disabled = true
+  const result = await window.electronAPI.mondayTestConnection()
+  if (result.ok) {
+    sSaveStatus.textContent = `Conexión OK — ${result.boards_count} tablero(s) encontrado(s).`
+    sSaveStatus.className = 'settings-status-text success'
+    loadBoardsIntoExplorer()
+  } else {
+    sSaveStatus.textContent = `Sin conexión: ${result.error}`
+    sSaveStatus.className = 'settings-status-text error'
+  }
+  sTestBtn.textContent = 'Probar conexión'
+  sTestBtn.disabled = false
+})
+
+async function loadBoardsIntoExplorer() {
+  sBoardSelect.innerHTML = '<option value="">Cargando tableros...</option>'
+  const result = await window.electronAPI.mondayGetBoards()
+  if (!result.ok || !result.data?.length) {
+    sBoardSelect.innerHTML = '<option value="">No se pudieron cargar los tableros</option>'
+    return
+  }
+  sBoardSelect.innerHTML = '<option value="">Seleccionar tablero...</option>'
+  result.data.forEach(b => {
+    const opt = document.createElement('option')
+    opt.value = b.id
+    opt.textContent = b.name
+    sBoardSelect.appendChild(opt)
+  })
+}
+
+const GROUP_COLORS = {
+  '#037f4c': '#037f4c', '#00c875': '#00c875', '#e2445c': '#e2445c',
+  '#fdab3d': '#fdab3d', '#0086c0': '#0086c0', '#579bfc': '#579bfc',
+}
+
+sBoardSelect.addEventListener('change', async () => {
+  const boardId = sBoardSelect.value
+  sBoardMetrics.classList.add('hidden')
+  sBoardLoading.classList.add('hidden')
+
+  if (!boardId) return
+  sBoardLoading.classList.remove('hidden')
+
+  const result = await window.electronAPI.mondayBoardDetails(boardId)
+  sBoardLoading.classList.add('hidden')
+
+  if (!result.ok) {
+    sBoardLoading.textContent = `Error: ${result.error}`
+    sBoardLoading.classList.remove('hidden')
+    return
+  }
+
+  const d = result.data
+  sBoardName.textContent  = d.name
+  sBoardCount.textContent = d.items_count != null ? `${d.items_count} ítem(s)` : ''
+  sBoardDesc.textContent  = d.description || ''
+
+  // Groups
+  sBoardGroups.innerHTML = ''
+  ;(d.groups || []).forEach(g => {
+    const el = document.createElement('div')
+    el.className = 'board-metrics-group'
+    if (g.color) el.querySelector ? null : null
+    el.style.setProperty('--g-color', g.color || 'var(--border)')
+    el.innerHTML = `<span style="width:8px;height:8px;border-radius:2px;background:${g.color||'var(--border)'};flex-shrink:0;display:inline-block"></span>${g.title}`
+    sBoardGroups.appendChild(el)
+  })
+
+  // Columns
+  sBoardColumns.innerHTML = ''
+  ;(d.columns || []).forEach(c => {
+    const el = document.createElement('div')
+    el.className = 'board-metrics-col'
+    const idEl = document.createElement('span')
+    idEl.className = 'board-metrics-col-id'
+    idEl.textContent = c.id
+    idEl.title = 'Clic para copiar ID'
+    idEl.addEventListener('click', () => {
+      navigator.clipboard.writeText(c.id)
+      idEl.textContent = '¡copiado!'
+      setTimeout(() => { idEl.textContent = c.id }, 1500)
+    })
+    el.innerHTML = `<span style="flex:1;font-size:11px;color:var(--text)">${c.title}</span>`
+    el.appendChild(idEl)
+    const typeEl = document.createElement('span')
+    typeEl.className = 'board-metrics-col-type'
+    typeEl.textContent = c.type
+    el.appendChild(typeEl)
+    sBoardColumns.appendChild(el)
+  })
+
+  sBoardMetrics.classList.remove('hidden')
+})
+
+// ── Auto-publish after acta generation ─────────────────────────
+async function autoPublishIfEnabled(actaData) {
+  const s = appSettings
+  if (!s.monday_auto_publish) return
+  const itemId = projectPreSelect.value
+  if (!itemId) return
+
+  mondayStatusText.textContent = 'Publicando automáticamente...'
+  mondayStatusText.className = 'monday-status-text'
+
+  const content = formatActaTextForMonday(actaData)
+  const result = await window.electronAPI.mondayPublishActa(itemId, actaData)
+
+  if (!result.ok) {
+    mondayStatusText.textContent = `Auto-publicación fallida: ${result.error}`
+    mondayStatusText.classList.add('error')
+  } else {
+    mondayStatusText.textContent = '✓ Acta publicada automáticamente en Monday.com.'
+    mondayStatusText.classList.add('success')
+  }
+}
+
+function formatActaTextForMonday(data) {
+  return formatMeetingAct(data)
+}
+
+// Load app settings on startup (for auto-publish state)
+window.electronAPI.getSettings().then(s => { appSettings = s })
 
 // ── Record button toggle ───────────────────────────────────────
 recordBtn.addEventListener('click', () => {

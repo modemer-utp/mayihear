@@ -1,0 +1,236 @@
+<mxfile host="app.diagrams.net" modified="2026-03-20T00:00:00.000Z" agent="Claude" version="21.0.0">
+  <diagram name="mayihear-teams-pipeline" id="mayihear-arch">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SWIMLANE: Microsoft Teams -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="sw_teams" value="Microsoft Teams (UTP)" style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="280" height="280" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user" value="Usuario" style="shape=mxgraph.azure2.user;fillColor=#0078D4;strokeColor=none;fontColor=#ffffff;fontSize=11;fontStyle=1;" vertex="1" parent="sw_teams">
+          <mxGeometry x="30" y="60" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="meeting" value="Reunión Teams" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_teams">
+          <mxGeometry x="110" y="70" width="130" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="vtt" value="Transcripción .vtt&#xa;(~2-5 min)" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_teams">
+          <mxGeometry x="110" y="180" width="130" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_user_meeting" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="user" target="meeting" parent="sw_teams">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_user_meeting" value="Inicia transcripción" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_user_meeting">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_meeting_vtt" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="meeting" target="vtt" parent="sw_teams">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_meeting_vtt" value="Fin de reunión" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_meeting_vtt">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SWIMLANE: Microsoft Entra ID -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="sw_entra" value="Microsoft Entra ID" style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="280" height="260" as="geometry" />
+        </mxCell>
+
+        <mxCell id="app_reg" value="App Registration&#xa;mayihear-test&#xa;client_id / secret" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_entra">
+          <mxGeometry x="20" y="50" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="policy" value="CsApplicationAccessPolicy&#xa;mayihear-policy" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_entra">
+          <mxGeometry x="20" y="140" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="token" value="OAuth2 Token&#xa;client_credentials" style="rounded=1;fillColor=#005a9e;strokeColor=#003d6b;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_entra">
+          <mxGeometry x="20" y="180" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SWIMLANE: Microsoft Graph API -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="sw_graph" value="Microsoft Graph API" style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="400" y="40" width="220" height="280" as="geometry" />
+        </mxCell>
+
+        <mxCell id="graph_notif" value="Change Notification&#xa;(transcript created)" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_graph">
+          <mxGeometry x="20" y="60" width="170" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="graph_fetch" value="GET /onlineMeetings/&#xa;transcripts/content" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_graph">
+          <mxGeometry x="20" y="170" width="170" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SWIMLANE: AWS -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="sw_aws" value="AWS" style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="700" y="40" width="580" height="580" as="geometry" />
+        </mxCell>
+
+        <mxCell id="apigw" value="API Gateway&#xa;POST /webhook" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;fillColor=#E7157B;strokeColor=none;fontColor=#000000;fontSize=11;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="sw_aws">
+          <mxGeometry x="30" y="60" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lambda_wh" value="Lambda&#xa;webhook_receiver" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fillColor=#ED7100;strokeColor=none;fontColor=#000000;fontSize=11;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="sw_aws">
+          <mxGeometry x="160" y="60" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sqs" value="SQS Queue&#xa;mayihear-transcripts" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;fillColor=#E7157B;strokeColor=none;fontColor=#000000;fontSize=11;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="sw_aws">
+          <mxGeometry x="290" y="60" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dlq" value="SQS DLQ&#xa;failed jobs" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;fillColor=#dd3300;strokeColor=none;fontColor=#000000;fontSize=11;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="sw_aws">
+          <mxGeometry x="290" y="200" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lambda_proc" value="Lambda&#xa;transcript_processor" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fillColor=#ED7100;strokeColor=none;fontColor=#000000;fontSize=11;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="sw_aws">
+          <mxGeometry x="420" y="60" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3" value="S3 Bucket&#xa;transcripts + results" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;fillColor=#3F8624;strokeColor=none;fontColor=#000000;fontSize=11;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="sw_aws">
+          <mxGeometry x="420" y="200" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="secrets" value="Secrets Manager&#xa;Azure / LLM / Monday" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.secrets_manager;fillColor=#DD344C;strokeColor=none;fontColor=#000000;fontSize=11;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="sw_aws">
+          <mxGeometry x="420" y="350" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- AWS internal edges -->
+        <mxCell id="e_apigw_wh" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="apigw" target="lambda_wh" parent="sw_aws">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_wh_sqs" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="lambda_wh" target="sqs" parent="sw_aws">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_wh_sqs" value="Encolar mensaje" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_wh_sqs">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_sqs_proc" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="sqs" target="lambda_proc" parent="sw_aws">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_sqs_proc" value="Trigger" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_sqs_proc">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_sqs_dlq" style="edgeStyle=orthogonalEdgeStyle;dashed=1;" edge="1" source="sqs" target="dlq" parent="sw_aws">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_sqs_dlq" value="max 3 reintentos" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_sqs_dlq">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_proc_s3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="lambda_proc" target="s3" parent="sw_aws">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_proc_s3" value="Guardar VTT + results" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_proc_s3">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_proc_sm" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="lambda_proc" target="secrets" parent="sw_aws">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_proc_sm" value="Leer credenciales" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_proc_sm">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SWIMLANE: LLM Processing -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="sw_llm" value="LLM Processing" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="700" y="680" width="340" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="vtt_parser" value="VTT Parser&#xa;Teams .vtt → texto limpio" style="rounded=1;fillColor=#82b366;strokeColor=#5a7a47;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_llm">
+          <mxGeometry x="20" y="50" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gemini" value="Gemini 2.5 Flash&#xa;Insights + Acta" style="rounded=1;fillColor=#4285F4;strokeColor=#2a5db0;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_llm">
+          <mxGeometry x="180" y="50" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_vtt_gem" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="vtt_parser" target="gemini" parent="sw_llm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SWIMLANE: Output -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="sw_output" value="Output" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="680" width="220" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="monday" value="Monday.com&#xa;Board UTP&#xa;Item + Update" style="rounded=1;fillColor=#00C875;strokeColor=#008a52;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sw_output">
+          <mxGeometry x="30" y="50" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- CROSS-SWIMLANE EDGES -->
+        <!-- ═══════════════════════════════════════════════════ -->
+
+        <!-- Teams VTT → Graph Notification -->
+        <mxCell id="e_vtt_graph" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="vtt" target="graph_notif" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_vtt_graph" value="Transcript ready" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_vtt_graph">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Graph Notification → API Gateway -->
+        <mxCell id="e_graph_apigw" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="graph_notif" target="apigw" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_graph_apigw" value="POST webhook" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_graph_apigw">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Processor → Graph fetch VTT -->
+        <mxCell id="e_proc_graph" style="edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;entryX=1;entryY=0.5;dashed=1;" edge="1" source="lambda_proc" target="graph_fetch" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1120" y="110" />
+              <mxPoint x="660" y="110" />
+              <mxPoint x="660" y="215" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_proc_graph" value="Fetch transcript" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_proc_graph">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Entra ID → Graph API (token) -->
+        <mxCell id="e_entra_graph" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.8;" edge="1" source="app_reg" target="graph_fetch" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_entra_graph" value="Bearer token" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_entra_graph">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Processor → VTT Parser -->
+        <mxCell id="e_proc_vttparser" style="edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.3;entryY=0;" edge="1" source="lambda_proc" target="vtt_parser" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_proc_vttparser" value="Raw VTT" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_proc_vttparser">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Gemini → Monday -->
+        <mxCell id="e_gem_monday" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="gemini" target="monday" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_gem_monday" value="Insights + Acta" style="edgeLabel;fontSize=9;" vertex="1" connectable="0" parent="e_gem_monday">
+          <mxGeometry x="-0.1" relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

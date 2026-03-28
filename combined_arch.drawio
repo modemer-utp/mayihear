@@ -1,0 +1,211 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SECTION A — Automatic Pipeline                                    -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+
+    <mxCell id="bg_a" value="" style="rounded=1;fillColor=#f0f7ff;strokeColor=#6c8ebf;opacity=60;" vertex="1" parent="1">
+      <mxGeometry x="20" y="55" width="1380" height="160" as="geometry" />
+    </mxCell>
+    <mxCell id="lbl_a" value="⚡ Automatic Pipeline  (Architecture A — AWS Serverless)" style="text;html=1;fontStyle=1;fontSize=13;fontColor=#23527c;align=left;" vertex="1" parent="1">
+      <mxGeometry x="32" y="60" width="500" height="24" as="geometry" />
+    </mxCell>
+
+    <!-- A nodes -->
+    <mxCell id="a1" value="Teams Meeting" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="40" y="100" width="120" height="55" as="geometry" />
+    </mxCell>
+    <mxCell id="a2" value="Graph API&#xa;Webhook" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="205" y="100" width="115" height="55" as="geometry" />
+    </mxCell>
+    <mxCell id="a3" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;fillColor=#E7157B;strokeColor=#ffffff;labelBackgroundColor=none;sketch=0;" vertex="1" parent="1">
+      <mxGeometry x="377" y="100" width="55" height="55" as="geometry" />
+    </mxCell>
+    <mxCell id="a3l" value="API Gateway" style="text;html=1;align=center;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="360" y="158" width="90" height="18" as="geometry" />
+    </mxCell>
+    <mxCell id="a4" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fillColor=#FF9900;strokeColor=#E07B00;labelBackgroundColor=none;sketch=0;" vertex="1" parent="1">
+      <mxGeometry x="495" y="100" width="55" height="55" as="geometry" />
+    </mxCell>
+    <mxCell id="a4l" value="Lambda&#xa;Receiver" style="text;html=1;align=center;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="478" y="158" width="88" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="a5" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;fillColor=#FF9900;strokeColor=#E07B00;labelBackgroundColor=none;sketch=0;" vertex="1" parent="1">
+      <mxGeometry x="615" y="100" width="55" height="55" as="geometry" />
+    </mxCell>
+    <mxCell id="a5l" value="SQS Queue" style="text;html=1;align=center;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="598" y="158" width="88" height="18" as="geometry" />
+    </mxCell>
+    <mxCell id="a6" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fillColor=#FF9900;strokeColor=#E07B00;labelBackgroundColor=none;sketch=0;" vertex="1" parent="1">
+      <mxGeometry x="735" y="100" width="55" height="55" as="geometry" />
+    </mxCell>
+    <mxCell id="a6l" value="Lambda&#xa;Processor" style="text;html=1;align=center;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="718" y="158" width="88" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="a7" value="Monday.com" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="865" y="90" width="120" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="a8" value="Email to Attendees" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="865" y="145" width="120" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- A arrows -->
+    <mxCell id="ea1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="a1" target="a2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea2" value="notification" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="a2" target="a3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="a3" target="a4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea4" value="enqueue" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="a4" target="a5" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea5" value="trigger" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="a5" target="a6" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea6" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="a6" target="a7" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea7" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="a6" target="a8" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SHARED RESOURCES                                                   -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+
+    <mxCell id="bg_shared" value="" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;opacity=60;" vertex="1" parent="1">
+      <mxGeometry x="20" y="240" width="1380" height="110" as="geometry" />
+    </mxCell>
+    <mxCell id="lbl_shared" value="🔗 Shared Resources" style="text;html=1;fontStyle=1;fontSize=13;fontColor=#7d6608;align=left;" vertex="1" parent="1">
+      <mxGeometry x="32" y="245" width="220" height="22" as="geometry" />
+    </mxCell>
+
+    <!-- Azure App Registration -->
+    <mxCell id="s1" value="Azure App Registration&#xa;(Graph API credentials)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="160" y="270" width="180" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- Knowledge DB -->
+    <mxCell id="s2" value="Knowledge DB&#xa;(pgvector / Aurora)" style="shape=mxgraph.flowchart.database;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="530" y="262" width="130" height="70" as="geometry" />
+    </mxCell>
+
+    <!-- mayihear API -->
+    <mxCell id="s3" value="mayihear API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="860" y="270" width="130" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- Prompt Config -->
+    <mxCell id="s4" value="Prompt Config&#xa;(by user / area)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="1080" y="270" width="140" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- Shared arrows: Lambda Processor → Knowledge DB (writes) -->
+    <mxCell id="es1" value="writes insights" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;fontColor=#996600;strokeColor=#d79b00;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="a6" target="s2" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Lambda Processor → mayihear API -->
+    <mxCell id="es2" value="calls" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="a6" target="s3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="762" y="230" />
+          <mxPoint x="925" y="230" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Lambda Processor → Prompt Config -->
+    <mxCell id="es3" value="lookup" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="a6" target="s4" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="762" y="230" />
+          <mxPoint x="1150" y="230" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Azure App Reg ↔ Lambda Receiver (Graph API auth) -->
+    <mxCell id="es4" value="auth" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;strokeColor=#6c8ebf;fontColor=#6c8ebf;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="s1" target="a4" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SECTION B — Teams SDK Agent                                       -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+
+    <mxCell id="bg_b" value="" style="rounded=1;fillColor=#f3e8ff;strokeColor=#9673a6;opacity=60;" vertex="1" parent="1">
+      <mxGeometry x="20" y="375" width="1380" height="185" as="geometry" />
+    </mxCell>
+    <mxCell id="lbl_b" value="💬 User Interaction Layer  (Architecture B — Teams SDK Agent)" style="text;html=1;fontStyle=1;fontSize=13;fontColor=#5b2c8d;align=left;" vertex="1" parent="1">
+      <mxGeometry x="32" y="380" width="540" height="22" as="geometry" />
+    </mxCell>
+    <mxCell id="lbl_b2" value="v2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9673a6;strokeColor=#7a4f9e;fontColor=#ffffff;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="580" y="380" width="30" height="20" as="geometry" />
+    </mxCell>
+
+    <!-- B1: User in Teams -->
+    <mxCell id="b1" value="User in Teams" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="40" y="420" width="130" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- B2: Teams SDK Agent -->
+    <mxCell id="b2" value="Teams SDK Agent&#xa;(always-on)&#xa;&#xa;• receive messages&#xa;• query knowledge DB&#xa;• trigger on-demand" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+      <mxGeometry x="230" y="400" width="175" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- B3: Reply in Teams -->
+    <mxCell id="b3" value="Reply in Teams&#xa;(summary / insights)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="490" y="405" width="150" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- B4: On-demand Lambda trigger -->
+    <mxCell id="b4" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fillColor=#FF9900;strokeColor=#E07B00;labelBackgroundColor=none;sketch=0;" vertex="1" parent="1">
+      <mxGeometry x="520" y="480" width="50" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="b4l" value="On-demand Lambda" style="text;html=1;align=center;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="490" y="533" width="110" height="18" as="geometry" />
+    </mxCell>
+
+    <!-- B arrows -->
+    <mxCell id="eb1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="b1" target="b2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="eb2" value="query" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="b2" target="b3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="eb3" value="on-demand" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;dashed=1;" edge="1" source="b2" target="b4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="eb4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="b4" target="a7" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="925" y="505" />
+          <mxPoint x="925" y="110" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Knowledge DB → Teams SDK Agent (reads) -->
+    <mxCell id="ec1" value="reads" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;fontColor=#996600;strokeColor=#d79b00;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s2" target="b2" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Azure App Reg → Teams SDK Agent (auth) -->
+    <mxCell id="ec2" value="auth" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;strokeColor=#6c8ebf;fontColor=#6c8ebf;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="s1" target="b2" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- TIMELINE / PHASE LABELS                                           -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+
+    <mxCell id="phase1" value="Phase 1 — Build now" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1260" y="90" width="130" height="35" as="geometry" />
+    </mxCell>
+    <mxCell id="phase2" value="Phase 2 — Add alongside" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1260" y="270" width="130" height="35" as="geometry" />
+    </mxCell>
+    <mxCell id="phase3" value="Phase 3 — When needed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1260" y="430" width="130" height="35" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- LEGEND                                                             -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+
+    <mxCell id="legend_bg" value="" style="rounded=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+      <mxGeometry x="20" y="585" width="700" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="legend" value="⚡ = Fully automatic, no human needed     |     💬 = Triggered by user     |     🔗 = Used by both A and B" style="text;html=1;align=center;fontSize=11;fontColor=#555555;" vertex="1" parent="1">
+      <mxGeometry x="20" y="595" width="700" height="22" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>

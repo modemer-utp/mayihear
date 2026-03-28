@@ -1,0 +1,320 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- TITLE -->
+    <mxCell id="title" value="mayihear — Architecture Comparison: Teams Pipeline (AWS) vs Teams Agent (Azure)"
+      style="text;html=1;align=center;fontStyle=1;fontSize=16;fontColor=#333333;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="10" width="1760" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- ARCHITECTURE A — Teams Pipeline (AWS Serverless)                    -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+    <mxCell id="bg_a" value=""
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF3FB;strokeColor=#6c8ebf;opacity=60;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="58" width="1760" height="290" as="geometry" />
+    </mxCell>
+
+    <mxCell id="hdr_a" value="Architecture A — Teams Pipeline  (AWS Serverless)"
+      style="text;html=1;fontStyle=1;fontSize=14;fontColor=#1a5276;align=left;"
+      vertex="1" parent="1">
+      <mxGeometry x="35" y="65" width="620" height="25" as="geometry" />
+    </mxCell>
+
+    <!-- Zone labels A -->
+    <mxCell id="za_teams" value="Microsoft Teams"
+      style="text;html=1;align=center;fontStyle=3;fontSize=10;fontColor=#6c8ebf;"
+      vertex="1" parent="1">
+      <mxGeometry x="40" y="90" width="340" height="18" as="geometry" />
+    </mxCell>
+    <mxCell id="za_api" value="mayihear API"
+      style="text;html=1;align=center;fontStyle=3;fontSize=10;fontColor=#9673a6;"
+      vertex="1" parent="1">
+      <mxGeometry x="515" y="90" width="165" height="18" as="geometry" />
+    </mxCell>
+    <mxCell id="za_aws" value="AWS"
+      style="text;html=1;align=center;fontStyle=3;fontSize=10;fontColor=#E07B00;"
+      vertex="1" parent="1">
+      <mxGeometry x="700" y="90" width="260" height="18" as="geometry" />
+    </mxCell>
+    <mxCell id="za_out" value="Output"
+      style="text;html=1;align=center;fontStyle=3;fontSize=10;fontColor=#82b366;"
+      vertex="1" parent="1">
+      <mxGeometry x="975" y="90" width="130" height="18" as="geometry" />
+    </mxCell>
+
+    <!-- Nodes A -->
+    <mxCell id="a1" value="Teams&#xa;Meeting"
+      style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="40" y="118" width="110" height="52" as="geometry" />
+    </mxCell>
+
+    <mxCell id="a2" value="Teams Auto-&#xa;Transcription"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="190" y="118" width="135" height="52" as="geometry" />
+    </mxCell>
+
+    <mxCell id="a3" value="Graph API&#xa;Webhook"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="370" y="118" width="130" height="52" as="geometry" />
+    </mxCell>
+
+    <mxCell id="a4" value="mayihear API"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="540" y="118" width="130" height="52" as="geometry" />
+    </mxCell>
+
+    <mxCell id="a4b" value="Prompt Config&#xa;(by email / area)"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;dashed=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="530" y="228" width="150" height="50" as="geometry" />
+    </mxCell>
+
+    <mxCell id="a5" value=""
+      style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;fillColor=#FF9900;strokeColor=#E07B00;labelBackgroundColor=none;sketch=0;"
+      vertex="1" parent="1">
+      <mxGeometry x="728" y="113" width="62" height="62" as="geometry" />
+    </mxCell>
+    <mxCell id="a5lbl" value="SQS Queue"
+      style="text;html=1;align=center;fontSize=10;"
+      vertex="1" parent="1">
+      <mxGeometry x="712" y="182" width="92" height="18" as="geometry" />
+    </mxCell>
+
+    <mxCell id="a6" value=""
+      style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fillColor=#FF9900;strokeColor=#E07B00;labelBackgroundColor=none;sketch=0;"
+      vertex="1" parent="1">
+      <mxGeometry x="858" y="113" width="62" height="62" as="geometry" />
+    </mxCell>
+    <mxCell id="a6lbl" value="Lambda&#xa;Processor"
+      style="text;html=1;align=center;fontSize=10;"
+      vertex="1" parent="1">
+      <mxGeometry x="842" y="182" width="92" height="22" as="geometry" />
+    </mxCell>
+
+    <mxCell id="a7" value="Monday.com"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="978" y="105" width="128" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="a8" value="Email to&#xa;Attendees"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="978" y="162" width="128" height="45" as="geometry" />
+    </mxCell>
+
+    <!-- Pros / Cons / Resources A -->
+    <mxCell id="pros_a" value="&lt;b&gt;✓ Pros&lt;/b&gt;&lt;br&gt;• Serverless — pay per use only&lt;br&gt;• SQS automatic retries + DLQ&lt;br&gt;• Auto-scales to zero when idle&lt;br&gt;• Prompt personalization by email/area&lt;br&gt;• Battle-tested AWS services"
+      style="text;html=1;align=left;fontSize=10;fontColor=#1a7a1a;verticalAlign=top;whiteSpace=wrap;"
+      vertex="1" parent="1">
+      <mxGeometry x="1145" y="68" width="250" height="115" as="geometry" />
+    </mxCell>
+
+    <mxCell id="cons_a" value="&lt;b&gt;✗ Cons&lt;/b&gt;&lt;br&gt;• More AWS services to configure&lt;br&gt;• Higher baseline cost at low volume&lt;br&gt;• No user interaction inside Teams"
+      style="text;html=1;align=left;fontSize=10;fontColor=#cc0000;verticalAlign=top;whiteSpace=wrap;"
+      vertex="1" parent="1">
+      <mxGeometry x="1145" y="193" width="250" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="res_a" value="&lt;b&gt;Resources (AWS)&lt;/b&gt;&lt;br&gt;• API Gateway&lt;br&gt;• Lambda × 2&lt;br&gt;• SQS Queue&lt;br&gt;• Secrets Manager&lt;br&gt;• mayihear API server&lt;br&gt;&lt;br&gt;&lt;b style=&quot;font-size:12px;&quot;&gt;~$25–35 / month&lt;/b&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E07B00;fontSize=10;align=left;verticalAlign=top;spacingLeft=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="1415" y="68" width="155" height="188" as="geometry" />
+    </mxCell>
+
+    <!-- Arrows A -->
+    <mxCell id="ea1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="a1" target="a2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea2" value="transcript ready" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="a2" target="a3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea3" value="POST /webhook" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="a3" target="a4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="a4" target="a4b" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea5" value="enqueue task" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="a4" target="a5" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea5b" value="prompt selected" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="a4b" target="a5" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="759" y="253" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="ea6" value="trigger" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="a5" target="a6" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea7" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="a6" target="a7" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ea8" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="a6" target="a8" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- ARCHITECTURE B — Teams Agent (Azure / M365 Agents SDK)              -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+    <mxCell id="bg_b" value=""
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5EEF8;strokeColor=#9673a6;opacity=60;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="368" width="1760" height="290" as="geometry" />
+    </mxCell>
+
+    <mxCell id="hdr_b" value="Architecture B — Teams Agent  (M365 Agents SDK · Azure App Service)"
+      style="text;html=1;fontStyle=1;fontSize=14;fontColor=#6c3483;align=left;"
+      vertex="1" parent="1">
+      <mxGeometry x="35" y="375" width="720" height="25" as="geometry" />
+    </mxCell>
+
+    <!-- Zone labels B -->
+    <mxCell id="zb_teams" value="Microsoft Teams"
+      style="text;html=1;align=center;fontStyle=3;fontSize=10;fontColor=#6c8ebf;"
+      vertex="1" parent="1">
+      <mxGeometry x="40" y="400" width="340" height="18" as="geometry" />
+    </mxCell>
+    <mxCell id="zb_azure" value="Azure App Service B1  (always-on)"
+      style="text;html=1;align=center;fontStyle=3;fontSize=10;fontColor=#0070C0;"
+      vertex="1" parent="1">
+      <mxGeometry x="515" y="400" width="330" height="18" as="geometry" />
+    </mxCell>
+    <mxCell id="zb_out" value="Output"
+      style="text;html=1;align=center;fontStyle=3;fontSize=10;fontColor=#82b366;"
+      vertex="1" parent="1">
+      <mxGeometry x="895" y="400" width="130" height="18" as="geometry" />
+    </mxCell>
+
+    <!-- Nodes B -->
+    <mxCell id="b1" value="Teams&#xa;Meeting"
+      style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="40" y="430" width="110" height="52" as="geometry" />
+    </mxCell>
+
+    <mxCell id="b2" value="Teams Auto-&#xa;Transcription"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="190" y="430" width="135" height="52" as="geometry" />
+    </mxCell>
+
+    <mxCell id="b3" value="Graph API&#xa;Change Notification"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="370" y="430" width="130" height="52" as="geometry" />
+    </mxCell>
+
+    <!-- Big Agent App box -->
+    <mxCell id="b4" value="&lt;b&gt;Teams Agent App&lt;/b&gt;  (aiohttp · Python)&lt;br&gt;&lt;hr/&gt;/api/messages — Teams bot endpoint&lt;br&gt;/webhook — Graph notifications&lt;br&gt;&lt;br&gt;pipeline.run():&lt;br&gt;&amp;nbsp;&amp;nbsp;• Fetch VTT via Graph API&lt;br&gt;&amp;nbsp;&amp;nbsp;• Parse transcript (VTT → text)&lt;br&gt;&amp;nbsp;&amp;nbsp;• Gemini 1.5 Flash → insights&lt;br&gt;&amp;nbsp;&amp;nbsp;• POST results to Monday.com"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="548" y="382" width="295" height="228" as="geometry" />
+    </mxCell>
+
+    <mxCell id="b5" value="Monday.com&#xa;(board · Insights col.)"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="900" y="408" width="148" height="52" as="geometry" />
+    </mxCell>
+
+    <mxCell id="b6" value="User in Teams&#xa;(@mayihear ...)"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;dashed=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="900" y="498" width="148" height="52" as="geometry" />
+    </mxCell>
+
+    <!-- Pros / Cons / Resources B -->
+    <mxCell id="pros_b" value="&lt;b&gt;✓ Pros&lt;/b&gt;&lt;br&gt;• Fewer services — one codebase&lt;br&gt;• Cheaper (~$13/mo, always-on B1)&lt;br&gt;• Native user interaction in Teams&lt;br&gt;• Azure ecosystem (same as M365)&lt;br&gt;• No SQS / Lambda complexity"
+      style="text;html=1;align=left;fontSize=10;fontColor=#1a7a1a;verticalAlign=top;whiteSpace=wrap;"
+      vertex="1" parent="1">
+      <mxGeometry x="1095" y="378" width="250" height="115" as="geometry" />
+    </mxCell>
+
+    <mxCell id="cons_b" value="&lt;b&gt;✗ Cons&lt;/b&gt;&lt;br&gt;• Always-on — billed even when idle&lt;br&gt;• No built-in retries (manual logic)&lt;br&gt;• M365 Agents SDK new (Feb 2026)&lt;br&gt;• Manual horizontal scaling"
+      style="text;html=1;align=left;fontSize=10;fontColor=#cc0000;verticalAlign=top;whiteSpace=wrap;"
+      vertex="1" parent="1">
+      <mxGeometry x="1095" y="503" width="250" height="100" as="geometry" />
+    </mxCell>
+
+    <mxCell id="res_b" value="&lt;b&gt;Resources (Azure)&lt;/b&gt;&lt;br&gt;• Azure App Service B1&lt;br&gt;• Azure Bot Service&lt;br&gt;• App Registration (AAD)&lt;br&gt;• Gemini 1.5 Flash API&lt;br&gt;• Graph API (Microsoft)&lt;br&gt;&lt;br&gt;&lt;b style=&quot;font-size:12px;&quot;&gt;~$13 / month&lt;/b&gt;"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0070C0;fontSize=10;align=left;verticalAlign=top;spacingLeft=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="1415" y="378" width="155" height="188" as="geometry" />
+    </mxCell>
+
+    <!-- Arrows B -->
+    <mxCell id="eb1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="b1" target="b2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="eb2" value="transcript ready" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="b2" target="b3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="eb3" value="POST /webhook" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="b3" target="b4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="eb4" value="insights" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;" edge="1" source="b4" target="b5" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="eb5" value="optional v2" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;fontStyle=2;dashed=1;" edge="1" source="b4" target="b6" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- COMPARISON TABLE                                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+    <mxCell id="tbl_bg" value=""
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9f9f9;strokeColor=#aaaaaa;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="678" width="1760" height="278" as="geometry" />
+    </mxCell>
+
+    <mxCell id="tbl_title" value="Feature Comparison"
+      style="text;html=1;fontStyle=1;fontSize=14;fontColor=#333333;align=center;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="682" width="1760" height="26" as="geometry" />
+    </mxCell>
+
+    <!-- Header row -->
+    <mxCell id="th_feat" value="Feature"
+      style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d6e4f0;strokeColor=#aaaaaa;fontStyle=1;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="30" y="712" width="195" height="34" as="geometry" />
+    </mxCell>
+    <mxCell id="th_pipe" value="Teams Pipeline (AWS Serverless)"
+      style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#aaaaaa;fontStyle=1;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="225" y="712" width="770" height="34" as="geometry" />
+    </mxCell>
+    <mxCell id="th_agent" value="Teams Agent (Azure App Service)"
+      style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5EEF8;strokeColor=#aaaaaa;fontStyle=1;fontSize=11;"
+      vertex="1" parent="1">
+      <mxGeometry x="995" y="712" width="775" height="34" as="geometry" />
+    </mxCell>
+
+    <!-- Row: Cost -->
+    <mxCell id="r1f" value="Cost" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#cccccc;fontStyle=1;fontSize=10;" vertex="1" parent="1"><mxGeometry x="30" y="746" width="195" height="32" as="geometry" /></mxCell>
+    <mxCell id="r1a" value="~$25–35/mo  (API GW + Lambda ×2 + SQS + Secrets Manager + server)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFDE7;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="225" y="746" width="770" height="32" as="geometry" /></mxCell>
+    <mxCell id="r1b" value="~$13/mo  (App Service B1 + Bot Service + Gemini API calls)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAF0FE;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="995" y="746" width="775" height="32" as="geometry" /></mxCell>
+
+    <!-- Row: Scaling -->
+    <mxCell id="r2f" value="Scaling" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#cccccc;fontStyle=1;fontSize=10;" vertex="1" parent="1"><mxGeometry x="30" y="778" width="195" height="32" as="geometry" /></mxCell>
+    <mxCell id="r2a" value="✓ Auto-scale — Lambda scales to zero, no cost when idle" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFDE7;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="225" y="778" width="770" height="32" as="geometry" /></mxCell>
+    <mxCell id="r2b" value="✗ Manual — upgrade App Service tier or add instances manually" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAF0FE;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="995" y="778" width="775" height="32" as="geometry" /></mxCell>
+
+    <!-- Row: Retries -->
+    <mxCell id="r3f" value="Retries / Reliability" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#cccccc;fontStyle=1;fontSize=10;" vertex="1" parent="1"><mxGeometry x="30" y="810" width="195" height="32" as="geometry" /></mxCell>
+    <mxCell id="r3a" value="✓ SQS automatic retries + Dead Letter Queue on failure — built-in" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFDE7;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="225" y="810" width="770" height="32" as="geometry" /></mxCell>
+    <mxCell id="r3b" value="✗ Manual retry logic must be coded — no built-in queue or DLQ" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAF0FE;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="995" y="810" width="775" height="32" as="geometry" /></mxCell>
+
+    <!-- Row: LLM -->
+    <mxCell id="r4f" value="LLM" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#cccccc;fontStyle=1;fontSize=10;" vertex="1" parent="1"><mxGeometry x="30" y="842" width="195" height="32" as="geometry" /></mxCell>
+    <mxCell id="r4a" value="Claude / configurable — prompt personalization by user email or department area" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFDE7;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="225" y="842" width="770" height="32" as="geometry" /></mxCell>
+    <mxCell id="r4b" value="Gemini 1.5 Flash — fast, cheap (~$0.075 / 1M input tokens)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAF0FE;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="995" y="842" width="775" height="32" as="geometry" /></mxCell>
+
+    <!-- Row: User Interaction -->
+    <mxCell id="r5f" value="User Interaction" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#cccccc;fontStyle=1;fontSize=10;" vertex="1" parent="1"><mxGeometry x="30" y="874" width="195" height="32" as="geometry" /></mxCell>
+    <mxCell id="r5a" value="✗ None — fully automated pipeline, no bot interaction in Teams" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFDE7;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="225" y="874" width="770" height="32" as="geometry" /></mxCell>
+    <mxCell id="r5b" value="✓ @mayihear bot in Teams — users can query insights directly in chat" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAF0FE;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="995" y="874" width="775" height="32" as="geometry" /></mxCell>
+
+    <!-- Row: Maturity -->
+    <mxCell id="r6f" value="Maturity / Risk" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#cccccc;fontStyle=1;fontSize=10;" vertex="1" parent="1"><mxGeometry x="30" y="906" width="195" height="32" as="geometry" /></mxCell>
+    <mxCell id="r6a" value="✓ Battle-tested — AWS services GA, mayihear API already proven in production" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFDE7;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="225" y="906" width="770" height="32" as="geometry" /></mxCell>
+    <mxCell id="r6b" value="⚠ SDK released Feb 2026 — early adopter risk; E2E test_pipeline.py passes locally" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAF0FE;strokeColor=#cccccc;fontSize=10;" vertex="1" parent="1"><mxGeometry x="995" y="906" width="775" height="32" as="geometry" /></mxCell>
+
+    <!-- Verdict -->
+    <mxCell id="verdict" value="Recommendation: Use Architecture A for the core automated pipeline (proven, scalable, reliable). Adopt Architecture B when native Teams bot interaction is required (planned v2)."
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;align=center;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="968" width="1760" height="44" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>

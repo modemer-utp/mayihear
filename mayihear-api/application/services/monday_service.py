@@ -1,10 +1,10 @@
 from infrastructure.monday_client import (
     get_boards, get_items, get_columns, get_board_items,
-    post_update, update_column, update_long_text_column
+    get_board_details, post_update, update_column, update_long_text_column
 )
 from infrastructure.utilities import secret_manager
 from domain.models.input.monday_publish_request import MondayPublishRequest
-from domain.models.output.monday_result import BoardInfo, ItemInfo, ColumnInfo, MondayPublishResult
+from domain.models.output.monday_result import BoardInfo, ItemInfo, ColumnInfo, BoardDetails, GroupInfo, MondayPublishResult
 
 
 class MondayService:
@@ -31,6 +31,24 @@ class MondayService:
             return MondayPublishResult(ok=True, update_id=uid)
         except Exception as e:
             return MondayPublishResult(ok=False, error=str(e))
+
+    def get_board_details(self, board_id: str) -> BoardDetails:
+        raw = get_board_details(board_id)
+        return BoardDetails(
+            id=board_id,
+            name=raw.get("name", ""),
+            description=raw.get("description"),
+            items_count=raw.get("items_count"),
+            groups=[GroupInfo(id=g["id"], title=g["title"], color=g.get("color")) for g in raw.get("groups", [])],
+            columns=[ColumnInfo(id=c["id"], title=c["title"], type=c["type"]) for c in raw.get("columns", [])],
+        )
+
+    def update_monday_settings(self, token: str, board_id: str = None, column_id: str = None):
+        secret_manager.set_override('MONDAY_API_TOKEN', token)
+        if board_id:
+            secret_manager.set_override('MONDAY_BOARD_ID', board_id)
+        if column_id:
+            secret_manager.set_override('MONDAY_COLUMN_ID', column_id)
 
     def publish_acta(self, item_id: str, content: str) -> MondayPublishResult:
         try:

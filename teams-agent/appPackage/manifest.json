@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeamsSchema.json",
+  "manifestVersion": "1.17",
+  "version": "1.0.0",
+  "id": "d4a48d6a-65b3-4770-88d5-800a58127bfa",
+  "developer": {
+    "name": "EYA Tech",
+    "websiteUrl": "https://eya-tech.com",
+    "privacyUrl": "https://eya-tech.com/privacy",
+    "termsOfUseUrl": "https://eya-tech.com/terms"
+  },
+  "name": {
+    "short": "MayiHear",
+    "full": "MayiHear — Meeting Insights Agent"
+  },
+  "description": {
+    "short": "Processes Teams meeting transcripts and generates insights.",
+    "full": "MayiHear automatically processes Teams meeting transcripts, generates structured insights and meeting minutes, and posts them to Monday.com."
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "#6264A7",
+  "bots": [
+    {
+      "botId": "d4a48d6a-65b3-4770-88d5-800a58127bfa",
+      "scopes": ["personal", "team", "groupChat"],
+      "isNotificationOnly": false,
+      "commandLists": [
+        {
+          "scopes": ["personal"],
+          "commands": [
+            {
+              "title": "status",
+              "description": "Check the agent status"
+            },
+            {
+              "title": "last meeting",
+              "description": "Show insights from the last processed meeting"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["mayihear-agent.azurewebsites.net"]
+}

@@ -1,7 +1,7 @@
 import os
 import sys
 
-os.environ.setdefault('GEMINI_API_KEY', '__GEMINI_API_KEY_PLACEHOLDER__')
+# No API keys are hardcoded — users configure them via the Settings panel (⚙) in the app.
 
 if getattr(sys, 'frozen', False):
     sys.path.insert(0, sys._MEIPASS)
@@ -13,4 +13,4 @@ if data_dir:
 import uvicorn
 
 if __name__ == '__main__':
-    uvicorn.run('api.main:app', host='127.0.0.1', port=8000, log_level='info')
+    uvicorn.run('api.main:app', host='127.0.0.1', port=8001, log_level='info')
