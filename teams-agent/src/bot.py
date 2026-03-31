@@ -4,18 +4,26 @@ Teams activity handler with conversational state machine:
   - Board selection: user can choose which Monday board to publish to
   - Proactive messaging: bot initiates conversation when meeting is processed
   - State persisted in Azure Table Storage — survives redeploys + multi-instance scaling
+  - Multi-user routing: conv refs stored per email, notifications go to the right person
+  - Monday Q&A: user can ask natural-language questions about board data
 """
 import os
 import asyncio
 import logging
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from botbuilder.core import ActivityHandler, TurnContext, MessageFactory
 from botbuilder.schema import ConversationReference
 
 import pipeline
 from tools.monday import list_boards, create_meeting_item
+from tools.monday_qa import ask_monday
 from tools.llm import generate_insights, format_insights_for_monday
-from tools.state_store import save_conversation_ref, load_conversation_ref
+from tools.graph import resolve_email_from_aad_id
+from tools.state_store import (
+    save_conversation_ref, load_conversation_ref,
+    save_conv_ref_for_email, load_conv_ref_for_email,
+)
 from tools.table_state import get_conv_state, set_conv_state
 
 _executor = ThreadPoolExecutor(max_workers=4)
@@ -28,9 +36,27 @@ def set_adapter(adapter):
     global _adapter
     _adapter = adapter
 
-# ── In-memory refs + last processed (lightweight, acceptable to lose on restart) ──
-_conv_refs: dict = {}
+# ── In-memory caches (lightweight, rebuilt from blob on cold start) ────────────
+_conv_refs: dict = {}            # key → ConversationReference (any user, fast path)
+_conv_refs_by_email: dict = {}   # email → ConversationReference (for routing)
 _last_processed: dict = {}
+
+
+# ── Question detection for Monday Q&A ─────────────────────────────────────────
+
+_QUESTION_SIGNALS = ("?", "¿", "qué ", "que ", "cuál", "cual", "quién", "quien",
+                     "cuándo", "cuando", "cuánto", "cuanto", "cómo", "como ",
+                     "hay ", "tiene ", "tienen ", "dame ", "dime ", "muéstrame", "mostrame")
+_MONDAY_KEYWORDS = ("tarea", "pendiente", "reunión", "meeting", "decisión", "decision",
+                    "insights", "monday", "tablero", "board", "item", "proyecto",
+                    "acción", "accion", "resumen", "decisiones", "tareas")
+
+
+def _is_monday_question(text: str) -> bool:
+    """True if the message looks like a question about Monday board data."""
+    has_question = any(s in text for s in _QUESTION_SIGNALS)
+    has_monday_kw = any(k in text for k in _MONDAY_KEYWORDS)
+    return has_question and has_monday_kw
 
 
 class MayiHearBot(ActivityHandler):
@@ -66,6 +92,9 @@ class MayiHearBot(ActivityHandler):
         elif "last meeting" in text or "última reunión" in text:
             await self._cmd_last_meeting(turn_context)
 
+        elif _is_monday_question(text):
+            await self._cmd_ask_monday(turn_context, text, state)
+
         else:
             board_name = state.get("selected_board_name", os.environ.get("MONDAY_BOARD_ID", "Monday"))
             await turn_context.send_activity(
@@ -75,7 +104,8 @@ class MayiHearBot(ActivityHandler):
                     "Comandos:\n"
                     "• **status** — estado del agente\n"
                     "• **boards** — ver y cambiar tablero de Monday\n"
-                    "• **last meeting** — insights de la última reunión procesada"
+                    "• **last meeting** — insights de la última reunión procesada\n"
+                    "• Pregúntame sobre el tablero: *¿qué tareas quedaron pendientes?*"
                 )
             )
 
@@ -86,7 +116,8 @@ class MayiHearBot(ActivityHandler):
                     MessageFactory.text(
                         "Hola! Soy MayiHear 👋\n\n"
                         "Procesaré automáticamente tus reuniones de Teams y publicaré los insights en Monday.\n\n"
-                        "Usa **boards** para elegir el tablero donde publicar."
+                        "Usa **boards** para elegir el tablero donde publicar.\n"
+                        "También puedes preguntarme sobre el tablero: *¿qué tareas quedaron pendientes?*"
                     )
                 )
 
@@ -126,6 +157,28 @@ class MayiHearBot(ActivityHandler):
             await turn_context.send_activity(
                 MessageFactory.text("Aún no he procesado ninguna reunión en esta sesión.")
             )
+
+    async def _cmd_ask_monday(self, turn_context: TurnContext, question: str, state: dict):
+        """Answer a natural-language question about Monday board data using Gemini."""
+        board_id = state.get("selected_board_id") or os.environ.get("MONDAY_BOARD_ID")
+        board_name = state.get("selected_board_name", "")
+
+        if not board_id:
+            await turn_context.send_activity(
+                MessageFactory.text("Primero selecciona un tablero con el comando **boards**.")
+            )
+            return
+
+        await turn_context.send_activity(MessageFactory.text("🔍 Consultando Monday..."))
+        loop = asyncio.get_event_loop()
+        try:
+            answer = await loop.run_in_executor(
+                _executor, ask_monday, question, board_id, board_name
+            )
+            await turn_context.send_activity(MessageFactory.text(answer))
+        except Exception as e:
+            logger.exception("Monday Q&A failed")
+            await turn_context.send_activity(MessageFactory.text(f"❌ Error consultando Monday: {e}"))
 
     # ── State: board selection ─────────────────────────────────────────────────
 
@@ -232,6 +285,7 @@ class MayiHearBot(ActivityHandler):
         """
         Called by Service Bus trigger (or webhook fallback) for each new transcript.
         Fetches transcript + generates insights, then asks organizer to confirm before posting.
+        Routes proactive message to the correct organizer via _get_ref_for_organizer().
         Falls back to auto-post if no conversation reference is stored yet.
         """
         resource_data = payload.get("resourceData", {})
@@ -250,7 +304,7 @@ class MayiHearBot(ActivityHandler):
 
         loop = asyncio.get_event_loop()
 
-        # Step 1+2: fetch transcript only (no Monday post yet)
+        # Step 1+2: fetch transcript
         transcript_data = await loop.run_in_executor(
             _executor, pipeline.fetch_transcript,
             organizer_email, meeting_id, transcript_id, subject
@@ -261,8 +315,9 @@ class MayiHearBot(ActivityHandler):
             transcript_data["transcript_text"], subject
         )
 
-        # Try proactive message to organizer for review
-        ref = _get_any_ref()
+        # Route to the correct organizer, fall back to any known ref
+        ref = _get_ref_for_organizer(organizer_email) or _get_any_ref()
+
         if ref and _adapter:
             msg = (
                 f"📝 **Nueva reunión lista: {subject}**\n\n"
@@ -276,7 +331,6 @@ class MayiHearBot(ActivityHandler):
                 conv_id = ctx.activity.conversation.id
                 state = get_conv_state(conv_id)
                 if state.get("phase") == "awaiting_confirmation":
-                    # Already reviewing a meeting — enqueue this one
                     queue = list(state.get("pending_queue", []))
                     queue.append(result)
                     set_conv_state(conv_id, {**state, "pending_queue": queue})
@@ -291,12 +345,12 @@ class MayiHearBot(ActivityHandler):
                     await ctx.send_activity(MessageFactory.text(msg))
 
             await _adapter.continue_conversation(ref, _callback, os.environ.get("BOT_ID", ""))
-            logger.info(f"Proactive message sent for '{subject}'")
-            return f"Notified user about '{subject}'"
+            logger.info(f"Proactive message sent to '{organizer_email}' for '{subject}'")
+            return f"Notified '{organizer_email}' about '{subject}'"
 
         else:
             # No stored ref yet → auto-post as fallback
-            logger.warning("No conversation reference stored — auto-posting to Monday")
+            logger.warning(f"No conversation reference for '{organizer_email}' — auto-posting to Monday")
             item_id = await loop.run_in_executor(
                 _executor, pipeline.post_to_monday,
                 subject, result["insights_text"], None
@@ -316,34 +370,96 @@ def _save_ref(turn_context: TurnContext):
         or activity.conversation.id
     )
     _conv_refs[key] = ref
-    # Persist to blob so it survives redeploys
+
+    # Serialize for blob storage
+    ref_dict = {
+        "activity_id": ref.activity_id,
+        "bot": {"id": ref.bot.id, "name": ref.bot.name} if ref.bot else None,
+        "channel_id": ref.channel_id,
+        "conversation": ref.conversation.serialize() if ref.conversation else None,
+        "locale": ref.locale,
+        "service_url": ref.service_url,
+        "user": {
+            "id": ref.user.id,
+            "name": ref.user.name,
+            "aad_object_id": ref.user.aad_object_id,
+        } if ref.user else None,
+    }
+
+    # Persist generic ref (fast path / fallback)
     try:
-        ref_dict = {
-            "activity_id": ref.activity_id,
-            "bot": {"id": ref.bot.id, "name": ref.bot.name} if ref.bot else None,
-            "channel_id": ref.channel_id,
-            "conversation": ref.conversation.serialize() if ref.conversation else None,
-            "locale": ref.locale,
-            "service_url": ref.service_url,
-            "user": {"id": ref.user.id, "name": ref.user.name, "aad_object_id": ref.user.aad_object_id} if ref.user else None,
-        }
         save_conversation_ref(ref_dict)
     except Exception as e:
         logger.warning(f"Could not persist conversation ref: {e}")
 
+    # Resolve email and persist email-keyed ref in background (non-blocking)
+    aad_id = (activity.from_property.aad_object_id or "").strip()
+    if aad_id:
+        threading.Thread(
+            target=_resolve_and_save_email_ref,
+            args=(aad_id, ref_dict),
+            daemon=True,
+        ).start()
+
+
+def _resolve_and_save_email_ref(aad_object_id: str, ref_dict: dict):
+    """Resolve AAD object ID → email, then save ref keyed by email. Runs in background thread."""
+    email = resolve_email_from_aad_id(aad_object_id)
+    if email:
+        _conv_refs_by_email[email] = _deserialize_ref(ref_dict)
+        save_conv_ref_for_email(email, ref_dict)
+        logger.info(f"Saved conv ref for email: {email}")
+
+
+def _get_ref_for_organizer(organizer_email: str) -> ConversationReference | None:
+    """
+    Get conversation reference for a specific organizer email.
+    Checks in-memory cache first, then blob storage.
+    Returns None if not found (user has never chatted with the bot).
+    """
+    if not organizer_email:
+        return None
+    email = organizer_email.lower()
+
+    # In-memory cache (fast path)
+    ref = _conv_refs_by_email.get(email)
+    if ref:
+        return ref
+
+    # Load from blob
+    ref_dict = load_conv_ref_for_email(email)
+    if ref_dict:
+        ref = _deserialize_ref(ref_dict)
+        if ref:
+            _conv_refs_by_email[email] = ref
+            return ref
+
+    return None
+
 
 def _get_any_ref() -> ConversationReference | None:
-    """Return stored conversation reference — checks memory first, then blob storage."""
-    # In-memory (fast path)
+    """Fallback: return any stored conversation reference."""
     ref = next(iter(_conv_refs.values()), None)
     if ref:
         return ref
 
-    # Load from persistent blob storage (survives redeploys)
     ref_dict = load_conversation_ref()
     if not ref_dict:
         return None
 
+    try:
+        ref = _deserialize_ref(ref_dict)
+        if ref:
+            _conv_refs["__loaded__"] = ref
+            logger.info("Conversation reference restored from blob storage")
+        return ref
+    except Exception as e:
+        logger.warning(f"Could not restore conversation ref from blob: {e}")
+        return None
+
+
+def _deserialize_ref(ref_dict: dict) -> ConversationReference | None:
+    """Deserialize a stored ref_dict → ConversationReference object."""
     try:
         from botbuilder.schema import ConversationAccount, ChannelAccount
         ref = ConversationReference()
@@ -358,9 +474,7 @@ def _get_any_ref() -> ConversationReference | None:
         if ref_dict.get("user"):
             u = ref_dict["user"]
             ref.user = ChannelAccount(id=u["id"], name=u.get("name"), aad_object_id=u.get("aad_object_id"))
-        _conv_refs["__loaded__"] = ref
-        logger.info("Conversation reference restored from blob storage")
         return ref
     except Exception as e:
-        logger.warning(f"Could not restore conversation ref from blob: {e}")
+        logger.warning(f"Could not deserialize conversation ref: {e}")
         return None

@@ -228,33 +228,47 @@ def _graph_token() -> str:
     return r.json()["access_token"]
 
 
+def _get_organizer_emails() -> list:
+    """Return list of organizer emails from env. Supports comma-separated ORGANIZER_EMAILS (new) or single ORGANIZER_TEAMS_MAIL (legacy)."""
+    raw = os.environ.get("ORGANIZER_EMAILS", os.environ.get("ORGANIZER_TEAMS_MAIL", ""))
+    return [e.strip() for e in raw.split(",") if e.strip()]
+
+
 def _renew_or_create_subscription(token: str):
+    """Renew or create Graph subscriptions for all configured organizers."""
+    for email in _get_organizer_emails():
+        try:
+            _renew_or_create_subscription_for(token, email)
+        except Exception:
+            logger.exception(f"Failed to renew subscription for {email}")
+
+
+def _renew_or_create_subscription_for(token: str, organizer: str):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     expiry = (
         datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=59)
     ).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
-    # Find existing subscription
+    # Resolve user GUID
+    uid_resp = requests.get(f"{GRAPH_API}/users/{organizer}?$select=id", headers=headers)
+    uid_resp.raise_for_status()
+    uid = uid_resp.json()["id"]
+
+    # Find existing subscription for this specific user (match by UID in resource URL)
     subs = requests.get(f"{GRAPH_API}/subscriptions", headers=headers).json().get("value", [])
     for sub in subs:
-        if "getAllTranscripts" in sub.get("resource", ""):
+        if uid in sub.get("resource", ""):
             r = requests.patch(
                 f"{GRAPH_API}/subscriptions/{sub['id']}",
                 json={"expirationDateTime": expiry},
                 headers=headers,
             )
             if r.status_code == 200:
-                logger.info(f"Webhook subscription renewed → expires {expiry}")
+                logger.info(f"Webhook subscription renewed for {organizer} → expires {expiry}")
                 return
-            logger.warning(f"Renew failed ({r.status_code}), recreating...")
+            logger.warning(f"Renew failed ({r.status_code}) for {organizer}, recreating...")
             requests.delete(f"{GRAPH_API}/subscriptions/{sub['id']}", headers=headers)
             break
-
-    # Resolve user GUID
-    organizer = os.environ["ORGANIZER_TEAMS_MAIL"]
-    uid = requests.get(
-        f"{GRAPH_API}/users/{organizer}?$select=id", headers=headers
-    ).json()["id"]
 
     body = {
         "changeType": "created",
@@ -266,7 +280,7 @@ def _renew_or_create_subscription(token: str):
     }
     r = requests.post(f"{GRAPH_API}/subscriptions", json=body, headers=headers)
     r.raise_for_status()
-    logger.info(f"Webhook subscription created → expires {expiry}")
+    logger.info(f"Webhook subscription created for {organizer} → expires {expiry}")
 
 
 # ── Module-level processed IDs — seeded from blob once per process lifetime ───
@@ -287,50 +301,55 @@ def _load_processed_ids_once():
 
 @app.timer_trigger(schedule="0 */5 * * * *", arg_name="poll_timer", run_on_startup=True)
 def poll_transcripts(poll_timer: func.TimerRequest) -> None:
-    """Polls Graph API every 5 min. Enqueues new transcripts to Service Bus."""
+    """Polls Graph API every 5 min for all configured organizers. Enqueues new transcripts."""
     global _processed_ids
 
     _load_processed_ids_once()
 
-    logger.info("Polling for new transcripts...")
+    organizers = _get_organizer_emails()
+    logger.info(f"Polling for new transcripts ({len(organizers)} organizer(s))...")
+
     try:
         token = _graph_token()
-        organizer = os.environ["ORGANIZER_TEAMS_MAIL"]
         headers = {"Authorization": f"Bearer {token}"}
-
-        uid = requests.get(
-            f"{GRAPH_API}/users/{organizer}?$select=id", headers=headers
-        ).json()["id"]
-
-        url = f"{GRAPH_API}/users/{uid}/onlineMeetings/getAllTranscripts(meetingOrganizerUserId='{uid}')"
-        r = requests.get(url, headers=headers)
-        if r.status_code != 200:
-            logger.warning(f"getAllTranscripts returned {r.status_code}")
-            return
-
-        transcripts = r.json().get("value", [])
-        new_found = [t for t in transcripts if t.get("id") and t["id"] not in _processed_ids]
-
-        if not new_found:
-            logger.info(f"Poll: {len(transcripts)} transcript(s) checked, none new")
-            return
-
         from tools.state_store import save_processed_ids
 
-        for t in new_found:
-            tid = t["id"]
-            meeting_id = t.get("meetingId") or ""
-            subject = t.get("subject") or "Reunión Teams"
-            logger.info(f"New transcript: '{subject}' id={tid[:40]}...")
+        for organizer in organizers:
+            try:
+                uid = requests.get(
+                    f"{GRAPH_API}/users/{organizer}?$select=id", headers=headers
+                ).json()["id"]
 
-            # Mark processed FIRST — prevents re-queuing even if enqueue fails
-            _processed_ids.add(tid)
-            save_processed_ids(_processed_ids)
+                url = f"{GRAPH_API}/users/{uid}/onlineMeetings/getAllTranscripts(meetingOrganizerUserId='{uid}')"
+                r = requests.get(url, headers=headers)
+                if r.status_code != 200:
+                    logger.warning(f"getAllTranscripts returned {r.status_code} for {organizer}")
+                    continue
 
-            _enqueue_meeting(meeting_id, tid, organizer, subject)
+                transcripts = r.json().get("value", [])
+                new_found = [t for t in transcripts if t.get("id") and t["id"] not in _processed_ids]
+
+                if not new_found:
+                    logger.info(f"Poll [{organizer}]: {len(transcripts)} transcript(s) checked, none new")
+                    continue
+
+                for t in new_found:
+                    tid = t["id"]
+                    meeting_id = t.get("meetingId") or ""
+                    subject = t.get("subject") or "Reunión Teams"
+                    logger.info(f"New transcript [{organizer}]: '{subject}' id={tid[:40]}...")
+
+                    # Mark processed FIRST — prevents re-queuing even if enqueue fails
+                    _processed_ids.add(tid)
+                    save_processed_ids(_processed_ids)
+
+                    _enqueue_meeting(meeting_id, tid, organizer, subject)
+
+            except Exception:
+                logger.exception(f"poll_transcripts failed for {organizer}")
 
     except Exception:
-        logger.exception("poll_transcripts failed")
+        logger.exception("poll_transcripts: failed to obtain Graph token")
 
 
 # ── Timer: keep-warm ping every 4 min ────────────────────────────────────────
