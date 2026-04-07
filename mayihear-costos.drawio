@@ -1,0 +1,231 @@
+<mxfile>
+  <diagram name="MayiHear Costos">
+    <mxGraphModel dx="1422" dy="762" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="title" value="MayiHear — Servicios, Rol en el Sistema y Costos" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=22;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="0" y="15" width="1400" height="36" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- AZURE SECTION -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="az_bg" value="☁️  Microsoft Azure" style="swimlane;startSize=30;fillColor=#e3f2fd;strokeColor=#0078D4;fontStyle=1;fontSize=13;fontColor=#0078D4;rounded=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="20" y="65" width="1360" height="310" as="geometry"/>
+        </mxCell>
+
+        <!-- Azure Functions -->
+        <mxCell id="c1" value="⚡ Azure Functions" style="swimlane;startSize=26;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=12;fontStyle=1;rounded=1;arcSize=8;" vertex="1" parent="az_bg">
+          <mxGeometry x="15" y="45" width="230" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="c1r" value="🎯 Rol" style="text;html=1;strokeColor=none;fillColor=#005a9e;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c1">
+          <mxGeometry x="10" y="32" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c1rd" value="Es el cerebro del sistema. Ejecuta todas las funciones: detectar transcripciones, procesar reuniones, responder mensajes del bot y renovar webhooks." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=10;align=left;whiteSpace=wrap;" vertex="1" parent="c1">
+          <mxGeometry x="10" y="55" width="210" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="c1i" value="⚙️ Funciones activas" style="text;html=1;strokeColor=none;fillColor=#005a9e;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c1">
+          <mxGeometry x="10" y="138" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c1id" value="poll · webhook · teams_messages&#xa;process_meeting_sb · renew · keep_warm" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#cce5ff;fontSize=10;align=left;" vertex="1" parent="c1">
+          <mxGeometry x="10" y="160" width="210" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="c1p" value="$0 / mes" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;rounded=1;align=center;fontSize=15;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="c1">
+          <mxGeometry x="40" y="202" width="150" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Service Bus -->
+        <mxCell id="c2" value="🚌 Service Bus" style="swimlane;startSize=26;fillColor=#FF6D00;strokeColor=#e65100;fontColor=#ffffff;fontSize=12;fontStyle=1;rounded=1;arcSize=8;" vertex="1" parent="az_bg">
+          <mxGeometry x="265" y="45" width="230" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2r" value="🎯 Rol" style="text;html=1;strokeColor=none;fillColor=#e65100;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c2">
+          <mxGeometry x="10" y="32" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2rd" value="Cola confiable entre el webhook/poller y el procesamiento. Si algo falla (red, Anthropic, Monday) reintenta automáticamente hasta 10 veces antes de mandar al Dead Letter Queue." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=10;align=left;whiteSpace=wrap;" vertex="1" parent="c2">
+          <mxGeometry x="10" y="55" width="210" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2i" value="⚙️ Queue: meetings · Retry x10 · DLQ" style="text;html=1;strokeColor=none;fillColor=#e65100;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c2">
+          <mxGeometry x="10" y="148" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2id" value="~200 mensajes/mes" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffe0b2;fontSize=10;align=left;" vertex="1" parent="c2">
+          <mxGeometry x="10" y="172" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2p" value="~$0.01 / mes" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;rounded=1;align=center;fontSize=15;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="c2">
+          <mxGeometry x="40" y="202" width="150" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Table Storage -->
+        <mxCell id="c3" value="📊 Table Storage" style="swimlane;startSize=26;fillColor=#0097A7;strokeColor=#006064;fontColor=#ffffff;fontSize=12;fontStyle=1;rounded=1;arcSize=8;" vertex="1" parent="az_bg">
+          <mxGeometry x="515" y="45" width="230" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3r" value="🎯 Rol" style="text;html=1;strokeColor=none;fillColor=#006064;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c3">
+          <mxGeometry x="10" y="32" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3rd" value="Persiste el estado de cada conversación del bot (fase actual, reunión pendiente, cola de reuniones). Sin esto, si Azure reinicia la función el usuario pierde el contexto." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=10;align=left;whiteSpace=wrap;" vertex="1" parent="c3">
+          <mxGeometry x="10" y="55" width="210" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3i" value="⚙️ Tabla: convstate" style="text;html=1;strokeColor=none;fillColor=#006064;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c3">
+          <mxGeometry x="10" y="148" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3id" value="phase · pending · pending_queue&#xa;selected_board_id · email refs" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#e0f7fa;fontSize=10;align=left;" vertex="1" parent="c3">
+          <mxGeometry x="10" y="172" width="210" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3p" value="~$0 / mes" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;rounded=1;align=center;fontSize=15;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="c3">
+          <mxGeometry x="40" y="207" width="150" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Blob Storage -->
+        <mxCell id="c4" value="💾 Blob Storage" style="swimlane;startSize=26;fillColor=#106EBE;strokeColor=#005a9e;fontColor=#ffffff;fontSize=12;fontStyle=1;rounded=1;arcSize=8;" vertex="1" parent="az_bg">
+          <mxGeometry x="765" y="45" width="230" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4r" value="🎯 Rol" style="text;html=1;strokeColor=none;fillColor=#005a9e;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c4">
+          <mxGeometry x="10" y="32" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4rd" value="Guarda las referencias de conversación por email (para notificaciones proactivas al usuario correcto) y el historial de transcripciones procesadas (evita duplicados)." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=10;align=left;whiteSpace=wrap;" vertex="1" parent="c4">
+          <mxGeometry x="10" y="55" width="210" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4i" value="⚙️ Archivos JSON en blob" style="text;html=1;strokeColor=none;fillColor=#005a9e;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c4">
+          <mxGeometry x="10" y="148" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4id" value="conv_refs_by_email.json&#xa;processed_transcripts.json" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#bbdefb;fontSize=10;align=left;" vertex="1" parent="c4">
+          <mxGeometry x="10" y="172" width="210" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4p" value="~$0 / mes" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;rounded=1;align=center;fontSize=15;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="c4">
+          <mxGeometry x="40" y="207" width="150" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- App Insights -->
+        <mxCell id="c5" value="📈 App Insights" style="swimlane;startSize=26;fillColor=#4a148c;strokeColor=#2d0062;fontColor=#ffffff;fontSize=12;fontStyle=1;rounded=1;arcSize=8;" vertex="1" parent="az_bg">
+          <mxGeometry x="1015" y="45" width="230" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="c5r" value="🎯 Rol" style="text;html=1;strokeColor=none;fillColor=#2d0062;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c5">
+          <mxGeometry x="10" y="32" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c5rd" value="Monitoreo y diagnóstico. Permite ver logs en tiempo real, detectar errores del bot, verificar si el webhook Graph API está disparando, y auditar el procesamiento de reuniones." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=10;align=left;whiteSpace=wrap;" vertex="1" parent="c5">
+          <mxGeometry x="10" y="55" width="210" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="c5i" value="⚙️ KQL queries · Live logs" style="text;html=1;strokeColor=none;fillColor=#2d0062;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="c5">
+          <mxGeometry x="10" y="148" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c5id" value="~100 MB/mes · Free tier: 5 GB" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#e1bee7;fontSize=10;align=left;" vertex="1" parent="c5">
+          <mxGeometry x="10" y="172" width="210" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="c5p" value="$0 / mes" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;rounded=1;align=center;fontSize=15;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="c5">
+          <mxGeometry x="40" y="202" width="150" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Azure Total -->
+        <mxCell id="az_totalp" value="Total Azure ≈ $0.01 – $0.15 / mes" style="text;html=1;strokeColor=#0078D4;fillColor=#ffffff;rounded=1;align=center;fontSize=14;fontStyle=1;fontColor=#0078D4;" vertex="1" parent="az_bg">
+          <mxGeometry x="1015" y="270" width="330" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- EXTERNAL SERVICES SECTION -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="ext_bg" value="🔌  Servicios Externos" style="swimlane;startSize=30;fillColor=#fce4ec;strokeColor=#CC785C;fontStyle=1;fontSize=13;fontColor=#CC785C;rounded=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="20" y="395" width="1360" height="310" as="geometry"/>
+        </mxCell>
+
+        <!-- Claude -->
+        <mxCell id="e1" value="🧠 Claude API (Anthropic)" style="swimlane;startSize=26;fillColor=#CC785C;strokeColor=#a85a3e;fontColor=#ffffff;fontSize=12;fontStyle=1;rounded=1;arcSize=8;" vertex="1" parent="ext_bg">
+          <mxGeometry x="15" y="45" width="320" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1r" value="🎯 Rol" style="text;html=1;strokeColor=none;fillColor=#a85a3e;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="e1">
+          <mxGeometry x="10" y="32" width="300" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1rd" value="Motor de IA del sistema. Analiza transcripciones y genera insights estructurados (resumen, decisiones, tareas, preguntas abiertas). También razona sobre datos de Monday para responder preguntas en lenguaje natural." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=10;align=left;whiteSpace=wrap;" vertex="1" parent="e1">
+          <mxGeometry x="10" y="56" width="300" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1i" value="⚙️ claude-sonnet-4-6  ·  $3/$15 per MTok" style="text;html=1;strokeColor=none;fillColor=#a85a3e;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="e1">
+          <mxGeometry x="10" y="150" width="300" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1id" value="Insights reunión: ~$0.017/llamada&#xa;Q&amp;A board pequeño: ~$0.01/consulta&#xa;Q&amp;A board grande (&gt;200 items): ~$0.16/consulta" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffe0cc;fontSize=10;align=left;" vertex="1" parent="e1">
+          <mxGeometry x="10" y="174" width="300" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1p" value="~$1 – $5 / mes (uso típico)" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;rounded=1;align=center;fontSize=13;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="e1">
+          <mxGeometry x="30" y="220" width="260" height="12" as="geometry"/>
+        </mxCell>
+
+        <!-- Microsoft Graph API -->
+        <mxCell id="e2" value="📡 Microsoft Graph API" style="swimlane;startSize=26;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=12;fontStyle=1;rounded=1;arcSize=8;" vertex="1" parent="ext_bg">
+          <mxGeometry x="355" y="45" width="280" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2r" value="🎯 Rol" style="text;html=1;strokeColor=none;fillColor=#005a9e;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="e2">
+          <mxGeometry x="10" y="32" width="260" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2rd" value="Puente con Microsoft Teams. Permite obtener la lista de transcripciones de reuniones, descargar el contenido VTT de cada transcripción y recibir notificaciones en tiempo real vía webhook cuando termina una reunión." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=10;align=left;whiteSpace=wrap;" vertex="1" parent="e2">
+          <mxGeometry x="10" y="56" width="260" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2i" value="⚙️ Permisos requeridos" style="text;html=1;strokeColor=none;fillColor=#005a9e;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="e2">
+          <mxGeometry x="10" y="160" width="260" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2id" value="OnlineMeetingTranscript.Read.All&#xa;User.Read.All (multi-user routing)" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#bbdefb;fontSize=10;align=left;" vertex="1" parent="e2">
+          <mxGeometry x="10" y="184" width="260" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2p" value="$0 / mes  (incluido en M365)" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;rounded=1;align=center;fontSize=13;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="e2">
+          <mxGeometry x="20" y="220" width="240" height="12" as="geometry"/>
+        </mxCell>
+
+        <!-- Monday.com -->
+        <mxCell id="e3" value="📋 Monday.com GraphQL API" style="swimlane;startSize=26;fillColor=#F62B54;strokeColor=#c0003a;fontColor=#ffffff;fontSize=12;fontStyle=1;rounded=1;arcSize=8;" vertex="1" parent="ext_bg">
+          <mxGeometry x="655" y="45" width="280" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3r" value="🎯 Rol" style="text;html=1;strokeColor=none;fillColor=#c0003a;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="e3">
+          <mxGeometry x="10" y="32" width="260" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3rd" value="Destino final de los insights. Recibe los resultados de cada reunión como un ítem nuevo en el tablero elegido. También es la fuente de datos para las consultas Q&amp;A del agente (tareas, decisiones, estado del proyecto)." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=10;align=left;whiteSpace=wrap;" vertex="1" parent="e3">
+          <mxGeometry x="10" y="56" width="260" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3i" value="⚙️ Operaciones usadas" style="text;html=1;strokeColor=none;fillColor=#c0003a;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="e3">
+          <mxGeometry x="10" y="160" width="260" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3id" value="create_item() · items_page()&#xa;boards() · column_values" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffcdd2;fontSize=10;align=left;" vertex="1" parent="e3">
+          <mxGeometry x="10" y="184" width="260" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3p" value="$0 adicional  (plan Monday existente)" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;rounded=1;align=center;fontSize=13;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="e3">
+          <mxGeometry x="15" y="220" width="250" height="12" as="geometry"/>
+        </mxCell>
+
+        <!-- Bot Framework -->
+        <mxCell id="e4" value="🤖 Bot Framework Service" style="swimlane;startSize=26;fillColor=#005a9e;strokeColor=#003f7a;fontColor=#ffffff;fontSize=12;fontStyle=1;rounded=1;arcSize=8;" vertex="1" parent="ext_bg">
+          <mxGeometry x="955" y="45" width="280" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4r" value="🎯 Rol" style="text;html=1;strokeColor=none;fillColor=#003f7a;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="e4">
+          <mxGeometry x="10" y="32" width="260" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4rd" value="Intermediario entre Teams y el bot. Valida tokens JWT, enruta mensajes entrantes al endpoint /api/messages y permite enviar mensajes proactivos al usuario (sin que el usuario escriba primero) via continue_conversation()." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=10;align=left;whiteSpace=wrap;" vertex="1" parent="e4">
+          <mxGeometry x="10" y="56" width="260" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4i" value="⚙️ Microsoft App ID + Secret" style="text;html=1;strokeColor=none;fillColor=#003f7a;fontColor=#ffffff;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="e4">
+          <mxGeometry x="10" y="160" width="260" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4id" value="Channel: Microsoft Teams&#xa;Mensajes proactivos habilitados" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#bbdefb;fontSize=10;align=left;" vertex="1" parent="e4">
+          <mxGeometry x="10" y="184" width="260" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4p" value="$0 / mes  (gratuito)" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;rounded=1;align=center;fontSize=13;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="e4">
+          <mxGeometry x="50" y="220" width="180" height="12" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- GRAND TOTAL -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="total_bg" value="" style="rounded=1;fillColor=#1b5e20;strokeColor=#0d3b12;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="20" y="725" width="1360" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="total_label" value="💰  COSTO TOTAL MENSUAL ESTIMADO" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=16;fontStyle=1;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="60" y="740" width="500" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="total_amount" value="≈ $1 – $5 / mes" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=28;fontStyle=1;fontColor=#69f0ae;" vertex="1" parent="1">
+          <mxGeometry x="560" y="735" width="300" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="total_note" value="100% serverless · sin VMs · sin contenedores · escala automática" style="text;html=1;strokeColor=none;fillColor=none;align=right;fontSize=12;fontColor=#a5d6a7;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="860" y="748" width="500" height="24" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

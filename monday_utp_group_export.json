@@ -1,0 +1,114 @@
+{
+  "board": "UTP - Roadmap proyectos - Producto",
+  "group": "Productos Digitales",
+  "group_id": "group_mm0qd5p9",
+  "items": [
+    {
+      "id": "11311841596",
+      "name": "Learning Analytics - Recolección",
+      "columns": {
+        "Responsable": "David Sakiyama",
+        "Área encargada": "Digital",
+        "Sponsor": "Ernesto Cok / Jorge Luis Pando",
+        "Estado": "No iniciado"
+      },
+      "subitems": []
+    },
+    {
+      "id": "11311805974",
+      "name": "Learning Analytics - Análisis",
+      "columns": {
+        "Responsable": "David Sakiyama",
+        "Área encargada": "Digital",
+        "Sponsor": "Ernesto Cok / Jorge Luis Pando",
+        "Estado": "No iniciado"
+      },
+      "subitems": []
+    },
+    {
+      "id": "11311842632",
+      "name": "Lanzamiento NOVA",
+      "columns": {
+        "Responsable": "Ernesto Cok",
+        "Área encargada": "Digital",
+        "Sponsor": "Ernesto Cok / Jorge Luis Pando",
+        "Estado": "En proceso"
+      },
+      "subitems": []
+    },
+    {
+      "id": "11311807449",
+      "name": "Modelo Operativo Producto Digital",
+      "columns": {
+        "Responsable": "Ernesto Cok",
+        "Área encargada": "Digital",
+        "Sponsor": "Ernesto Cok / Jorge Luis Pando",
+        "Estado": "En proceso"
+      },
+      "subitems": []
+    },
+    {
+      "id": "11311805402",
+      "name": "Desarrollo de Asistente AI de Servicios (SAE)",
+      "columns": {
+        "Responsable": "Ernesto Cok",
+        "Área encargada": "Digital",
+        "Sponsor": "Daniela Augusto",
+        "Estado": "No iniciado"
+      },
+      "subitems": []
+    },
+    {
+      "id": "11311807625",
+      "name": "Feedback & Data Gathering",
+      "columns": {
+        "Responsable": "Fiorella Francia",
+        "Área encargada": "Digital",
+        "Sponsor": "Ernesto Cok / Jorge Luis Pando",
+        "Estado": "No iniciado"
+      },
+      "subitems": []
+    },
+    {
+      "id": "11311842039",
+      "name": "Optimización de Gestión de Inicidencias",
+      "columns": {
+        "Responsable": "Sebastián Mirvois",
+        "Área encargada": "Digital",
+        "Sponsor": "Ernesto Cok / Jorge Luis Pando",
+        "Estado": "En proceso"
+      },
+      "subitems": []
+    },
+    {
+      "id": "11311807368",
+      "name": "Asesor Académico",
+      "columns": {
+        "Responsable": "Natalia Martinelli / David Sakiyama",
+        "Área encargada": "Digital",
+        "Sponsor": "Ernesto Cok / Jorge Luis Pando",
+        "Estado": "En proceso"
+      },
+      "subitems": []
+    },
+    {
+      "id": "11439625715",
+      "name": "Productividad (Agentes)",
+      "columns": {
+        "Responsable": "Natalia Martinelli",
+        "Área encargada": "Digital",
+        "Sponsor": "Jorge Luis Pando - Gerente de Producto Académico",
+        "Estado": "En proceso"
+      },
+      "subitems": [
+        {
+          "id": "11548461863",
+          "name": "hello world from Copilot",
+          "columns": {
+            "Estado": "No Iniciado"
+          }
+        }
+      ]
+    }
+  ]
+}

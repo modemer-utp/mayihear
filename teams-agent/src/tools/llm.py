@@ -29,6 +29,8 @@ Transcripción:
 Responde SOLO con el JSON válido, sin texto adicional ni markdown.
 """
 
+GEMINI_MODEL = "gemini-2.5-flash"
+
 
 def _get_client():
     global _client
@@ -38,9 +40,8 @@ def _get_client():
 
 
 def generate_insights(transcript: str) -> dict:
-    client = _get_client()
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
+    response = _get_client().models.generate_content(
+        model=GEMINI_MODEL,
         contents=INSIGHTS_PROMPT.format(transcript=transcript),
     )
     raw = response.text.strip()

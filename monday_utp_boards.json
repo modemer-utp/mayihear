@@ -1,0 +1,28 @@
+{
+  "account": {
+    "me": {
+      "id": "100660708",
+      "name": "D G",
+      "email": "dgavancho@utp.edu.pe",
+      "account": {
+        "id": "34096557",
+        "name": "Utp"
+      }
+    }
+  },
+  "boards": [
+    {
+      "id": "18402804191",
+      "name": "Modelos emergentes",
+      "description": "Manage any type of project. Assign owners, set timelines and keep track of where your project stands.",
+      "state": "active",
+      "items_count": 2,
+      "type": "board",
+      "updated_at": "2026-03-06T16:02:31Z",
+      "workspace": {
+        "id": "14573631",
+        "name": "Main workspace"
+      }
+    }
+  ]
+}

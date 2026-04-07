@@ -42,22 +42,6 @@ _conv_refs_by_email: dict = {}   # email → ConversationReference (for routing)
 _last_processed: dict = {}
 
 
-# ── Question detection for Monday Q&A ─────────────────────────────────────────
-
-_QUESTION_SIGNALS = ("?", "¿", "qué ", "que ", "cuál", "cual", "quién", "quien",
-                     "cuándo", "cuando", "cuánto", "cuanto", "cómo", "como ",
-                     "hay ", "tiene ", "tienen ", "dame ", "dime ", "muéstrame", "mostrame")
-_MONDAY_KEYWORDS = ("tarea", "pendiente", "reunión", "meeting", "decisión", "decision",
-                    "insights", "monday", "tablero", "board", "item", "proyecto",
-                    "acción", "accion", "resumen", "decisiones", "tareas")
-
-
-def _is_monday_question(text: str) -> bool:
-    """True if the message looks like a question about Monday board data."""
-    has_question = any(s in text for s in _QUESTION_SIGNALS)
-    has_monday_kw = any(k in text for k in _MONDAY_KEYWORDS)
-    return has_question and has_monday_kw
-
 
 class MayiHearBot(ActivityHandler):
 
@@ -67,61 +51,48 @@ class MayiHearBot(ActivityHandler):
         _save_ref(turn_context)
 
         conv_id = turn_context.activity.conversation.id
-        text = (turn_context.activity.text or "").strip().lower()
+        raw = (turn_context.activity.text or "").strip()
         state = get_conv_state(conv_id)
-        phase = state.get("phase")
 
-        # Route by current conversation phase first
-        if phase == "awaiting_confirmation":
-            await self._handle_confirmation(turn_context, text, state, conv_id)
-            return
-
-        if phase == "awaiting_board":
-            await self._handle_board_choice(turn_context, text, state, conv_id)
-            return
-
-        # Top-level commands
-        if any(w in text for w in ("boards", "tablero", "board")):
-            await self._cmd_show_boards(turn_context, conv_id, state)
-
-        elif "status" in text:
-            await turn_context.send_activity(
-                MessageFactory.text("✅ MayiHear está activo. Procesando reuniones automáticamente cuando terminan.")
-            )
-
-        elif "last meeting" in text or "última reunión" in text:
-            await self._cmd_last_meeting(turn_context)
-
-        elif _is_monday_question(text):
-            await self._cmd_ask_monday(turn_context, text, state)
-
+        if raw.startswith("/"):
+            await self._handle_slash(turn_context, raw, state, conv_id)
         else:
-            board_name = state.get("selected_board_name", os.environ.get("MONDAY_BOARD_ID", "Monday"))
-            await turn_context.send_activity(
-                MessageFactory.text(
-                    "Hola! Soy MayiHear. Proceso automáticamente las reuniones de Teams y publico insights en Monday.\n\n"
-                    f"📌 Tablero actual: **{board_name}**\n\n"
-                    "Comandos:\n"
-                    "• **status** — estado del agente\n"
-                    "• **boards** — ver y cambiar tablero de Monday\n"
-                    "• **last meeting** — insights de la última reunión procesada\n"
-                    "• Pregúntame sobre el tablero: *¿qué tareas quedaron pendientes?*"
-                )
-            )
+            # Natural language always works — Q&A against Monday board
+            text_lower = raw.lower()
+            if text_lower in ("hola", "hi", "hello", "ayuda", "help", "inicio", "start", ""):
+                await self._cmd_welcome(turn_context, state)
+            else:
+                await self._cmd_ask_monday(turn_context, raw, state)
 
     async def on_members_added_activity(self, members_added, turn_context: TurnContext):
         for member in members_added:
             if member.id != turn_context.activity.recipient.id:
-                await turn_context.send_activity(
-                    MessageFactory.text(
-                        "Hola! Soy MayiHear 👋\n\n"
-                        "Procesaré automáticamente tus reuniones de Teams y publicaré los insights en Monday.\n\n"
-                        "Usa **boards** para elegir el tablero donde publicar.\n"
-                        "También puedes preguntarme sobre el tablero: *¿qué tareas quedaron pendientes?*"
-                    )
-                )
+                state = get_conv_state(turn_context.activity.conversation.id)
+                await self._cmd_welcome(turn_context, state)
 
     # ── Commands ───────────────────────────────────────────────────────────────
+
+    async def _cmd_welcome(self, turn_context: TurnContext, state: dict):
+        board_name = state.get("selected_board_name") if state.get("board_explicitly_selected") else "UTP - Roadmap proyectos - Producto"
+        pending = state.get("pending")
+        pending_note = (
+            f"\n\n⏳ Tienes una reunión pendiente de confirmar: **{pending.get('subject', '')}**\n"
+            "Usa `/confirm`, `/regenerate` o `/cancel`."
+        ) if pending else ""
+        await turn_context.send_activity(
+            MessageFactory.text(
+                "Hola! Soy MayiHear 👋\n\n"
+                "Proceso automáticamente las reuniones de Teams y publico insights en Monday.\n\n"
+                f"📌 Tablero actual: **{board_name}**"
+                f"{pending_note}\n\n"
+                "**Comandos disponibles:**\n"
+                "• `/boards` — ver tableros · `/select <n>` — cambiar tablero\n"
+                "• `/confirm` · `/regenerate` · `/cancel` — gestionar reunión pendiente\n"
+                "• `/status` · `/last` — info\n\n"
+                "O simplemente pregúntame en lenguaje natural:\n"
+                "_¿qué proyectos están en proceso?_, _¿quién es el responsable de NOVA?_..."
+            )
+        )
 
     async def _cmd_show_boards(self, turn_context: TurnContext, conv_id: str, state: dict):
         loop = asyncio.get_event_loop()
@@ -137,11 +108,11 @@ class MayiHearBot(ActivityHandler):
 
         lines = ["**Tableros disponibles en Monday:**\n"]
         for i, b in enumerate(boards, 1):
-            marker = " ✅" if b["id"] == state.get("selected_board_id") else ""
+            marker = " ✅" if b["id"] == (state.get("selected_board_id") or os.environ.get("MONDAY_BOARD_ID")) else ""
             lines.append(f"**{i}.** {b['name']}{marker}")
-        lines.append("\nResponde con el **número** del tablero donde quieres publicar los insights.")
+        lines.append("\nUsa `/select <número>` para cambiar de tablero.")
 
-        set_conv_state(conv_id, {**state, "phase": "awaiting_board", "boards": boards})
+        set_conv_state(conv_id, {**state, "boards_cache": boards})
         await turn_context.send_activity(MessageFactory.text("\n".join(lines)))
 
     async def _cmd_last_meeting(self, turn_context: TurnContext):
@@ -158,10 +129,156 @@ class MayiHearBot(ActivityHandler):
                 MessageFactory.text("Aún no he procesado ninguna reunión en esta sesión.")
             )
 
+    async def _handle_slash(self, turn_context: TurnContext, text: str, state: dict, conv_id: str):
+        parts = text.split(None, 1)
+        cmd = parts[0].lower()
+        arg = parts[1].strip() if len(parts) > 1 else ""
+
+        if cmd == "/boards":
+            await self._cmd_show_boards(turn_context, conv_id, state)
+        elif cmd == "/select":
+            await self._cmd_select_board(turn_context, arg, state, conv_id)
+        elif cmd in ("/confirm", "/confirmar"):
+            await self._slash_confirm(turn_context, state, conv_id)
+        elif cmd in ("/cancel", "/cancelar"):
+            await self._slash_cancel(turn_context, state, conv_id)
+        elif cmd in ("/regenerate", "/regenerar"):
+            await self._slash_regenerate(turn_context, state, conv_id)
+        elif cmd == "/status":
+            await turn_context.send_activity(
+                MessageFactory.text("✅ MayiHear está activo. Procesando reuniones automáticamente cuando terminan.")
+            )
+        elif cmd in ("/last", "/ultima"):
+            await self._cmd_last_meeting(turn_context)
+        elif cmd in ("/help", "/ayuda"):
+            await self._cmd_welcome(turn_context, state)
+        else:
+            await turn_context.send_activity(
+                MessageFactory.text(
+                    f"Comando no reconocido: `{cmd}`\n\n"
+                    "Comandos disponibles: `/boards` · `/select <n>` · `/confirm` · `/cancel` · `/regenerate` · `/status` · `/last`"
+                )
+            )
+
+    async def _cmd_select_board(self, turn_context: TurnContext, arg: str, state: dict, conv_id: str):
+        boards = state.get("boards_cache", [])
+        if not boards:
+            await turn_context.send_activity(MessageFactory.text("Primero usa `/boards` para ver la lista de tableros."))
+            return
+        try:
+            idx = int(arg) - 1
+            if 0 <= idx < len(boards):
+                chosen = boards[idx]
+                set_conv_state(conv_id, {
+                    **state,
+                    "selected_board_id": chosen["id"],
+                    "selected_board_name": chosen["name"],
+                    "board_explicitly_selected": True,
+                })
+                await turn_context.send_activity(
+                    MessageFactory.text(f"✅ Tablero cambiado a: **{chosen['name']}**")
+                )
+                return
+        except ValueError:
+            pass
+        await turn_context.send_activity(
+            MessageFactory.text(f"Usa un número válido de la lista. Ejemplo: `/select 1`")
+        )
+
+    async def _slash_confirm(self, turn_context: TurnContext, state: dict, conv_id: str):
+        pending = state.get("pending")
+        if not pending:
+            await turn_context.send_activity(MessageFactory.text("No hay ninguna reunión pendiente de confirmar."))
+            return
+
+        board_name = state.get("selected_board_name") if state.get("board_explicitly_selected") else "UTP - Roadmap proyectos - Producto"
+
+        # First /confirm → show preview and ask for explicit approval
+        if not state.get("pending_previewed"):
+            set_conv_state(conv_id, {**state, "pending_previewed": True})
+            await turn_context.send_activity(
+                MessageFactory.text(
+                    f"📋 **Vista previa — {pending.get('subject', 'Reunión')}**\n\n"
+                    f"{pending['insights_text']}\n\n"
+                    f"---\n"
+                    f"Se publicará en **{board_name}**.\n"
+                    f"¿Confirmas? → `/confirm` para publicar · `/regenerate` para regenerar · `/cancel` para descartar"
+                )
+            )
+            return
+
+        # Second /confirm → publish
+        board_id = state.get("selected_board_id") if state.get("board_explicitly_selected") else os.environ.get("MONDAY_BOARD_ID")
+        await turn_context.send_activity(MessageFactory.text("⏳ Publicando en Monday..."))
+        loop = asyncio.get_event_loop()
+        try:
+            item_id = await loop.run_in_executor(
+                _executor, pipeline.post_to_monday,
+                pending["subject"], pending["insights_text"], board_id
+            )
+        except Exception as e:
+            await turn_context.send_activity(MessageFactory.text(f"❌ Error publicando: {e}"))
+            return
+        _last_processed.update({**pending, "item_id": item_id})
+
+        # Advance queue — show next preview if any
+        queue = list(state.get("pending_queue", []))
+        if queue:
+            next_pending = queue.pop(0)
+            set_conv_state(conv_id, {**state, "pending": next_pending, "pending_queue": queue, "pending_previewed": False})
+        else:
+            set_conv_state(conv_id, {**state, "pending": None, "pending_queue": [], "pending_previewed": False})
+
+        await turn_context.send_activity(
+            MessageFactory.text(f"✅ **{pending['subject']}** publicada en **{board_name}** → item `{item_id}`")
+        )
+        if queue:
+            next_pending_item = queue[0] if queue else state.get("pending_queue", [{}])[0] if state.get("pending_queue") else None
+            # next_pending was already popped above
+            await turn_context.send_activity(
+                MessageFactory.text(
+                    f"📝 **Siguiente reunión pendiente: {next_pending.get('subject', 'Reunión')}**\n\n"
+                    f"{next_pending['insights_text']}\n\n"
+                    "Usa `/confirm` para revisar y publicar · `/regenerate` · `/cancel`"
+                )
+            )
+
+    async def _slash_cancel(self, turn_context: TurnContext, state: dict, conv_id: str):
+        pending = state.get("pending")
+        if not pending:
+            await turn_context.send_activity(MessageFactory.text("No hay ninguna reunión pendiente."))
+            return
+        set_conv_state(conv_id, {**state, "pending": None, "pending_queue": [], "pending_previewed": False})
+        await turn_context.send_activity(
+            MessageFactory.text(f"❌ Cancelado. Los insights de **{pending.get('subject', 'la reunión')}** no se publicaron.")
+        )
+
+    async def _slash_regenerate(self, turn_context: TurnContext, state: dict, conv_id: str):
+        pending = state.get("pending")
+        if not pending:
+            await turn_context.send_activity(MessageFactory.text("No hay ninguna reunión pendiente."))
+            return
+        await turn_context.send_activity(MessageFactory.text("🔄 Regenerando insights..."))
+        loop = asyncio.get_event_loop()
+        try:
+            insights = await loop.run_in_executor(_executor, generate_insights, pending["transcript_text"])
+            insights_text = format_insights_for_monday(insights)
+        except Exception as e:
+            await turn_context.send_activity(MessageFactory.text(f"❌ Error: {e}"))
+            return
+        new_pending = {**pending, "insights": insights, "insights_text": insights_text}
+        set_conv_state(conv_id, {**state, "pending": new_pending, "pending_previewed": False})
+        await turn_context.send_activity(
+            MessageFactory.text(
+                f"🔄 **Nuevos insights — {pending['subject']}**\n\n{insights_text}\n\n"
+                "Usa `/confirm` para revisar y publicar · `/cancel` para descartar"
+            )
+        )
+
     async def _cmd_ask_monday(self, turn_context: TurnContext, question: str, state: dict):
         """Answer a natural-language question about Monday board data using Gemini."""
-        board_id = state.get("selected_board_id") or os.environ.get("MONDAY_BOARD_ID")
-        board_name = state.get("selected_board_name", "")
+        board_id = state.get("selected_board_id") if state.get("board_explicitly_selected") else os.environ.get("MONDAY_BOARD_ID")
+        board_name = state.get("selected_board_name") if state.get("board_explicitly_selected") else "UTP - Roadmap proyectos - Producto"
 
         if not board_id:
             await turn_context.send_activity(
@@ -180,104 +297,6 @@ class MayiHearBot(ActivityHandler):
             logger.exception("Monday Q&A failed")
             await turn_context.send_activity(MessageFactory.text(f"❌ Error consultando Monday: {e}"))
 
-    # ── State: board selection ─────────────────────────────────────────────────
-
-    async def _handle_board_choice(self, turn_context: TurnContext, text: str, state: dict, conv_id: str):
-        boards = state.get("boards", [])
-        try:
-            idx = int(text.strip()) - 1
-            if 0 <= idx < len(boards):
-                chosen = boards[idx]
-                set_conv_state(conv_id, {
-                    **state,
-                    "phase": None,
-                    "selected_board_id": chosen["id"],
-                    "selected_board_name": chosen["name"],
-                })
-                await turn_context.send_activity(
-                    MessageFactory.text(f"✅ Tablero seleccionado: **{chosen['name']}**. Los próximos insights se publicarán aquí.")
-                )
-                return
-        except ValueError:
-            pass
-        await turn_context.send_activity(
-            MessageFactory.text(f"Por favor responde con un número entre 1 y {len(boards)}.")
-        )
-
-    # ── State: insight confirmation ────────────────────────────────────────────
-
-    async def _handle_confirmation(self, turn_context: TurnContext, text: str, state: dict, conv_id: str):
-        pending = state.get("pending", {})
-
-        if any(w in text for w in ("confirmar", "confirm", "sí", "si", "publicar", "yes")):
-            board_id = state.get("selected_board_id") or os.environ.get("MONDAY_BOARD_ID")
-            board_name = state.get("selected_board_name", "Monday")
-            await turn_context.send_activity(MessageFactory.text("⏳ Publicando en Monday..."))
-            loop = asyncio.get_event_loop()
-            try:
-                item_id = await loop.run_in_executor(
-                    _executor, pipeline.post_to_monday,
-                    pending["subject"], pending["insights_text"], board_id
-                )
-            except Exception as e:
-                await turn_context.send_activity(MessageFactory.text(f"❌ Error publicando: {e}"))
-                return
-            _last_processed.update({**pending, "item_id": item_id})
-            await turn_context.send_activity(
-                MessageFactory.text(f"✅ **{pending['subject']}** publicada en **{board_name}** → item `{item_id}`")
-            )
-            await self._advance_queue(turn_context, state, conv_id)
-
-        elif any(w in text for w in ("regenerar", "regenerate", "nuevo", "volver")):
-            await turn_context.send_activity(MessageFactory.text("🔄 Regenerando insights con Gemini..."))
-            loop = asyncio.get_event_loop()
-            try:
-                insights = await loop.run_in_executor(
-                    _executor, generate_insights, pending["transcript_text"]
-                )
-                insights_text = format_insights_for_monday(insights)
-            except Exception as e:
-                await turn_context.send_activity(MessageFactory.text(f"❌ Error: {e}"))
-                return
-            new_pending = {**pending, "insights": insights, "insights_text": insights_text}
-            set_conv_state(conv_id, {**state, "pending": new_pending})
-            await turn_context.send_activity(
-                MessageFactory.text(
-                    f"🔄 **Nuevos insights — {pending['subject']}**\n\n{insights_text}\n\n"
-                    "---\nResponde: **confirmar** · **regenerar** · **cancelar**"
-                )
-            )
-
-        elif any(w in text for w in ("cancelar", "cancel", "no")):
-            await turn_context.send_activity(
-                MessageFactory.text("❌ Cancelado. Los insights no se publicaron en Monday.")
-            )
-            await self._advance_queue(turn_context, state, conv_id)
-
-        else:
-            await turn_context.send_activity(
-                MessageFactory.text("Responde: **confirmar** para publicar · **regenerar** para nuevos insights · **cancelar**")
-            )
-
-    # ── Queue helpers ──────────────────────────────────────────────────────────
-
-    async def _advance_queue(self, turn_context: TurnContext, state: dict, conv_id: str):
-        """After resolving current meeting, start next queued one or clear phase."""
-        queue = list(state.get("pending_queue", []))
-        if queue:
-            next_pending = queue.pop(0)
-            set_conv_state(conv_id, {**state, "phase": "awaiting_confirmation", "pending": next_pending, "pending_queue": queue})
-            subject = next_pending.get("subject", "Reunión")
-            remaining = f" ({len(queue)} más en cola)" if queue else ""
-            await turn_context.send_activity(
-                MessageFactory.text(
-                    f"📝 **Siguiente reunión: {subject}**{remaining}\n\n"
-                    f"{next_pending['insights_text']}\n\n"
-                    "---\nResponde: **confirmar** · **regenerar** · **cancelar**"
-                )
-            )
-        else:
-            set_conv_state(conv_id, {**state, "phase": None, "pending_queue": []})
 
     # ── Webhook / Service Bus handler ──────────────────────────────────────────
 
@@ -323,25 +342,25 @@ class MayiHearBot(ActivityHandler):
                 f"📝 **Nueva reunión lista: {subject}**\n\n"
                 f"{result['insights_text']}\n\n"
                 "---\n"
-                "¿Publicar estos insights en Monday?\n"
-                "Responde: **confirmar** · **regenerar** · **cancelar**"
+                "Usa `/confirm` para publicar · `/regenerate` para regenerar · `/cancel` para descartar\n"
+                "_(puedes seguir haciendo preguntas mientras decides)_"
             )
 
             async def _callback(ctx: TurnContext):
                 conv_id = ctx.activity.conversation.id
                 state = get_conv_state(conv_id)
-                if state.get("phase") == "awaiting_confirmation":
+                if state.get("pending"):
                     queue = list(state.get("pending_queue", []))
                     queue.append(result)
                     set_conv_state(conv_id, {**state, "pending_queue": queue})
                     await ctx.send_activity(
                         MessageFactory.text(
                             f"⏳ **{subject}** procesada y en cola ({len(queue)} pendiente{'s' if len(queue) > 1 else ''}). "
-                            "Termina la revisión actual primero."
+                            "Usa `/confirm` cuando estés listo."
                         )
                     )
                 else:
-                    set_conv_state(conv_id, {**state, "phase": "awaiting_confirmation", "pending": result, "pending_queue": []})
+                    set_conv_state(conv_id, {**state, "pending": result, "pending_queue": [], "pending_previewed": False})
                     await ctx.send_activity(MessageFactory.text(msg))
 
             await _adapter.continue_conversation(ref, _callback, os.environ.get("BOT_ID", ""))

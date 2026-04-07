@@ -1,0 +1,158 @@
+<mxfile>
+  <diagram name="MayiHear Flujos">
+    <mxGraphModel dx="1422" dy="762" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="840" math="0" shadow="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="title" value="MayiHear — Flujos de Usuario" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=24;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="0" y="15" width="1400" height="38" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- FLUJO 1: CONFIRMAR                                            -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <mxCell id="sub1" value="✅  FLUJO 1 — Reunión procesada · usuario confirma directamente" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=13;fontStyle=1;fontColor=#2b7a0b;" vertex="1" parent="1">
+          <mxGeometry x="60" y="65" width="900" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a1" value="📹&#xa;Reunión en Teams&#xa;termina" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="60" y="100" width="155" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="a2" value="🤖&#xa;Bot detecta&#xa;transcripción&#xa;(webhook / 5 min)" style="rounded=1;fillColor=#FF6D00;strokeColor=#e65100;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="278" y="100" width="155" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="a3" value="🧠&#xa;MayiHear AI&#xa;genera insights&#xa;de la reunión" style="rounded=1;fillColor=#6B4FBB;strokeColor=#4a2fa0;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="496" y="100" width="155" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="a4" value="💬&#xa;Bot envía resumen&#xa;al organizador&#xa;en Teams" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="714" y="100" width="155" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="a5" value="👤&#xa;Usuario escribe&#xa;&quot;confirmar&quot;" style="rounded=1;fillColor=#2b7a0b;strokeColor=#1a5c07;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="932" y="100" width="155" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="a6" value="📋&#xa;Insights publicados&#xa;en Monday.com" style="rounded=1;fillColor=#F62B54;strokeColor=#c0003a;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1185" y="100" width="155" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fa1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#555;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="a1" target="a2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fa2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#555;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="a2" target="a3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fa3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#555;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="a3" target="a4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fa4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#555;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="a4" target="a5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fa5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#555;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="a5" target="a6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- SEPARATOR 1 -->
+        <mxCell id="sep1" value="" style="line;strokeColor=#cccccc;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="212" width="1280" height="10" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- FLUJO 2: REGENERAR                                            -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <mxCell id="sub2" value="🔄  FLUJO 2 — Reunión procesada · usuario pide regenerar · luego confirma" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=13;fontStyle=1;fontColor=#e64a19;" vertex="1" parent="1">
+          <mxGeometry x="60" y="232" width="900" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="b1" value="📹&#xa;Reunión en Teams&#xa;termina" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="30" y="266" width="130" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2" value="🤖&#xa;Bot detecta&#xa;transcripción" style="rounded=1;fillColor=#FF6D00;strokeColor=#e65100;fontColor=#ffffff;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="205" y="266" width="130" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3" value="🧠&#xa;MayiHear AI&#xa;genera insights" style="rounded=1;fillColor=#6B4FBB;strokeColor=#4a2fa0;fontColor=#ffffff;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="380" y="266" width="130" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="b4" value="💬&#xa;Bot envía resumen&#xa;en Teams" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="555" y="266" width="130" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="b5" value="👤&#xa;Usuario escribe&#xa;&quot;regenerar&quot;" style="rounded=1;fillColor=#e64a19;strokeColor=#bf360c;fontColor=#ffffff;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="730" y="266" width="130" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="b6" value="🧠&#xa;MayiHear AI&#xa;regenera insights" style="rounded=1;fillColor=#6B4FBB;strokeColor=#4a2fa0;fontColor=#ffffff;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="905" y="266" width="130" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="b7" value="👤&#xa;Usuario escribe&#xa;&quot;confirmar&quot;" style="rounded=1;fillColor=#2b7a0b;strokeColor=#1a5c07;fontColor=#ffffff;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="266" width="130" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="b8" value="📋&#xa;Insights publicados&#xa;en Monday.com" style="rounded=1;fillColor=#F62B54;strokeColor=#c0003a;fontColor=#ffffff;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1255" y="266" width="130" height="85" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fb1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#888;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="b1" target="b2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fb2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#888;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="b2" target="b3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fb3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#888;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="b3" target="b4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fb4" value="❌ no satisfecho" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#e64a19;strokeWidth=2;endArrow=block;endFill=1;fontColor=#e64a19;fontSize=10;" edge="1" source="b4" target="b5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fb5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#888;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="b5" target="b6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fb6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#888;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="b6" target="b7" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fb7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#888;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="b7" target="b8" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- SEPARATOR 2 -->
+        <mxCell id="sep2" value="" style="line;strokeColor=#cccccc;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="368" width="1280" height="10" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- FLUJO 3: Q&A MONDAY                                           -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <mxCell id="sub3" value="💬  FLUJO 3 — Usuario consulta estado de proyectos y tareas en Monday" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=13;fontStyle=1;fontColor=#6a329f;" vertex="1" parent="1">
+          <mxGeometry x="60" y="388" width="900" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c1" value="👤&#xa;Usuario escribe&#xa;cualquier pregunta&#xa;en lenguaje natural" style="rounded=1;fillColor=#6a329f;strokeColor=#4a1f7a;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="80" y="423" width="190" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2" value="📋&#xa;Bot consulta&#xa;Monday.com&#xa;(todos los ítems del board)" style="rounded=1;fillColor=#F62B54;strokeColor=#c0003a;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="370" y="423" width="190" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3" value="🧠&#xa;MayiHear AI&#xa;analiza y&#xa;formula respuesta" style="rounded=1;fillColor=#6B4FBB;strokeColor=#4a2fa0;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="660" y="423" width="190" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4" value="💬&#xa;Respuesta en lenguaje&#xa;natural directo&#xa;en Teams chat" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="950" y="423" width="190" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fc1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#6a329f;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="c1" target="c2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fc2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#6a329f;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="c2" target="c3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fc3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#6a329f;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="c3" target="c4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Q&A examples -->
+        <mxCell id="qa_note" value="Ejemplos de preguntas:&#xa;• ¿Qué tareas están bloqueadas?&#xa;• ¿Cuál es el estado del proyecto X?&#xa;• ¿Qué quedó pendiente esta semana?&#xa;• Dame un resumen de decisiones" style="rounded=1;fillColor=#f3e8ff;strokeColor=#6a329f;fontColor=#4a1f7a;fontSize=11;align=left;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="80" y="540" width="280" height="88" as="geometry"/>
+        </mxCell>
+
+        <!-- SEPARATOR 3 -->
+        <mxCell id="sep3" value="" style="line;strokeColor=#cccccc;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="645" width="1280" height="10" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- INFRAESTRUCTURA                                               -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <mxCell id="infra_title" value="☁️  Infraestructura compartida (detrás de los 3 flujos)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=13;fontStyle=1;fontColor=#FF6D00;" vertex="1" parent="1">
+          <mxGeometry x="60" y="665" width="700" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="i1" value="⚡ Azure Functions&#xa;6 funciones serverless&#xa;~$0 / mes" style="rounded=1;fillColor=#ffe6cc;strokeColor=#FF6D00;fontColor=#7a3000;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="60" y="698" width="175" height="72" as="geometry"/>
+        </mxCell>
+        <mxCell id="i2" value="🚌 Service Bus&#xa;Cola confiable&#xa;Retry x10 · ~$0.01/mes" style="rounded=1;fillColor=#fff3e0;strokeColor=#FF6D00;fontColor=#7a3000;fontSize=11;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="252" y="698" width="175" height="72" as="geometry"/>
+        </mxCell>
+        <mxCell id="i3" value="💾 Table + Blob Storage&#xa;Estado conversación&#xa;Referencias por email" style="rounded=1;fillColor=#e0f7fa;strokeColor=#0097A7;fontColor=#004d57;fontSize=11;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="444" y="698" width="175" height="72" as="geometry"/>
+        </mxCell>
+        <mxCell id="i4" value="📡 Graph API&#xa;Transcripciones de Teams&#xa;Webhook de notificación" style="rounded=1;fillColor=#dae8fc;strokeColor=#0078D4;fontColor=#00396b;fontSize=11;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="636" y="698" width="175" height="72" as="geometry"/>
+        </mxCell>
+        <mxCell id="i5" value="🧠 MayiHear AI&#xa;~$0.006/reunión&#xa;Q&amp;A ~$0.002/pregunta" style="rounded=1;fillColor=#ede7f6;strokeColor=#6B4FBB;fontColor=#4a2fa0;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="828" y="698" width="210" height="72" as="geometry"/>
+        </mxCell>
+        <mxCell id="i6" value="💰 Costo total estimado&#xa;~$0.15 – $3 / mes&#xa;100% serverless" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2d6a4f;fontColor=#1b4332;fontSize=11;fontStyle=1;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1055" y="698" width="200" height="72" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

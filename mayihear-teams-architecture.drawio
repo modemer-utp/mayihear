@@ -1,0 +1,402 @@
+<mxfile>
+  <diagram name="MayiHear Technical Architecture">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- TITLE -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="title" value="MayiHear — Arquitectura Técnica del Agente Teams" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="1520" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION: MICROSOFT TEAMS -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="teams_section" value="Microsoft Teams" style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=13;rounded=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="20" y="80" width="210" height="750" as="geometry"/>
+        </mxCell>
+
+        <!-- Teams User -->
+        <mxCell id="user" value="👤 Usuario / Organizador" style="shape=mxgraph.general.person;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontStyle=1;fontSize=11;" vertex="1" parent="teams_section">
+          <mxGeometry x="45" y="50" width="120" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Teams Meeting -->
+        <mxCell id="teams_meeting" value="📹 Reunión Teams&#xa;(con transcripción)" style="rounded=1;fillColor=#005a9e;strokeColor=#003f7a;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="teams_section">
+          <mxGeometry x="25" y="160" width="160" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Transcript generated -->
+        <mxCell id="transcript_gen" value="📝 Transcripción&#xa;generada por Teams" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=10;" vertex="1" parent="teams_section">
+          <mxGeometry x="25" y="250" width="160" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Bot Chat -->
+        <mxCell id="bot_chat" value="💬 Chat con Bot&#xa;(1:1 en Teams)" style="rounded=1;fillColor=#106EBE;strokeColor=#005a9e;fontColor=#ffffff;fontSize=10;" vertex="1" parent="teams_section">
+          <mxGeometry x="25" y="430" width="160" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Confirm dialog -->
+        <mxCell id="confirm_dialog" value="✅ Confirmar / Regenerar&#xa;/ Cancelar insights" style="rounded=1;fillColor=#2b7a0b;strokeColor=#1a5c07;fontColor=#ffffff;fontSize=10;" vertex="1" parent="teams_section">
+          <mxGeometry x="25" y="530" width="160" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Q&A -->
+        <mxCell id="qa_input" value="❓ Pregunta natural&#xa;(ej: &quot;tareas pendientes&quot;)" style="rounded=1;fillColor=#6a329f;strokeColor=#4a1f7a;fontColor=#ffffff;fontSize=10;" vertex="1" parent="teams_section">
+          <mxGeometry x="25" y="630" width="160" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION: AZURE CLOUD -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="azure_section" value="Microsoft Azure" style="swimlane;startSize=30;fillColor=#fff8e1;strokeColor=#f0a500;fontStyle=1;fontSize=13;rounded=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="250" y="80" width="1030" height="750" as="geometry"/>
+        </mxCell>
+
+        <!-- Azure Functions App container -->
+        <mxCell id="func_app" value="Azure Functions App  —  mayihear-agent  (Linux Consumption Plan)" style="swimlane;startSize=28;fillColor=#ffe6cc;strokeColor=#d6882c;fontStyle=1;fontSize=11;rounded=1;" vertex="1" parent="azure_section">
+          <mxGeometry x="20" y="45" width="690" height="500" as="geometry"/>
+        </mxCell>
+
+        <!-- Timer: poll_transcripts -->
+        <mxCell id="fn_poll" value="⏱ poll_transcripts&#xa;Timer: cada 5 min&#xa;run_on_startup=True" style="rounded=1;fillColor=#FF6D00;strokeColor=#e65100;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="func_app">
+          <mxGeometry x="20" y="50" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Timer: renew_webhook -->
+        <mxCell id="fn_renew" value="⏱ renew_webhook&#xa;Timer: cada 60 min&#xa;Renueva suscripción Graph" style="rounded=1;fillColor=#FF6D00;strokeColor=#e65100;fontColor=#ffffff;fontSize=10;" vertex="1" parent="func_app">
+          <mxGeometry x="20" y="145" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Timer: keep_warm -->
+        <mxCell id="fn_warm" value="⏱ keep_warm&#xa;Timer: cada 8 min&#xa;Previene cold start" style="rounded=1;fillColor=#bf8000;strokeColor=#a06000;fontColor=#ffffff;fontSize=10;" vertex="1" parent="func_app">
+          <mxGeometry x="20" y="240" width="180" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- HTTP: graph_webhook -->
+        <mxCell id="fn_webhook" value="🌐 graph_webhook&#xa;HTTP Trigger (POST)&#xa;/api/webhook&#xa;Notificaciones Graph API" style="rounded=1;fillColor=#c8102e;strokeColor=#8b0000;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="func_app">
+          <mxGeometry x="250" y="50" width="185" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- HTTP: teams_messages -->
+        <mxCell id="fn_messages" value="🤖 teams_messages&#xa;HTTP Trigger (POST)&#xa;/api/messages&#xa;Bot Framework handler" style="rounded=1;fillColor=#c8102e;strokeColor=#8b0000;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="func_app">
+          <mxGeometry x="250" y="160" width="185" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- SB: process_meeting_sb -->
+        <mxCell id="fn_sb" value="📨 process_meeting_sb&#xa;Service Bus Trigger&#xa;Queue: meetings&#xa;Retry x10 + DLQ" style="rounded=1;fillColor=#7B1FA2;strokeColor=#4a0072;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="func_app">
+          <mxGeometry x="480" y="50" width="185" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- bot.py -->
+        <mxCell id="bot_py" value="🧠 bot.py&#xa;MayiHearBot&#xa;• on_message_activity()&#xa;• process_meeting_webhook()&#xa;• _cmd_ask_monday()&#xa;• Conversation state machine" style="rounded=1;fillColor=#2d6a4f;strokeColor=#1b4332;fontColor=#ffffff;fontSize=10;fontStyle=1;align=left;" vertex="1" parent="func_app">
+          <mxGeometry x="250" y="280" width="415" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- pipeline.py -->
+        <mxCell id="pipeline_py" value="⚙️ pipeline.py&#xa;fetch_transcript() → VTT parser&#xa;generate() → Gemini call&#xa;post_to_monday() → Monday API" style="rounded=1;fillColor=#1b4332;strokeColor=#0d2b22;fontColor=#ffffff;fontSize=10;align=left;" vertex="1" parent="func_app">
+          <mxGeometry x="250" y="420" width="415" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ── Storage Layer ─────────────────────────────────────────── -->
+        <mxCell id="storage_layer" value="Azure Storage Layer" style="swimlane;startSize=25;fillColor=#e0f7fa;strokeColor=#0097A7;fontStyle=1;fontSize=11;rounded=1;" vertex="1" parent="azure_section">
+          <mxGeometry x="20" y="570" width="690" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- Service Bus -->
+        <mxCell id="servicebus" value="🚌 Azure Service Bus&#xa;Queue: meetings&#xa;Basic tier · ~$0.01/mes&#xa;Retry x10 + Dead Letter" style="rounded=1;fillColor=#FF6D00;strokeColor=#e65100;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="storage_layer">
+          <mxGeometry x="15" y="35" width="185" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Table Storage -->
+        <mxCell id="table_storage" value="📊 Azure Table Storage&#xa;Tabla: convstate&#xa;Estado de conversación&#xa;(phase, pending, queue)" style="rounded=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="storage_layer">
+          <mxGeometry x="250" y="35" width="185" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Blob Storage -->
+        <mxCell id="blob_storage" value="💾 Azure Blob Storage&#xa;conv_refs_by_email.json&#xa;processed_transcripts.json&#xa;AzureWebJobsStorage" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="storage_layer">
+          <mxGeometry x="485" y="35" width="185" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- ── Bot Framework SDK ───────────────────────────────────── -->
+        <mxCell id="bot_framework" value="🔧 Bot Framework SDK v4&#xa;BotFrameworkHttpAdapter&#xa;CloudAdapter · JWT auth&#xa;continue_conversation() para mensajes proactivos" style="rounded=1;fillColor=#005a9e;strokeColor=#003f7a;fontColor=#ffffff;fontSize=10;align=left;" vertex="1" parent="azure_section">
+          <mxGeometry x="730" y="45" width="280" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Graph subscription -->
+        <mxCell id="graph_sub" value="📡 Graph Subscription&#xa;changeType: created&#xa;resource: getAllTranscripts&#xa;TTL: 60 min (auto-renovado)&#xa;lifecycleNotificationUrl ✓" style="rounded=1;fillColor=#c8102e;strokeColor=#8b0000;fontColor=#ffffff;fontSize=10;align=left;" vertex="1" parent="azure_section">
+          <mxGeometry x="730" y="155" width="280" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- VTT Parser -->
+        <mxCell id="vtt_parser" value="📄 VTT Parser&#xa;Teams transcript → texto plano&#xa;WEBVTT format&#xa;Remove timestamps + speaker tags" style="rounded=1;fillColor=#546e7a;strokeColor=#37474f;fontColor=#ffffff;fontSize=10;align=left;" vertex="1" parent="azure_section">
+          <mxGeometry x="730" y="275" width="280" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- Multi-user routing -->
+        <mxCell id="routing" value="🗺️ Multi-User Routing&#xa;conv_refs_by_email (email → ref)&#xa;_get_ref_for_organizer(email)&#xa;resolve_email_from_aad_id()" style="rounded=1;fillColor=#6a329f;strokeColor=#4a1f7a;fontColor=#ffffff;fontSize=10;align=left;" vertex="1" parent="azure_section">
+          <mxGeometry x="730" y="375" width="280" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- Monday Q&A module -->
+        <mxCell id="monday_qa" value="💡 monday_qa.py&#xa;Approach B: fetch-all + LLM&#xa;fetch_board_items(board_id)&#xa;→ compact JSON → Gemini context" style="rounded=1;fillColor=#2d6a4f;strokeColor=#1b4332;fontColor=#ffffff;fontSize=10;align=left;" vertex="1" parent="azure_section">
+          <mxGeometry x="730" y="475" width="280" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION: EXTERNAL SERVICES -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="ext_section" value="Servicios Externos" style="swimlane;startSize=30;fillColor=#f3e5f5;strokeColor=#7B1FA2;fontStyle=1;fontSize=13;rounded=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="80" width="260" height="750" as="geometry"/>
+        </mxCell>
+
+        <!-- Graph API -->
+        <mxCell id="graph_api" value="☁️ Microsoft Graph API&#xa;v1.0&#xa;/users/{uid}/onlineMeetings&#xa;/getAllTranscripts&#xa;/transcripts/{id}/content&#xa;/subscriptions" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="ext_section">
+          <mxGeometry x="30" y="50" width="200" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Gemini -->
+        <mxCell id="gemini_api" value="🤖 Google Gemini&#xa;gemini-2.5-flash&#xa;generate_content()&#xa;• Insights de reunión&#xa;• Respuestas Q&amp;A Monday&#xa;• Formato Markdown" style="rounded=1;fillColor=#4285F4;strokeColor=#1a73e8;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="ext_section">
+          <mxGeometry x="30" y="195" width="200" height="115" as="geometry"/>
+        </mxCell>
+
+        <!-- Monday.com -->
+        <mxCell id="monday_api" value="📋 Monday.com&#xa;GraphQL API v2&#xa;boards · items_page&#xa;create_item()&#xa;column_values&#xa;Board ID: configurable" style="rounded=1;fillColor=#F62B54;strokeColor=#c0003a;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="ext_section">
+          <mxGeometry x="30" y="350" width="200" height="115" as="geometry"/>
+        </mxCell>
+
+        <!-- Azure AD -->
+        <mxCell id="azure_ad" value="🔐 Azure Active Directory&#xa;App Registration&#xa;Client Credentials flow&#xa;Permisos:&#xa;• OnlineMeetingTranscript.Read.All&#xa;• User.Read.All" style="rounded=1;fillColor=#0078D4;strokeColor=#005a9e;fontColor=#ffffff;fontSize=10;" vertex="1" parent="ext_section">
+          <mxGeometry x="30" y="510" width="200" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Bot Framework Service -->
+        <mxCell id="bf_service" value="🌐 Bot Framework Service&#xa;(Registro del bot)&#xa;Microsoft App ID + Secret&#xa;Token validation&#xa;Channel: Teams" style="rounded=1;fillColor=#106EBE;strokeColor=#005a9e;fontColor=#ffffff;fontSize=10;" vertex="1" parent="ext_section">
+          <mxGeometry x="30" y="655" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- FLOW ARROWS — Meeting Processing (blue/orange) -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+
+        <!-- 1. Meeting ends → transcript available -->
+        <mxCell id="f1" value="1. Reunión termina&#xa;transcripción lista" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#005a9e;strokeWidth=2;fontColor=#005a9e;fontStyle=1;fontSize=9;" edge="1" source="transcript_gen" target="fn_poll" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="185" y="360"/>
+              <mxPoint x="185" y="170"/>
+              <mxPoint x="370" y="170"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 2. poll_transcripts → Graph API -->
+        <mxCell id="f2" value="2. GET /getAllTranscripts" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#FF6D00;strokeWidth=2;fontColor=#FF6D00;fontStyle=1;fontSize=9;" edge="1" source="fn_poll" target="graph_api" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="460" y="170"/>
+              <mxPoint x="460" y="110"/>
+              <mxPoint x="1330" y="110"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 3. New transcript → Service Bus -->
+        <mxCell id="f3" value="3. Nueva transcripción&#xa;→ enqueue" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7B1FA2;strokeWidth=2;fontColor=#7B1FA2;fontStyle=1;fontSize=9;" edge="1" source="fn_poll" target="servicebus" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="370" y="230"/>
+              <mxPoint x="370" y="770"/>
+              <mxPoint x="390" y="770"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 4. Webhook → graph_webhook → Service Bus -->
+        <mxCell id="f4" value="4. Webhook notification&#xa;(alternativa al poller)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#c8102e;strokeWidth=2;fontColor=#c8102e;fontStyle=1;fontSize=9;dashed=1;" edge="1" source="graph_api" target="fn_webhook" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1330" y="140"/>
+              <mxPoint x="700" y="140"/>
+              <mxPoint x="700" y="90"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 5. Service Bus → process_meeting_sb -->
+        <mxCell id="f5" value="5. SB trigger" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7B1FA2;strokeWidth=2;fontColor=#7B1FA2;fontStyle=1;fontSize=9;" edge="1" source="servicebus" target="fn_sb" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="695"/>
+              <mxPoint x="390" y="740"/>
+              <mxPoint x="780" y="740"/>
+              <mxPoint x="780" y="90"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 6. process_meeting_sb → Graph API (get VTT) -->
+        <mxCell id="f6" value="6. GET /content (VTT)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#546e7a;strokeWidth=2;fontColor=#546e7a;fontStyle=1;fontSize=9;" edge="1" source="fn_sb" target="graph_api" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1080" y="90"/>
+              <mxPoint x="1330" y="90"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 7. VTT → Gemini insights -->
+        <mxCell id="f7" value="7. texto VTT → insights" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#4285F4;strokeWidth=2;fontColor=#4285F4;fontStyle=1;fontSize=9;" edge="1" source="fn_sb" target="gemini_api" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1080" y="90"/>
+              <mxPoint x="1200" y="90"/>
+              <mxPoint x="1200" y="255"/>
+              <mxPoint x="1330" y="255"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 8. process_meeting_sb → bot.py → Teams (proactive) -->
+        <mxCell id="f8" value="8. Mensaje proactivo&#xa;(insights para revisar)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#006400;strokeWidth=2;fontColor=#006400;fontStyle=1;fontSize=9;" edge="1" source="fn_sb" target="bot_chat" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="640" y="90"/>
+              <mxPoint x="640" y="500"/>
+              <mxPoint x="185" y="500"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 9. User confirms → teams_messages → Monday -->
+        <mxCell id="f9" value="9. Usuario confirma" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#2b7a0b;strokeWidth=2;fontColor=#2b7a0b;fontStyle=1;fontSize=9;" edge="1" source="confirm_dialog" target="fn_messages" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="185" y="560"/>
+              <mxPoint x="370" y="560"/>
+              <mxPoint x="370" y="310"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 10. teams_messages → Monday (create item) -->
+        <mxCell id="f10" value="10. create_item()&#xa;Publica en Monday" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#F62B54;strokeWidth=2;fontColor=#F62B54;fontStyle=1;fontSize=9;" edge="1" source="fn_messages" target="monday_api" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="640" y="240"/>
+              <mxPoint x="1200" y="240"/>
+              <mxPoint x="1200" y="408"/>
+              <mxPoint x="1330" y="408"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- FLOW ARROWS — Q&A Flow (purple) -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+
+        <!-- Q1. User Q&A → teams_messages -->
+        <mxCell id="fq1" value="Q1. Pregunta natural" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#6a329f;strokeWidth=2;fontColor=#6a329f;fontStyle=1;fontSize=9;" edge="1" source="qa_input" target="fn_messages" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="185" y="655"/>
+              <mxPoint x="540" y="655"/>
+              <mxPoint x="540" y="310"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Q2. teams_messages → Monday (fetch all) -->
+        <mxCell id="fq2" value="Q2. fetch_board_items()&#xa;Todos los items JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#F62B54;strokeWidth=2;fontColor=#F62B54;fontStyle=1;fontSize=9;dashed=1;" edge="1" source="fn_messages" target="monday_api" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="640" y="240"/>
+              <mxPoint x="1180" y="240"/>
+              <mxPoint x="1180" y="420"/>
+              <mxPoint x="1330" y="420"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Q3. bot → Gemini (Q&A) -->
+        <mxCell id="fq3" value="Q3. datos + pregunta&#xa;→ respuesta natural" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#4285F4;strokeWidth=2;fontColor=#4285F4;fontStyle=1;fontSize=9;dashed=1;" edge="1" source="monday_qa" target="gemini_api" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1280" y="512"/>
+              <mxPoint x="1400" y="512"/>
+              <mxPoint x="1400" y="253"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Q4. Response back to Teams -->
+        <mxCell id="fq4" value="Q4. Respuesta en Teams" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#6a329f;strokeWidth=2;fontColor=#6a329f;fontStyle=1;fontSize=9;dashed=1;" edge="1" source="fn_messages" target="bot_chat" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="360"/>
+              <mxPoint x="500" y="460"/>
+              <mxPoint x="185" y="460"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- State read/write -->
+        <mxCell id="fs1" value="state R/W" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#0097A7;strokeWidth=1;fontColor=#0097A7;fontSize=9;dashed=1;" edge="1" source="bot_py" target="table_storage" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="540" y="400"/>
+              <mxPoint x="540" y="610"/>
+              <mxPoint x="590" y="610"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Conv refs -->
+        <mxCell id="fs2" value="conv refs R/W" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#0078D4;strokeWidth=1;fontColor=#0078D4;fontSize=9;dashed=1;" edge="1" source="bot_py" target="blob_storage" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="400"/>
+              <mxPoint x="580" y="620"/>
+              <mxPoint x="840" y="620"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- LEGEND -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="legend" value="LEYENDA" style="swimlane;startSize=22;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=11;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="860" width="560" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="leg1" value="─── Flujo: Procesamiento automático de reuniones (1→10)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#005a9e;" vertex="1" parent="legend">
+          <mxGeometry x="10" y="28" width="400" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="leg2" value="- - - Flujo: Q&amp;A sobre Monday (Q1→Q4)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6a329f;" vertex="1" parent="legend">
+          <mxGeometry x="10" y="50" width="400" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="leg3" value="- - - Webhook Graph API (alternativa al poller, en validación)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#c8102e;" vertex="1" parent="legend">
+          <mxGeometry x="10" y="72" width="420" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- ENV VARS NOTE -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="env_note" value="Variables de entorno clave (Azure Function App Settings):&#xa;AZURE_TENANT_ID · AZURE_CLIENT_ID · AZURE_CLIENT_SECRET&#xa;ORGANIZER_EMAILS (multi-usuario) · MONDAY_TOKEN · MONDAY_BOARD_ID&#xa;GEMINI_API_KEY · MicrosoftAppId · MicrosoftAppPassword&#xa;AzureWebJobsStorage · SERVICEBUS_CONNECTION_STRING" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666;fontSize=10;align=left;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="600" y="860" width="680" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- COSTS NOTE -->
+        <mxCell id="cost_note" value="💰 Costo estimado mensual:&#xa;Azure Functions: $0 (Free tier — 1M ejecuciones/mes)&#xa;Service Bus Basic: ~$0.01/mes&#xa;Table + Blob Storage: ~$0/mes (uso mínimo)&#xa;Gemini 2.5 Flash: ~$0.01–0.10/mes (por uso)" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2d6a4f;fontSize=10;align=left;fontColor=#1b4332;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="860" width="260" height="100" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -6,11 +6,15 @@ INSIGHTS_COLUMN_ID = "insights"  # Monday column ID — set after running setup_
 
 
 def list_boards() -> list:
-    """Returns list of {id, name} for all accessible boards (max 30)."""
-    query = "query { boards(limit: 30, order_by: created_at) { id name } }"
+    """Returns relevant boards — excludes sub_items_boards and noise."""
+    query = "query { boards(limit: 50, order_by: used_at) { id name type } }"
     r = requests.post(MONDAY_API, json={"query": query}, headers=_headers())
     r.raise_for_status()
-    return [{"id": b["id"], "name": b["name"]} for b in r.json()["data"]["boards"]]
+    return [
+        {"id": b["id"], "name": b["name"]}
+        for b in r.json()["data"]["boards"]
+        if b.get("type") not in ("sub_items_board", "document")
+    ]
 
 
 def _headers() -> dict:
