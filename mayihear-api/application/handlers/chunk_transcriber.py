@@ -82,21 +82,37 @@ def _split_into_chunks(file_path: str, chunk_seconds: int) -> List[str]:
     return chunks
 
 
+def _is_vertex_client(client) -> bool:
+    try:
+        return client._api_client._vertexai
+    except AttributeError:
+        return False
+
+
 def _transcribe_one_chunk(client, chunk_path: str, mime_type: str, chunk_idx: int, total: int) -> tuple:
     """Upload and transcribe a single audio chunk. Returns (text, model_used, usage_metadata)."""
+    from google.genai import types as genai_types
     file_size_mb = round(os.path.getsize(chunk_path) / 1024 / 1024, 1)
-    print(f"[chunker] Chunk {chunk_idx + 1}/{total}: uploading {file_size_mb} MB...", flush=True)
+    print(f"[chunker] Chunk {chunk_idx + 1}/{total}: preparing {file_size_mb} MB...", flush=True)
 
-    audio_file = client.files.upload(file=chunk_path, config={"mime_type": mime_type})
+    is_vertex = _is_vertex_client(client)
 
-    poll_count = 0
-    while audio_file.state.name == "PROCESSING":
-        time.sleep(1)
-        poll_count += 1
-        audio_file = client.files.get(name=audio_file.name)
-
-    if audio_file.state.name == "FAILED":
-        raise RuntimeError(f"Gemini failed to process chunk {chunk_idx + 1}/{total}")
+    if is_vertex:
+        # Vertex AI: send audio inline as bytes
+        with open(chunk_path, 'rb') as f:
+            audio_bytes = f.read()
+        audio_part = genai_types.Part.from_bytes(data=audio_bytes, mime_type=mime_type)
+        audio_content = audio_part
+        audio_file = None
+    else:
+        # AI Studio: upload file then reference it
+        audio_file = client.files.upload(file=chunk_path, config={"mime_type": mime_type})
+        while audio_file.state.name == "PROCESSING":
+            time.sleep(1)
+            audio_file = client.files.get(name=audio_file.name)
+        if audio_file.state.name == "FAILED":
+            raise RuntimeError(f"Gemini failed to process chunk {chunk_idx + 1}/{total}")
+        audio_content = audio_file
 
     print(f"[chunker] Chunk {chunk_idx + 1}/{total}: transcribing...", flush=True)
 
@@ -108,7 +124,7 @@ def _transcribe_one_chunk(client, chunk_path: str, mime_type: str, chunk_idx: in
             try:
                 response = client.models.generate_content(
                     model=model,
-                    contents=[TRANSCRIPTION_PROMPT, audio_file]
+                    contents=[TRANSCRIPTION_PROMPT, audio_content]
                 )
                 model_used = model
                 break
@@ -123,7 +139,8 @@ def _transcribe_one_chunk(client, chunk_path: str, mime_type: str, chunk_idx: in
         if response:
             break
 
-    client.files.delete(name=audio_file.name)
+    if audio_file:
+        client.files.delete(name=audio_file.name)
 
     if not response:
         raise RuntimeError(f"Transcription unavailable for chunk {chunk_idx + 1}/{total} after all retries")
