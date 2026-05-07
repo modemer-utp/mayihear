@@ -34,7 +34,11 @@ class TranscribeAudio:
     @property
     def client(self):
         if self._client is None:
-            self._client = genai.Client(api_key=secret_manager.get_gemini_api_key())
+            creds, project_id = secret_manager.get_vertex_credentials()
+            if creds:
+                self._client = genai.Client(vertexai=True, project=project_id, location="us-central1", credentials=creds)
+            else:
+                self._client = genai.Client(api_key=secret_manager.get_gemini_api_key())
         return self._client
 
     def _reset_client(self):

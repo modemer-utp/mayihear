@@ -134,7 +134,11 @@ def transcribe_chunked(
     Splits audio into 30-min chunks, transcribes each with gemini-2.5-pro, concatenates results.
     on_progress(chunks_done, total_chunks) called after each chunk completes.
     """
-    client = genai.Client(api_key=secret_manager.get_gemini_api_key())
+    creds, project_id = secret_manager.get_vertex_credentials()
+    if creds:
+        client = genai.Client(vertexai=True, project=project_id, location="us-central1", credentials=creds)
+    else:
+        client = genai.Client(api_key=secret_manager.get_gemini_api_key())
     start_total = time.perf_counter()
 
     chunks = _split_into_chunks(file_path, CHUNK_SECONDS)
