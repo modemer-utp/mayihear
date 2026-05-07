@@ -31,9 +31,12 @@ TRANSCRIPTION_PROMPT = (
 
 def _get_ffmpeg_path() -> str:
     """Returns path to bundled ffmpeg, or falls back to system ffmpeg."""
-    bundled = os.path.normpath(
-        os.path.join(os.path.dirname(__file__), '..', '..', 'bin', 'ffmpeg.exe')
-    )
+    import sys
+    if getattr(sys, 'frozen', False):
+        base = sys._MEIPASS
+    else:
+        base = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    bundled = os.path.join(base, 'bin', 'ffmpeg.exe')
     if os.path.exists(bundled):
         return bundled
     return 'ffmpeg'

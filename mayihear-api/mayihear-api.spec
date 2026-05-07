@@ -8,6 +8,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('agents/prompts/*.prompt', 'agents/prompts'),
+        ('bin/ffmpeg.exe', 'bin'),
     ],
     hiddenimports=[
         'api.main',
