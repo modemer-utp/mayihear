@@ -37,9 +37,14 @@ def _get_ffmpeg_path() -> str:
     else:
         base = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..'))
     bundled = os.path.join(base, 'bin', 'ffmpeg.exe')
+    print(f"[ffmpeg] bundled path = '{bundled}' | exists = {os.path.exists(bundled)}", flush=True)
     if os.path.exists(bundled):
         return bundled
-    return 'ffmpeg'
+    # Try to locate ffmpeg in PATH explicitly
+    import shutil
+    system_ffmpeg = shutil.which('ffmpeg') or shutil.which('ffmpeg.exe')
+    print(f"[ffmpeg] system path = '{system_ffmpeg}'", flush=True)
+    return system_ffmpeg or 'ffmpeg'
 
 
 def _split_into_chunks(file_path: str, chunk_seconds: int) -> List[str]:
@@ -50,7 +55,7 @@ def _split_into_chunks(file_path: str, chunk_seconds: int) -> List[str]:
     tmp_dir = tempfile.mkdtemp()
     pattern = os.path.join(tmp_dir, f'chunk_%03d{ext}')
 
-    print(f"[chunker] Splitting into {chunk_seconds // 60}-min chunks...", flush=True)
+    print(f"[chunker] Splitting into {chunk_seconds // 60}-min chunks, file='{file_path}', ffmpeg='{ffmpeg}'", flush=True)
     result = subprocess.run([
         ffmpeg, '-y', '-i', file_path,
         '-f', 'segment',
