@@ -39,6 +39,37 @@ def _get_client():
     return _client
 
 
+CUSTOM_PROMPT_WRAPPER = """\
+Tu tarea es generar un documento a partir de una transcripción de reunión.
+
+== INSTRUCCIÓN / PLANTILLA ==
+{custom_prompt}
+== FIN DE INSTRUCCIÓN ==
+
+REGLAS IMPORTANTES:
+- Si la instrucción o plantilla contiene datos de ejemplo (nombres, fechas, cifras, etc.), úsalos ÚNICAMENTE como referencia de formato y estructura. NO los copies al output.
+- Extrae toda la información del output EXCLUSIVAMENTE de la transcripción.
+- Si un dato no aparece en la transcripción, escribe N/D.
+- Responde siempre en español.
+
+== TRANSCRIPCIÓN ==
+{transcript}
+== FIN DE TRANSCRIPCIÓN ==
+"""
+
+
+def generate_insights_custom(transcript: str, custom_prompt: str) -> str:
+    """Generate insights using a user-defined prompt. Returns plain text."""
+    response = _get_client().models.generate_content(
+        model=GEMINI_MODEL,
+        contents=CUSTOM_PROMPT_WRAPPER.format(
+            custom_prompt=custom_prompt.strip(),
+            transcript=transcript,
+        ),
+    )
+    return response.text.strip()
+
+
 def generate_insights(transcript: str) -> dict:
     response = _get_client().models.generate_content(
         model=GEMINI_MODEL,

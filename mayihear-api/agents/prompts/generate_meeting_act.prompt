@@ -19,7 +19,8 @@ NO parafrasees ni omitas datos concretos. Si se dijo "30,500 horas liberadas", "
 
 Analiza la siguiente transcripción de reunión y genera un acta formal completa.
 
-Instrucciones específicas:
+{acta_template_block}
+Instrucciones específicas (aplican solo si no hay plantilla personalizada arriba):
 - nombre_reunion: infiere el nombre de la reunión del contexto (ej. "Reunión de seguimiento semanal — Ingeniería")
 - fecha: usa la fecha de hoy si no se menciona explícitamente en la transcripción
 - participantes: extrae todos los nombres de personas mencionadas en la transcripción

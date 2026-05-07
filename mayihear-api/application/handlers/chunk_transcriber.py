@@ -17,7 +17,7 @@ CHUNK_MINUTES = 30
 CHUNK_SECONDS = CHUNK_MINUTES * 60
 
 TRANSCRIPTION_MODEL = "gemini-2.5-pro"
-TRANSCRIPTION_MODEL_FALLBACK = "gemini-2.0-flash"
+TRANSCRIPTION_MODEL_FALLBACK = "gemini-2.5-flash-lite"
 
 _MAX_RETRIES = 3
 _RETRY_DELAY_SECONDS = 5
@@ -104,8 +104,8 @@ def _transcribe_one_chunk(client, chunk_path: str, mime_type: str, chunk_idx: in
                 )
                 model_used = model
                 break
-            except genai_errors.ServerError as e:
-                retryable = e.status_code in (503, 429)
+            except (genai_errors.ServerError, genai_errors.ClientError) as e:
+                retryable = getattr(e, 'code', 0) in (429, 503)
                 if retryable and attempt < _MAX_RETRIES - 1:
                     time.sleep(_RETRY_DELAY_SECONDS * (attempt + 1))
                     continue
@@ -120,8 +120,9 @@ def _transcribe_one_chunk(client, chunk_path: str, mime_type: str, chunk_idx: in
     if not response:
         raise RuntimeError(f"Transcription unavailable for chunk {chunk_idx + 1}/{total} after all retries")
 
-    print(f"[chunker] Chunk {chunk_idx + 1}/{total}: done ({len(response.text)} chars)", flush=True)
-    return response.text, model_used, response.usage_metadata
+    text = response.text or ''
+    print(f"[chunker] Chunk {chunk_idx + 1}/{total}: done ({len(text)} chars)", flush=True)
+    return text, model_used, response.usage_metadata
 
 
 def transcribe_chunked(

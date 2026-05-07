@@ -27,13 +27,13 @@ if errorlevel 1 (
 echo [build-api] Activating virtual environment...
 call "%API_DIR%\.venv\Scripts\activate.bat"
 if errorlevel 1 (
-    echo ERROR: Could not activate .venv — run: python -m venv .venv ^&^& pip install -r requirements.txt pyinstaller==6.11.1
+    echo ERROR: Could not activate .venv — run: python -m venv .venv ^&^& pip install -r requirements.txt pyinstaller==6.19.0
     exit /b 1
 )
 
 echo [build-api] Running PyInstaller...
 cd /d "%API_DIR%"
-pyinstaller mayihear-api.spec --noconfirm
+.venv\Scripts\pyinstaller mayihear-api.spec --noconfirm
 set PYINSTALLER_EXIT=%errorlevel%
 
 echo [build-api] Cleaning up run_built.py...

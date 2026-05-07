@@ -10,313 +10,479 @@
 </head>
 <body>
 
+  <!-- ── Header ── -->
   <header>
-    <span class="dot" id="status-dot"></span>
-    <h1>MayiHear</h1>
-    <button id="settings-btn" class="settings-btn" title="Configuración">⚙</button>
-  </header>
-
-  <!-- Settings panel overlay -->
-  <div id="settings-overlay" class="settings-overlay hidden"></div>
-  <aside id="settings-panel" class="settings-panel hidden">
-    <div class="settings-panel-header">
-      <span class="settings-panel-title">Configuración</span>
-      <button id="settings-close-btn" class="settings-close-btn">✕</button>
+    <div class="header-left">
+      <span class="api-dot" id="api-dot"></span>
+      <span class="app-name">MayiHear</span>
     </div>
 
-    <div class="settings-body">
+    <nav class="main-nav">
+      <button class="nav-btn active" data-page="record">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+        Grabar
+      </button>
+      <button class="nav-btn" data-page="transcriptions">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Transcripciones
+        <span class="nav-badge hidden" id="nav-running-badge"></span>
+      </button>
+      <button class="nav-btn" data-page="profiles">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Perfiles
+      </button>
+    </nav>
 
-      <!-- Gemini API Key -->
-      <div class="settings-section">
-        <div class="settings-section-label">Google Gemini — API Key</div>
+    <button id="settings-btn" class="header-icon-btn" title="Configuración">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </header>
 
-        <div class="settings-field">
-          <label class="settings-field-label">Gemini API Key</label>
-          <div class="settings-field-row">
-            <input type="password" id="s-gemini-key" class="settings-input" placeholder="AIzaSy..." />
-            <button id="s-gemini-toggle" class="settings-icon-btn" title="Mostrar/ocultar">👁</button>
+  <!-- ── Settings overlay + panel ── -->
+  <div id="settings-overlay" class="overlay hidden"></div>
+  <aside id="settings-panel" class="settings-panel hidden">
+    <div class="sp-header">
+      <span class="sp-title">Configuración</span>
+      <button id="settings-close-btn" class="icon-close-btn">✕</button>
+    </div>
+    <div class="sp-body">
+
+      <div class="sp-section">
+        <div class="sp-section-label">Carpeta de grabaciones</div>
+        <div class="sp-field">
+          <label class="sp-label">Ubicación actual</label>
+          <div class="sp-row">
+            <span id="s-recordings-path" class="sp-hint-value" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px"></span>
+            <button id="s-pick-dir-btn" class="btn-ghost" style="flex-shrink:0">Cambiar...</button>
           </div>
-          <span id="s-gemini-hint" class="settings-hint"></span>
-          <span class="settings-hint">Obtén tu clave en <strong>aistudio.google.com</strong> → Get API Key. Requerida para transcripción e insights.</span>
+          <span class="sp-hint">Las nuevas grabaciones se guardarán en esta carpeta.</span>
         </div>
-
-        <div class="settings-field-row settings-actions-row">
-          <button id="s-gemini-save-btn" class="settings-btn-primary">Guardar clave</button>
-        </div>
-        <span id="s-gemini-status" class="settings-status-text"></span>
+        <span id="s-dir-status" class="sp-status"></span>
       </div>
 
-      <!-- Monday.com API -->
-      <div class="settings-section">
-        <div class="settings-section-label">Monday.com — Credenciales</div>
-
-        <div class="settings-field">
-          <label class="settings-field-label">API Token</label>
-          <div class="settings-field-row">
-            <input type="password" id="s-monday-token" class="settings-input" placeholder="eyJhbGciOiJ..." />
-            <button id="s-token-toggle" class="settings-icon-btn" title="Mostrar/ocultar">👁</button>
+      <div class="sp-section">
+        <div class="sp-section-label">Google Gemini — API Key</div>
+        <div class="sp-field">
+          <label class="sp-label">Tu clave personal de Gemini</label>
+          <div class="sp-row">
+            <input type="password" id="s-gemini-key" class="sp-input" placeholder="AIzaSy..." />
+            <button id="s-gemini-toggle" class="sp-icon-btn" title="Mostrar/ocultar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
           </div>
-          <span class="settings-hint">Obtén tu token en monday.com → Perfil → Developers → API</span>
+          <span id="s-gemini-hint" class="sp-hint-value"></span>
+          <span class="sp-hint">Obtén tu clave gratuita en <strong>aistudio.google.com</strong> → Get API Key</span>
         </div>
-
-        <div class="settings-field">
-          <label class="settings-field-label">Board ID del tablero de proyectos</label>
-          <input type="text" id="s-monday-board-id" class="settings-input" placeholder="ej. 1234567890" />
-          <span class="settings-hint">ID del tablero donde están los proyectos (URL del tablero)</span>
-        </div>
-
-        <div class="settings-field">
-          <label class="settings-field-label">Column ID para el acta</label>
-          <input type="text" id="s-monday-column-id" class="settings-input" placeholder="ej. long_text" />
-          <span class="settings-hint">ID de la columna de texto donde se publica el acta</span>
-        </div>
-
-        <div class="settings-field-row settings-actions-row">
-          <button id="s-test-btn" class="settings-btn-secondary">Probar conexión</button>
-          <button id="s-save-btn" class="settings-btn-primary">Guardar</button>
-        </div>
-        <span id="s-save-status" class="settings-status-text"></span>
+        <button id="s-gemini-save-btn" class="btn-primary">Guardar clave Gemini</button>
+        <span id="s-gemini-status" class="sp-status"></span>
       </div>
 
-      <!-- Transcription mode -->
-      <div class="settings-section">
-        <div class="settings-section-label">Modo de transcripción</div>
-        <div class="settings-toggle-row">
-          <div class="settings-toggle-info">
-            <span class="settings-toggle-name">Usar Whisper local</span>
-            <span class="settings-toggle-desc">El audio nunca sale de tu PC. Requiere ~244MB de descarga la primera vez que actives este modo.</span>
+      <div class="sp-section">
+        <div class="sp-section-label">Vertex AI — Credenciales (opcional)</div>
+        <div class="sp-field">
+          <label class="sp-label">Service Account JSON</label>
+          <div class="sp-row">
+            <span id="s-vertex-hint" class="sp-hint-value" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">Sin configurar</span>
+            <button id="s-vertex-pick-btn" class="btn-ghost" style="flex-shrink:0">Elegir archivo...</button>
+          </div>
+          <span class="sp-hint">Si configuras esto, se usará Vertex AI en lugar de la clave Gemini.</span>
+        </div>
+        <div id="s-active-backend-row" class="sp-field" style="margin-top:6px">
+          <span id="s-active-backend-badge" class="acta-mode-badge"></span>
+        </div>
+        <button id="s-vertex-clear-btn" class="btn-ghost hidden">Quitar credenciales</button>
+        <span id="s-vertex-status" class="sp-status"></span>
+      </div>
+
+      <div class="sp-section">
+        <div class="sp-section-label">Modo de transcripción</div>
+        <div class="sp-toggle-card">
+          <div class="sp-toggle-info">
+            <span class="sp-toggle-name">Usar Whisper local</span>
+            <span class="sp-toggle-desc">El audio no sale de tu PC. Requiere ~244 MB la primera vez.</span>
           </div>
           <label class="toggle-label">
             <input type="checkbox" id="s-local-whisper" />
             <span class="toggle-pill"></span>
           </label>
         </div>
-        <div id="s-whisper-model-row" class="settings-field" style="margin-top:10px;display:none">
-          <label class="settings-field-label">Modelo Whisper</label>
-          <select id="s-whisper-model" class="monday-select" style="width:100%">
-            <option value="tiny">tiny — más rápido, menos preciso (~75MB)</option>
-            <option value="small" selected>small — equilibrio recomendado (~244MB)</option>
-            <option value="medium">medium — más preciso, más lento (~1.5GB)</option>
-            <option value="large-v3">large-v3 — máxima precisión (~3GB)</option>
+        <div id="s-whisper-model-row" class="sp-field hidden">
+          <label class="sp-label">Modelo Whisper</label>
+          <select id="s-whisper-model" class="sp-select">
+            <option value="tiny">tiny — más rápido, menos preciso (~75 MB)</option>
+            <option value="small" selected>small — equilibrio recomendado (~244 MB)</option>
+            <option value="medium">medium — más preciso, más lento (~1.5 GB)</option>
+            <option value="large-v3">large-v3 — máxima precisión (~3 GB)</option>
           </select>
         </div>
-        <div class="settings-field-row settings-actions-row" style="margin-top:8px">
-          <button id="s-transcription-save-btn" class="settings-btn-primary">Guardar modo</button>
-        </div>
-        <span id="s-transcription-status" class="settings-status-text"></span>
+        <button id="s-transcription-save-btn" class="btn-primary">Guardar modo</button>
+        <span id="s-transcription-status" class="sp-status"></span>
       </div>
 
-      <!-- Auto-publish toggle -->
-      <div class="settings-section">
-        <div class="settings-section-label">Publicación automática</div>
-        <div class="settings-toggle-row">
-          <div class="settings-toggle-info">
-            <span class="settings-toggle-name">Publicar en Monday.com automáticamente</span>
-            <span class="settings-toggle-desc">Publica el acta en Monday.com sin confirmación manual al terminar de generarla</span>
+      <div class="sp-section">
+        <div class="sp-section-label">Perfil por defecto</div>
+        <div class="sp-field">
+          <label class="sp-label">Perfil que se aplica automáticamente al grabar</label>
+          <select id="s-default-profile" class="sp-select">
+            <option value="">Default (sin perfil)</option>
+          </select>
+        </div>
+        <button id="s-default-profile-save-btn" class="btn-primary">Guardar perfil por defecto</button>
+        <span id="s-default-profile-status" class="sp-status"></span>
+      </div>
+
+      <div class="sp-section" style="display:none">
+        <div class="sp-section-label">Monday.com — opcional</div>
+        <div class="sp-field">
+          <label class="sp-label">API Token</label>
+          <div class="sp-row">
+            <input type="password" id="s-monday-token" class="sp-input" placeholder="eyJhbGciOiJ..." />
+            <button id="s-token-toggle" class="sp-icon-btn" title="Mostrar/ocultar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <span class="sp-hint">monday.com → Perfil → Developers → API</span>
+        </div>
+        <div class="sp-field">
+          <label class="sp-label">Board ID del tablero</label>
+          <input type="text" id="s-monday-board-id" class="sp-input" placeholder="ej. 1234567890" />
+        </div>
+        <div class="sp-field">
+          <label class="sp-label">Column ID para el acta</label>
+          <input type="text" id="s-monday-column-id" class="sp-input" placeholder="ej. long_text" />
+        </div>
+        <div class="sp-toggle-card">
+          <div class="sp-toggle-info">
+            <span class="sp-toggle-name">Publicar automáticamente</span>
+            <span class="sp-toggle-desc">Publica el acta en Monday.com sin confirmación</span>
           </div>
           <label class="toggle-label">
             <input type="checkbox" id="s-auto-publish" />
             <span class="toggle-pill"></span>
           </label>
         </div>
+        <div class="sp-row sp-actions-row">
+          <button id="s-test-btn" class="btn-ghost">Probar conexión</button>
+          <button id="s-save-btn" class="btn-primary">Guardar</button>
+        </div>
+        <span id="s-save-status" class="sp-status"></span>
       </div>
 
-      <!-- Board explorer -->
-      <div class="settings-section">
-        <div class="settings-section-label">Explorador de tableros</div>
-        <span class="settings-hint">Selecciona un tablero para ver sus métricas y columnas disponibles.</span>
-
-        <div class="settings-field" style="margin-top:10px">
-          <select id="s-board-select" class="monday-select">
-            <option value="">Seleccionar tablero...</option>
-          </select>
-        </div>
-
+      <div class="sp-section" style="display:none">
+        <div class="sp-section-label">Explorador de tableros</div>
+        <select id="s-board-select" class="sp-select">
+          <option value="">Seleccionar tablero para explorar...</option>
+        </select>
+        <div id="s-board-loading" class="sp-hint hidden">Cargando...</div>
         <div id="s-board-metrics" class="board-metrics hidden">
           <div class="board-metrics-header">
             <span id="s-board-name" class="board-metrics-name"></span>
             <span id="s-board-count" class="board-metrics-count"></span>
           </div>
-          <div id="s-board-desc" class="board-metrics-desc"></div>
-
+          <div id="s-board-desc" class="sp-hint"></div>
           <div class="board-metrics-grid">
-            <div class="board-metrics-block">
+            <div>
               <div class="board-metrics-block-label">Grupos</div>
               <div id="s-board-groups" class="board-metrics-list"></div>
             </div>
-            <div class="board-metrics-block">
-              <div class="board-metrics-block-label">Columnas disponibles</div>
+            <div>
+              <div class="board-metrics-block-label">Columnas</div>
               <div id="s-board-columns" class="board-metrics-list"></div>
             </div>
           </div>
-
-          <div class="settings-hint board-metrics-tip">
-            💡 Usa el <strong>Column ID</strong> de una columna de tipo <em>long_text</em> como "Column ID para el acta" arriba.
-          </div>
-        </div>
-
-        <div id="s-board-loading" class="board-loading hidden">Cargando métricas...</div>
-      </div>
-
-      <!-- Monday.com info -->
-      <div class="settings-section">
-        <div class="settings-section-label">¿Cómo funciona Monday.com?</div>
-        <div class="monday-info-box">
-          <div class="monday-info-item">
-            <span class="monday-info-icon">📋</span>
-            <div>
-              <strong>Tableros (Boards)</strong>
-              <p>Cada tablero es un proyecto o área de trabajo. Contiene grupos, columnas e ítems.</p>
-            </div>
-          </div>
-          <div class="monday-info-item">
-            <span class="monday-info-icon">📁</span>
-            <div>
-              <strong>Grupos</strong>
-              <p>Secciones dentro del tablero (ej. "Activo", "Completado", "Bloqueado").</p>
-            </div>
-          </div>
-          <div class="monday-info-item">
-            <span class="monday-info-icon">📌</span>
-            <div>
-              <strong>Ítems (Pulses)</strong>
-              <p>Filas del tablero. Cada ítem representa un proyecto, tarea o entregable.</p>
-            </div>
-          </div>
-          <div class="monday-info-item">
-            <span class="monday-info-icon">🗂</span>
-            <div>
-              <strong>Columnas</strong>
-              <p>Campos tipados de cada ítem: Estado, Responsable, Fecha, Texto largo, etc. MayiHear escribe en una columna de tipo <em>long_text</em>.</p>
-            </div>
-          </div>
-          <div class="monday-info-item">
-            <span class="monday-info-icon">💬</span>
-            <div>
-              <strong>Updates (Actualizaciones)</strong>
-              <p>Comentarios en un ítem. Alternativa a escribir en columnas; útil para historial de actas.</p>
-            </div>
-          </div>
+          <div class="sp-hint" style="margin-top:6px">Usa el <strong>Column ID</strong> de una columna <em>long_text</em> arriba.</div>
         </div>
       </div>
 
     </div>
   </aside>
 
-  <main>
+  <!-- ══════════ PAGE: GRABAR ══════════ -->
+  <div id="page-record" class="page active">
 
-    <!-- Record -->
-    <div class="record-section">
-      <div id="timer">00:00</div>
+    <!-- Setup banner -->
+    <div id="setup-banner" class="setup-banner hidden">
+      <div class="setup-banner-icon">🔑</div>
+      <div class="setup-banner-body">
+        <strong>Configura tu Gemini API Key para empezar</strong>
+        <span>Necesitas una clave gratuita de Google AI Studio para transcribir reuniones.</span>
+      </div>
+      <button id="setup-banner-btn" class="btn-primary">Configurar ahora</button>
+    </div>
 
-      <!-- Audio source toggles + level meters -->
+    <section class="card record-card">
+      <div class="card-header">
+        <h2 class="card-title">Nueva grabación</h2>
+        <div class="recordings-location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span id="recordings-path-text" class="recordings-path-text">Cargando...</span>
+          <button id="open-folder-btn" class="link-btn">Abrir ↗</button>
+        </div>
+      </div>
+
       <div class="audio-sources">
         <div class="source-toggle">
           <label class="toggle-label">
             <input type="checkbox" id="toggle-mic" checked />
             <span class="toggle-pill"></span>
-            Micrófono
+            <span>Micrófono</span>
           </label>
-          <div class="level-meter" id="meter-mic"><div class="level-bar" id="bar-mic"></div></div>
+          <div class="level-meter"><div class="level-bar" id="bar-mic"></div></div>
         </div>
         <div class="source-toggle">
           <label class="toggle-label">
             <input type="checkbox" id="toggle-system" checked />
             <span class="toggle-pill"></span>
-            Audio del sistema
+            <span>Audio del sistema</span>
           </label>
-          <div class="level-meter" id="meter-system"><div class="level-bar" id="bar-system"></div></div>
+          <div class="level-meter"><div class="level-bar" id="bar-system"></div></div>
         </div>
       </div>
 
-      <button id="record-btn" title="Iniciar grabación">&#9679;</button>
-      <span id="status-text">Listo para grabar</span>
-    </div>
+      <div class="profile-select-row">
+        <label class="profile-select-label">Perfil</label>
+        <select id="record-profile-select" class="select-field" style="flex:1;font-size:12px">
+          <option value="">Default (sin perfil)</option>
+        </select>
+      </div>
 
-    <!-- Import transcription (always visible) -->
-    <div class="import-section">
-      <div class="import-header">
-        <span class="section-label">Importar transcripcion</span>
-        <div class="import-header-actions">
-          <button class="copy-btn" id="load-txt-btn">Cargar .txt</button>
-          <button class="copy-btn" id="clear-import-btn" style="display:none">Limpiar</button>
+      <div class="record-center">
+        <div id="timer" class="timer hidden">00:00</div>
+        <button id="record-btn" class="record-btn" title="Grabar reunión">●</button>
+        <span id="status-text" class="status-text">Listo para grabar</span>
+        <span class="record-hint">Solo una grabación a la vez — múltiples transcripciones en paralelo.</span>
+      </div>
+    </section>
+
+    <!-- Import transcript card -->
+    <section class="card import-card">
+      <div class="card-header">
+        <h2 class="card-title">Importar transcripción</h2>
+        <button id="import-toggle-btn" class="text-btn">Expandir ↓</button>
+      </div>
+      <div id="import-area" class="import-area hidden">
+        <textarea id="import-textarea" class="textarea" rows="4"
+          placeholder="Pega aquí una transcripción existente o carga un archivo .txt..."></textarea>
+        <div class="import-actions">
+          <button id="load-txt-btn" class="text-btn">Cargar archivo...</button>
+          <button id="generate-from-text-btn" class="btn-primary" disabled>Analizar texto</button>
+          <button id="cancel-import-btn" class="text-btn muted">Cancelar</button>
         </div>
       </div>
-      <textarea id="import-textarea" placeholder="Pega aqui una transcripcion existente o carga un archivo .txt..." rows="3"></textarea>
-      <button id="generate-from-text-btn" class="generate-btn" disabled>Generar Insights desde texto</button>
-    </div>
+    </section>
 
-    <!-- Project selector (always visible) -->
-    <div class="context-section">
-      <span class="section-label">Proyecto Monday.com</span>
-      <select id="project-pre-select" class="monday-select" style="width:100%">
-        <option value="">Cargando proyectos...</option>
-      </select>
-    </div>
+  </div><!-- /page-record -->
 
-    <!-- Context (always visible) -->
-    <div class="context-section">
-      <span class="section-label">Contexto de la reunión (opcional)</span>
-      <textarea
-        id="context-input"
-        placeholder="ej. Reunión semanal de estado — Facultad de Ingeniería. Enfoque en riesgos de retención estudiantil y acciones de profesores."
-        rows="2"
-      ></textarea>
-    </div>
 
-    <!-- Transcript output -->
-    <div class="output-section" id="transcript-section">
-      <div class="output-header">
-        <span class="section-label">Transcripción</span>
-        <div class="output-header-actions">
-          <button class="copy-btn" id="save-transcript">Guardar .txt</button>
-          <button class="copy-btn" id="copy-transcript">Copiar</button>
-          <button class="copy-btn" id="regenerate-btn" style="display:none">Regenerar</button>
+  <!-- ══════════ PAGE: TRANSCRIPCIONES ══════════ -->
+  <div id="page-transcriptions" class="page hidden">
+    <div class="trans-layout">
+
+      <!-- Left sidebar: job list -->
+      <aside class="jobs-sidebar">
+        <div class="jobs-sidebar-header">
+          <span class="jobs-sidebar-title">Reuniones</span>
+          <button id="goto-record-btn" class="link-btn">+ Grabar</button>
         </div>
-      </div>
-      <div class="output-box" id="transcript-box"></div>
-    </div>
-
-    <!-- Insights output -->
-    <div class="output-section" id="insights-section">
-      <div class="output-header">
-        <span class="section-label">Insights</span>
-        <button class="copy-btn" id="copy-insights">Copiar</button>
-      </div>
-      <div class="output-box" id="insights-box"></div>
-    </div>
-
-    <!-- Acta button (appears after transcription) -->
-    <div id="acta-actions" class="acta-actions" style="display:none">
-      <button id="generate-acta-btn">Generar Acta de Reunión</button>
-    </div>
-
-    <!-- Acta output panel -->
-    <div class="output-section" id="acta-section">
-      <div class="output-header">
-        <span class="section-label">Acta de Reunión</span>
-        <button class="copy-btn" id="download-acta">Descargar .docx</button>
-      </div>
-      <div class="output-box" id="acta-box"></div>
-    </div>
-
-    <!-- Monday.com publish panel (shown after acta is generated) -->
-    <div id="monday-section" class="monday-section" style="display:none">
-      <div class="monday-header">
-        <span class="section-label">Publicar en Monday.com</span>
-        <span id="monday-status-text" class="monday-status-text"></span>
-      </div>
-      <div class="monday-controls">
-        <div class="monday-row">
-          <select id="monday-project-select" class="monday-select">
-            <option value="">Cargando proyectos...</option>
-          </select>
-          <button id="monday-publish-btn" class="monday-btn" disabled>Publicar</button>
+        <div id="jobs-list" class="jobs-list">
+          <div id="jobs-empty" class="jobs-empty">
+            Sin grabaciones aún.<br/>Ve a <strong>Grabar</strong> para empezar.
+          </div>
         </div>
-      </div>
-    </div>
+      </aside>
 
-  </main>
+      <!-- Right: detail area -->
+      <div class="job-detail-area">
+
+        <!-- Empty state -->
+        <div id="job-detail-empty" class="job-detail-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="color:var(--border)">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <p>Selecciona una reunión para ver su contenido</p>
+        </div>
+
+        <!-- Job detail (shown when selected) -->
+        <div id="job-detail-content" class="hidden">
+
+          <!-- Context bar -->
+          <div class="context-bar">
+            <select id="job-profile-select" class="select-field" style="font-size:12px">
+              <option value="">Default (sin perfil)</option>
+            </select>
+            <button id="regenerate-insights-btn" class="btn-ghost" title="Regenerar insights con el perfil seleccionado">↺ Regenerar</button>
+          </div>
+
+          <!-- Sub-tabs -->
+          <div class="sub-tabs-card">
+            <div class="sub-tabs-bar">
+              <button class="sub-tab-btn active" data-tab="transcript">Transcripción</button>
+              <button class="sub-tab-btn" data-tab="insights">Insights</button>
+              <button class="sub-tab-btn" data-tab="chat">Chat IA</button>
+              <button class="sub-tab-btn" data-tab="acta">Acta</button>
+            </div>
+
+            <!-- Transcript -->
+            <div class="sub-tab-pane active" id="tab-transcript">
+              <div class="tab-toolbar">
+                <button id="save-transcript" class="text-btn">Guardar .txt</button>
+                <button id="copy-transcript" class="text-btn">Copiar</button>
+              </div>
+              <div id="transcript-box" class="output-box"></div>
+            </div>
+
+            <!-- Insights -->
+            <div class="sub-tab-pane hidden" id="tab-insights">
+              <div class="tab-toolbar">
+                <button id="copy-insights" class="text-btn">Copiar</button>
+              </div>
+              <div id="insights-box" class="output-box"></div>
+            </div>
+
+            <!-- Chat IA -->
+            <div class="sub-tab-pane hidden" id="tab-chat">
+              <div id="chat-messages" class="chat-messages">
+                <div class="chat-empty">Haz una pregunta sobre esta reunión para empezar.</div>
+              </div>
+              <div class="chat-input-row">
+                <textarea id="chat-input" class="chat-input" rows="2"
+                  placeholder="Pregunta algo sobre esta reunión..."></textarea>
+                <button id="chat-send-btn" class="btn-primary">Enviar</button>
+              </div>
+            </div>
+
+            <!-- Acta -->
+            <div class="sub-tab-pane hidden" id="tab-acta">
+              <div id="acta-empty-state" class="acta-empty-state">
+                <p>Genera el acta formal de esta reunión.</p>
+                <p id="acta-mode-hint" class="acta-mode-hint">Modo: <span id="acta-mode-label">Estructura inteligente</span></p>
+                <button id="generate-acta-btn" class="btn-outline-accent">Generar Acta de Reunión</button>
+              </div>
+              <div id="acta-ready-state" class="hidden">
+                <div class="tab-toolbar">
+                  <span id="acta-mode-badge" class="acta-mode-badge">Estructura inteligente</span>
+                  <button id="regenerate-acta-btn" class="text-btn">↺ Regenerar</button>
+                  <button id="download-acta" class="text-btn">Descargar .docx</button>
+                </div>
+                <div id="acta-box" class="output-box"></div>
+              </div>
+            </div>
+
+          </div><!-- /sub-tabs-card -->
+
+          <!-- Monday.com -->
+          <div class="card hidden" id="monday-section" style="display:none!important">
+            <div class="card-header">
+              <h2 class="card-title">Publicar en Monday.com</h2>
+              <span id="monday-status-text" class="inline-status"></span>
+            </div>
+            <div class="monday-row">
+              <select id="monday-project-select" class="select-field">
+                <option value="">Seleccionar proyecto...</option>
+              </select>
+              <button id="monday-publish-btn" class="btn-monday" disabled>Publicar</button>
+            </div>
+          </div>
+
+        </div><!-- /job-detail-content -->
+      </div><!-- /job-detail-area -->
+    </div><!-- /trans-layout -->
+  </div><!-- /page-transcriptions -->
+
+  <!-- ══════════ PAGE: PERFILES ══════════ -->
+  <div id="page-profiles" class="page hidden">
+    <div class="trans-layout">
+
+      <!-- Left: list of profiles -->
+      <aside class="jobs-sidebar">
+        <div class="jobs-sidebar-header">
+          <span class="jobs-sidebar-title">Perfiles</span>
+          <button id="profiles-new-btn" class="link-btn">+ Nuevo</button>
+        </div>
+        <div class="profiles-sidebar-actions">
+          <button id="profiles-export-btn" class="btn-ghost" style="flex:1;font-size:11px">Exportar JSON</button>
+          <button id="profiles-import-btn" class="btn-ghost" style="flex:1;font-size:11px">Importar JSON</button>
+        </div>
+        <div id="profiles-list" class="jobs-list">
+          <div id="profiles-empty" class="jobs-empty">Sin perfiles aún.<br/>Usa <strong>+ Nuevo</strong> para crear el primero.</div>
+        </div>
+      </aside>
+
+      <!-- Right: form / empty state -->
+      <div class="job-detail-area">
+
+        <!-- Empty state -->
+        <div id="profile-detail-empty" class="job-detail-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="color:var(--border)">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <p>Selecciona un perfil para editar<br/>o crea uno nuevo con <strong>+ Nuevo</strong></p>
+        </div>
+
+        <!-- Form area (shown when creating or editing) -->
+        <div id="profile-form-area" class="profile-form-area hidden">
+
+          <div class="profile-form-topbar">
+            <span id="profile-form-title" class="profile-form-title">Nuevo perfil</span>
+            <button id="pf-cancel-btn" class="text-btn muted">✕ Cancelar</button>
+          </div>
+
+          <div id="pf-step-indicator" class="profile-step-indicator">Paso 1 de 3 — Identificación</div>
+
+          <!-- Step 1: Track + Name -->
+          <div id="profiles-step-1" class="profile-step-body">
+            <div class="sp-field">
+              <label class="sp-label">Track / Categoría *</label>
+              <input type="text" id="pf-track" class="sp-input" placeholder="Ej: Ventas, Innovación, Operaciones..." />
+              <span class="sp-hint">Clasificador temático del perfil.</span>
+            </div>
+            <div class="sp-field">
+              <label class="sp-label">Nombre del perfil *</label>
+              <input type="text" id="pf-name" class="sp-input" placeholder="Ej: Reunión de Ventas Semanal" />
+            </div>
+          </div>
+
+          <!-- Step 2: Context -->
+          <div id="profiles-step-2" class="profile-step-body hidden">
+            <div class="sp-field">
+              <label class="sp-label">Contexto para Insights</label>
+              <textarea id="pf-context" class="sp-textarea" rows="9"
+                placeholder="Describe el propósito de estas reuniones, el equipo involucrado, los objetivos clave...&#10;&#10;Ej: &quot;Reuniones semanales del equipo comercial. Se revisan avances de clientes, pipeline de ventas y próximos pasos.&quot;"></textarea>
+              <span class="sp-hint">Este contexto se inyectará automáticamente al generar insights. Cuanto más detallado, mejores resultados.</span>
+            </div>
+          </div>
+
+          <!-- Step 3: Acta template -->
+          <div id="profiles-step-3" class="profile-step-body hidden">
+            <div class="sp-field">
+              <label class="sp-label">Plantilla de Acta</label>
+              <textarea id="pf-acta-template" class="sp-textarea" rows="9"
+                placeholder="Escribe el formato o las instrucciones para el acta de esta categoría...&#10;&#10;Ej: &quot;El acta debe incluir: lista de asistentes, objetivos de la reunión, acuerdos y compromisos con responsable y fecha, y próxima reunión.&quot;"></textarea>
+              <span class="sp-hint"><strong>Si defines una plantilla:</strong> el acta seguirá ese formato libre exactamente.<br><strong>Si la dejas vacía:</strong> se usará la estructura inteligente predeterminada (secciones fijas: temas, acuerdos, riesgos, etc.).</span>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <div class="profiles-form-nav">
+            <div></div>
+            <div style="display:flex;gap:8px">
+              <button id="pf-back-btn" class="btn-ghost hidden">← Atrás</button>
+              <button id="pf-next-btn" class="btn-primary">Siguiente →</button>
+              <button id="pf-save-btn" class="btn-primary hidden">Guardar perfil</button>
+            </div>
+          </div>
+
+        </div><!-- /profile-form-area -->
+      </div><!-- /job-detail-area -->
+    </div><!-- /trans-layout -->
+  </div><!-- /page-profiles -->
 
   <script src="app.js"></script>
 </body>

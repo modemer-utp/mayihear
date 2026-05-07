@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeamsSchema.json",
   "manifestVersion": "1.17",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "id": "d4a48d6a-65b3-4770-88d5-800a58127bfa",
   "developer": {
     "name": "EYA Tech",
@@ -32,12 +32,44 @@
           "scopes": ["personal"],
           "commands": [
             {
-              "title": "status",
-              "description": "Check the agent status"
+              "title": "ayuda",
+              "description": "Guía de uso con ejemplos de frases que puedes escribir"
             },
             {
-              "title": "last meeting",
-              "description": "Show insights from the last processed meeting"
+              "title": "confirmar",
+              "description": "Publicar la reunión pendiente en Monday"
+            },
+            {
+              "title": "regenerar",
+              "description": "Regenerar insights de la reunión pendiente"
+            },
+            {
+              "title": "cancelar",
+              "description": "Descartar la reunión pendiente sin publicar"
+            },
+            {
+              "title": "cola",
+              "description": "Ver reuniones en cola de confirmación"
+            },
+            {
+              "title": "acta",
+              "description": "Ver o cambiar la estructura de acta activa"
+            },
+            {
+              "title": "acta lista",
+              "description": "Listar estructuras de acta guardadas"
+            },
+            {
+              "title": "boards",
+              "description": "Ver tableros de Monday disponibles"
+            },
+            {
+              "title": "status",
+              "description": "Ver estado del agente"
+            },
+            {
+              "title": "last",
+              "description": "Insights de la última reunión procesada"
             }
           ]
         }

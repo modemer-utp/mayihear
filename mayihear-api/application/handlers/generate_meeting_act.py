@@ -14,7 +14,8 @@ class GenerateMeetingAct:
         start = time.perf_counter()
         result = self.agent.invoke(
             transcript=request.transcript,
-            user_context=request.user_context
+            user_context=request.user_context,
+            acta_template=request.acta_template
         )
         processing_time = round(time.perf_counter() - start, 2)
         return result.model_copy(update={"processing_time_seconds": processing_time})

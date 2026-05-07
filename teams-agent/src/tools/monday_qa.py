@@ -18,10 +18,10 @@ _QA_PROMPT = """\
 Eres un asistente de productividad para el equipo de Producto Digital de UTP (Universidad Tecnológica del Perú).
 Responde SIEMPRE en español, de forma concisa y directa.
 Basa tu respuesta ÚNICAMENTE en los datos del tablero proporcionados.
-Si la información no está disponible, dilo claramente.
 
-El contexto corresponde al grupo "Productos Digitales" del tablero de roadmap de proyectos de UTP.
-Cada ítem es una iniciativa digital con su responsable, sponsor, estado, prioridad, KPIs impactados, fase y presupuesto.
+El contexto corresponde al roadmap de proyectos de UTP.
+Cada ítem es una iniciativa con su responsable, sponsor, estado, prioridad, KPIs, fase, presupuesto y subitems (actividades, tareas, etc.).
+Algunos proyectos tienen un campo "Enlace" con una URL a un tablero vinculado que contiene más detalle.
 
 == DATOS DEL TABLERO "{board_name}" — GRUPO: {group_name} ==
 {board_data}
@@ -29,8 +29,11 @@ Cada ítem es una iniciativa digital con su responsable, sponsor, estado, priori
 
 Pregunta: {question}
 
-Responde de forma clara. Si hay proyectos, responsables, estados u otros elementos específicos, enuméralos con viñetas.
-No inventes información que no esté en los datos.
+REGLAS:
+- Responde con viñetas cuando hay listas de proyectos, responsables, estados, actividades, etc.
+- Si el proyecto tiene subitems, inclúyelos en tu respuesta cuando sean relevantes.
+- Si el proyecto tiene un campo "Enlace" (tablero vinculado) y los detalles pedidos no están en los datos actuales, menciona que más información está disponible en ese enlace.
+- No inventes información que no esté en los datos.
 """
 
 
@@ -40,6 +43,59 @@ def _monday_headers() -> dict:
         "Content-Type": "application/json",
         "API-Version": "2024-01",
     }
+
+
+def fetch_actualizaciones_updates(board_id: str) -> list[dict]:
+    """
+    Fetch updates (Monday 'Actualizaciones') from the dedicated 'Actualizaciones' item on the board.
+    Returns list of {subject, body, created_at}.
+    """
+    # Find the Actualizaciones item
+    query = """
+    query($board_id: ID!) {
+      boards(ids: [$board_id]) {
+        items_page(limit: 50) {
+          items { id name }
+        }
+      }
+    }
+    """
+    try:
+        r = requests.post(MONDAY_API, json={"query": query, "variables": {"board_id": board_id}},
+                          headers=_monday_headers(), timeout=10)
+        r.raise_for_status()
+        boards = r.json().get("data", {}).get("boards", [])
+        if not boards:
+            return []
+        items = boards[0]["items_page"]["items"]
+        actualizaciones_id = None
+        for item in items:
+            if item["name"].lower() in ("actualizaciones", "updates", "reuniones"):
+                actualizaciones_id = item["id"]
+                break
+        if not actualizaciones_id:
+            return []
+
+        # Fetch updates on that item
+        updates_query = """
+        query($item_id: ID!) {
+          items(ids: [$item_id]) {
+            updates(limit: 100) {
+              id body created_at
+            }
+          }
+        }
+        """
+        r2 = requests.post(MONDAY_API, json={"query": updates_query, "variables": {"item_id": actualizaciones_id}},
+                           headers=_monday_headers(), timeout=15)
+        r2.raise_for_status()
+        items_data = r2.json().get("data", {}).get("items", [])
+        if not items_data:
+            return []
+        return items_data[0].get("updates", [])
+    except Exception as e:
+        logger.warning(f"Could not fetch actualizaciones updates: {e}")
+        return []
 
 
 def fetch_board_items(board_id: str) -> dict:
@@ -117,7 +173,24 @@ def fetch_board_items(board_id: str) -> dict:
               items {
                 id name
                 group { title }
-                column_values { text value column { title type } }
+                column_values {
+                  text value
+                  column { title type }
+                  ... on FormulaValue { display_value }
+                  ... on MirrorValue { display_value }
+                  ... on NumbersValue { number }
+                  ... on TimelineValue { from to }
+                  ... on LinkValue { url text }
+                }
+                subitems {
+                  id name
+                  column_values {
+                    text value
+                    column { title type }
+                    ... on FormulaValue { display_value }
+                    ... on NumbersValue { number }
+                  }
+                }
               }
             }
           }
@@ -200,7 +273,8 @@ def ask_monday(question: str, board_id: str, board_name: str = "") -> str:
             resolved = _resolve_cv(cv)
             if resolved is not None:
                 cols[cv["column"]["title"]] = resolved
-        row = {"proyecto": item["name"], "grupo": item.get("_group", ""), **cols}
+        grupo = item.get("_group") or (item.get("group") or {}).get("title", "")
+        row = {"proyecto": item["name"], "grupo": grupo, **cols}
         if item.get("subitems"):
             row["subitems"] = [
                 {
@@ -217,13 +291,26 @@ def ask_monday(question: str, board_id: str, board_name: str = "") -> str:
 
     board_data_str = json.dumps(compact_items, ensure_ascii=False, separators=(",", ":"))
 
+    # Append meeting updates (Actualizaciones) section if available
+    updates = fetch_actualizaciones_updates(board_id)
+    updates_section = ""
+    if updates:
+        import re as _re
+        updates_section = "\n\n== ACTUALIZACIONES DE REUNIONES (más recientes primero) ==\n"
+        for u in updates:
+            # Strip HTML tags for readability
+            body_clean = _re.sub(r"<[^>]+>", " ", u.get("body", "")).strip()
+            body_clean = _re.sub(r"\s+", " ", body_clean)
+            updates_section += f"[{u.get('created_at', '')}] {body_clean}\n"
+        updates_section += "== FIN ACTUALIZACIONES =="
+
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=_QA_PROMPT.format(
             board_name=name,
             group_name=group_name,
-            board_data=board_data_str,
+            board_data=board_data_str + updates_section,
             question=question,
         ),
     )

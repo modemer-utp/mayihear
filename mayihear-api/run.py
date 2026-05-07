@@ -13,4 +13,4 @@ if data_dir:
 import uvicorn
 
 if __name__ == '__main__':
-    uvicorn.run('api.main:app', host='127.0.0.1', port=8001, log_level='info')
+    uvicorn.run('api.main:app', host='127.0.0.1', port=47891, log_level='info')

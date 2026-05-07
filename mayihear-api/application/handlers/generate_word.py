@@ -1,3 +1,4 @@
+import re
 from io import BytesIO
 
 from docx import Document
@@ -7,8 +8,44 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from domain.models.output.meeting_act_result import MeetingActResult
 
 
+def _render_freeform(doc: Document, text: str) -> None:
+    """Render Markdown text (##/###, -, **bold**) into the Word document."""
+    for raw_line in text.splitlines():
+        line = raw_line.rstrip()
+        if line.startswith("### "):
+            doc.add_heading(line[4:].strip(), level=3)
+        elif line.startswith("## "):
+            doc.add_heading(line[3:].strip(), level=2)
+        elif line.startswith("# "):
+            doc.add_heading(line[2:].strip(), level=1)
+        elif line.startswith("- ") or line.startswith("* "):
+            para = doc.add_paragraph(style="List Bullet")
+            _add_inline(para, line[2:])
+        elif line == "":
+            pass  # skip blank lines
+        else:
+            para = doc.add_paragraph()
+            _add_inline(para, line)
+
+
+def _add_inline(para, text: str) -> None:
+    """Split on **bold** markers and add runs accordingly."""
+    parts = re.split(r"\*\*(.+?)\*\*", text)
+    for i, part in enumerate(parts):
+        run = para.add_run(part)
+        if i % 2 == 1:
+            run.bold = True
+
+
 def build_word_document(act: MeetingActResult) -> BytesIO:
     doc = Document()
+
+    if act.is_freeform:
+        _render_freeform(doc, act.free_form_text or "")
+        buffer = BytesIO()
+        doc.save(buffer)
+        buffer.seek(0)
+        return buffer
 
     # ── Title ────────────────────────────────────────────────────
     title = doc.add_heading(act.nombre_reunion or "Acta de Reunión", level=1)

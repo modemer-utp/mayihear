@@ -7,9 +7,12 @@ HTTP triggers:
 Service Bus trigger:
   process_meeting_sb  — processes one meeting end-to-end (fetch + insights + notify)
 Timer triggers:
-  poll_transcripts    — every 5 min, enqueues new transcripts to Service Bus
   keep_warm           — every 4 min, pings /health to prevent cold starts
   renew_webhook       — every 50 min, keeps Graph subscription alive
+
+Polling removed: Graph webhook is the sole trigger.
+The webhook fires on callTranscript "created" (= transcription started, not meeting ended).
+We guard against mid-meeting notifications by checking endDateTime before enqueuing.
 """
 import json
 import logging
@@ -57,10 +60,18 @@ adapter.on_turn_error = _on_error
 
 # ── Service Bus helpers ───────────────────────────────────────────────────────
 
-def _enqueue_meeting(meeting_id: str, transcript_id: str, organizer_email: str, subject: str):
-    """Push one meeting onto the Service Bus queue for reliable async processing."""
+def _enqueue_meeting(meeting_id: str, transcript_id: str, organizer_email: str, subject: str, scheduled_at=None):
+    """
+    Push one meeting onto the Service Bus queue.
+    scheduled_at: datetime (UTC) for delayed delivery, or None for immediate.
+    """
+    import datetime
     conn = os.environ.get("SERVICEBUS_CONNECTION_STRING", "")
     if not conn:
+        if scheduled_at and scheduled_at > datetime.datetime.now(datetime.timezone.utc):
+            delay_s = (scheduled_at - datetime.datetime.now(datetime.timezone.utc)).total_seconds()
+            logger.info(f"No SB conn — sleeping {delay_s:.0f}s before inline processing (dev mode)")
+            import time; time.sleep(min(delay_s, 300))
         logger.warning("SERVICEBUS_CONNECTION_STRING not set — processing inline (dev mode)")
         loop = asyncio.new_event_loop()
         loop.run_until_complete(bot.process_meeting_webhook({
@@ -72,14 +83,18 @@ def _enqueue_meeting(meeting_id: str, transcript_id: str, organizer_email: str, 
         loop.close()
         return
     from azure.servicebus import ServiceBusClient, ServiceBusMessage as SBMsg
+    msg = SBMsg(json.dumps({
+        "meetingId": meeting_id,
+        "transcriptId": transcript_id,
+        "organizerEmail": organizer_email,
+        "subject": subject,
+    }))
+    if scheduled_at:
+        msg.scheduled_enqueue_time_utc = scheduled_at
+        logger.info(f"Scheduling meeting '{subject}' → Service Bus at {scheduled_at.isoformat()}")
     with ServiceBusClient.from_connection_string(conn) as client:
         with client.get_queue_sender(SB_QUEUE) as sender:
-            sender.send_messages(SBMsg(json.dumps({
-                "meetingId": meeting_id,
-                "transcriptId": transcript_id,
-                "organizerEmail": organizer_email,
-                "subject": subject,
-            })))
+            sender.send_messages(msg)
     logger.info(f"Enqueued meeting '{subject}' → Service Bus")
 
 
@@ -163,14 +178,28 @@ async def graph_webhook(req: func.HttpRequest) -> func.HttpResponse:
         subject = resource_data.get("subject") or "Reunión Teams"
         logger.info(f"Graph webhook notification — resource: {resource_url} | meetingId: {meeting_id} | transcriptId: {transcript_id}")
 
-        if meeting_id and transcript_id:
-            threading.Thread(
-                target=_enqueue_meeting,
-                args=(meeting_id, transcript_id, organizer, subject),
-                daemon=True,
-            ).start()
-        else:
-            logger.warning(f"Could not extract meetingId/transcriptId from notification — skipping. resourceData: {resource_data}")
+        if not meeting_id or not transcript_id:
+            logger.warning(f"Could not extract meetingId/transcriptId — skipping. resourceData: {resource_data}")
+            continue
+
+        # Deduplicate: skip if already processed (by transcript ID or meeting ID)
+        _load_processed_ids_once()
+        if transcript_id in _processed_ids:
+            logger.info(f"Transcript {transcript_id[:30]}... already processed — skipping")
+            continue
+        if meeting_id in _processed_meeting_ids:
+            logger.info(f"Meeting {meeting_id[:30]}... already enqueued (different transcript) — skipping duplicate")
+            continue
+
+        # Mark meeting as seen immediately to block concurrent second transcripts
+        _processed_meeting_ids.add(meeting_id)
+
+        # Fire-and-forget: validate meeting is over before enqueuing
+        threading.Thread(
+            target=_validate_and_enqueue,
+            args=(meeting_id, transcript_id, organizer, subject),
+            daemon=True,
+        ).start()
 
     return func.HttpResponse(status_code=202)
 
@@ -283,8 +312,9 @@ def _renew_or_create_subscription_for(token: str, organizer: str):
     logger.info(f"Webhook subscription created for {organizer} → expires {expiry}")
 
 
-# ── Module-level processed IDs — seeded from blob once per process lifetime ───
-_processed_ids: set = set()
+# ── Processed IDs — deduplicate webhook notifications within a process lifetime ──
+_processed_ids: set = set()          # transcript IDs
+_processed_meeting_ids: set = set()  # meeting IDs — prevents dual-transcript duplicates
 _processed_ids_ready = False
 
 
@@ -297,59 +327,157 @@ def _load_processed_ids_once():
         logger.info(f"Loaded {len(_processed_ids)} processed transcript IDs from blob")
 
 
-# ── Timer: poll for new transcripts every 5 min (fallback for webhook) ────────
+def _validate_and_enqueue(meeting_id: str, transcript_id: str, organizer: str, subject: str):
+    """
+    Called after a Graph webhook notification or by the fallback timer.
 
-@app.timer_trigger(schedule="0 */5 * * * *", arg_name="poll_timer", run_on_startup=True)
-def poll_transcripts(poll_timer: func.TimerRequest) -> None:
-    """Polls Graph API every 5 min for all configured organizers. Enqueues new transcripts."""
-    global _processed_ids
+    Guard rule: endDateTime is the ONLY reliable signal.
+    - endDateTime in the past  → meeting is over → enqueue immediately
+    - endDateTime in the future → meeting still scheduled to run → schedule SB for endDateTime + 1 min
+    - endDateTime unknown       → schedule 10 min from now as safe fallback
 
+    We never use transcript content to decide timing — Teams writes live content
+    during the meeting, so content being present does NOT mean the meeting ended.
+    """
+    import datetime
+    from tools.state_store import save_processed_ids
+    from tools.graph_client import get_token as _gc_token, get_meeting_details
+
+    try:
+        token = _gc_token()
+        now = datetime.datetime.now(datetime.timezone.utc)
+        details = get_meeting_details(token, organizer, meeting_id)
+        end_dt_str = details.get("endDateTime")
+        start_dt_str = details.get("startDateTime")
+
+        # Append start time (Peru UTC-5) to subject for disambiguation
+        if start_dt_str:
+            try:
+                start_dt = datetime.datetime.fromisoformat(start_dt_str.replace("Z", "+00:00"))
+                peru_time = start_dt - datetime.timedelta(hours=5)
+                subject = f"{subject} ({peru_time.strftime('%I:%M %p')})"
+            except Exception:
+                pass
+
+        if end_dt_str is None:
+            # No endDateTime — can't tell if meeting is over, wait 10 min
+            scheduled_at = now + datetime.timedelta(minutes=10)
+            logger.info(f"Meeting '{subject}': no endDateTime — scheduling in 10 min")
+        else:
+            end_dt = datetime.datetime.fromisoformat(end_dt_str.replace("Z", "+00:00"))
+            if end_dt <= now:
+                # Scheduled end is in the past — meeting is over
+                scheduled_at = None
+                logger.info(f"Meeting '{subject}': ended at {end_dt_str} — enqueuing now")
+            else:
+                # Scheduled end is in the future — meeting is still running
+                scheduled_at = end_dt + datetime.timedelta(minutes=1)
+                logger.info(
+                    f"Meeting '{subject}': still active until {end_dt_str} — scheduling SB at {scheduled_at.isoformat()}"
+                )
+
+        _processed_ids.add(transcript_id)
+        _processed_meeting_ids.add(meeting_id)
+        save_processed_ids(_processed_ids)
+        _enqueue_meeting(meeting_id, transcript_id, organizer, subject, scheduled_at=scheduled_at)
+
+    except Exception:
+        logger.exception(f"_validate_and_enqueue failed for '{subject}'")
+
+
+# ── Timer: fallback transcript check every 2 min ─────────────────────────────
+
+@app.timer_trigger(schedule="0 */2 * * * *", arg_name="catchup_timer", run_on_startup=True)
+def check_missed_transcripts(catchup_timer: func.TimerRequest) -> None:
+    """
+    Fallback for when Graph webhook misses a notification (e.g. subscription gap on redeploy).
+    Checks only the most recent transcript per organizer.
+    Only processes if:
+      1. Not already in _processed_ids (dedup)
+      2. Meeting endDateTime is in the past (never notifies during an active meeting)
+    """
+    import datetime
     _load_processed_ids_once()
 
     organizers = _get_organizer_emails()
-    logger.info(f"Polling for new transcripts ({len(organizers)} organizer(s))...")
-
     try:
         token = _graph_token()
         headers = {"Authorization": f"Bearer {token}"}
-        from tools.state_store import save_processed_ids
+        now = datetime.datetime.now(datetime.timezone.utc)
 
         for organizer in organizers:
             try:
-                uid = requests.get(
-                    f"{GRAPH_API}/users/{organizer}?$select=id", headers=headers
-                ).json()["id"]
+                uid_resp = requests.get(f"{GRAPH_API}/users/{organizer}?$select=id", headers=headers)
+                uid_resp.raise_for_status()
+                uid = uid_resp.json()["id"]
 
-                url = f"{GRAPH_API}/users/{uid}/onlineMeetings/getAllTranscripts(meetingOrganizerUserId='{uid}')"
-                r = requests.get(url, headers=headers)
-                if r.status_code != 200:
-                    logger.warning(f"getAllTranscripts returned {r.status_code} for {organizer}")
+                url = (
+                    f"{GRAPH_API}/users/{uid}/onlineMeetings"
+                    f"/getAllTranscripts(meetingOrganizerUserId='{uid}')"
+                )
+                resp = requests.get(url, headers=headers)
+                if resp.status_code != 200:
                     continue
 
-                transcripts = r.json().get("value", [])
-                new_found = [t for t in transcripts if t.get("id") and t["id"] not in _processed_ids]
-
-                if not new_found:
-                    logger.info(f"Poll [{organizer}]: {len(transcripts)} transcript(s) checked, none new")
+                transcripts = resp.json().get("value", [])
+                if not transcripts:
                     continue
 
-                for t in new_found:
-                    tid = t["id"]
-                    meeting_id = t.get("meetingId") or ""
-                    subject = t.get("subject") or "Reunión Teams"
-                    logger.info(f"New transcript [{organizer}]: '{subject}' id={tid[:40]}...")
+                # Only check the single most recent transcript
+                latest = max(transcripts, key=lambda t: t.get("createdDateTime", ""))
+                tid = latest.get("id")
+                mid = latest.get("meetingId", "")
 
-                    # Mark processed FIRST — prevents re-queuing even if enqueue fails
-                    _processed_ids.add(tid)
-                    save_processed_ids(_processed_ids)
+                if not tid or tid in _processed_ids or mid in _processed_meeting_ids:
+                    continue  # already handled
 
-                    _enqueue_meeting(meeting_id, tid, organizer, subject)
+                # Guard: only process if meeting has ended
+                from tools.graph_client import get_meeting_details as _gmd
+                details = _gmd(token, organizer, mid)
+                end_dt_str = details.get("endDateTime", "")
+
+                if not end_dt_str:
+                    logger.info(f"Catchup [{organizer}]: no endDateTime — skipping")
+                    continue
+
+                end_dt = datetime.datetime.fromisoformat(end_dt_str.replace("Z", "+00:00"))
+                if end_dt > now:
+                    logger.info(
+                        f"Catchup [{organizer}]: meeting still active until {end_dt_str} — skipping"
+                    )
+                    continue
+
+                # Build subject with start time for disambiguation
+                subject = details.get("subject") or "Reunión Teams"
+                start_dt_str = details.get("startDateTime", "")
+                if start_dt_str:
+                    try:
+                        start_dt = datetime.datetime.fromisoformat(start_dt_str.replace("Z", "+00:00"))
+                        peru_time = start_dt - datetime.timedelta(hours=5)
+                        subject = f"{subject} ({peru_time.strftime('%I:%M %p')})"
+                    except Exception:
+                        pass
+
+                # Mark as processed NOW — before spawning thread — to prevent
+                # race condition where the next 2-min timer fires before the
+                # background thread adds the ID to _processed_ids
+                from tools.state_store import save_processed_ids
+                _processed_ids.add(tid)
+                _processed_meeting_ids.add(mid)
+                save_processed_ids(_processed_ids)
+
+                logger.info(f"Catchup [{organizer}]: found unprocessed transcript '{subject}' — enqueuing")
+                threading.Thread(
+                    target=_validate_and_enqueue,
+                    args=(mid, tid, organizer, subject),
+                    daemon=True,
+                ).start()
 
             except Exception:
-                logger.exception(f"poll_transcripts failed for {organizer}")
+                logger.exception(f"check_missed_transcripts failed for {organizer}")
 
     except Exception:
-        logger.exception("poll_transcripts: failed to obtain Graph token")
+        logger.exception("check_missed_transcripts: failed to obtain Graph token")
 
 
 # ── Timer: keep-warm ping every 4 min ────────────────────────────────────────
@@ -367,9 +495,9 @@ def keep_warm(warmup_timer: func.TimerRequest) -> None:
 
 # ── Timer: renew Graph webhook subscription every 50 min ─────────────────────
 
-@app.timer_trigger(schedule="0 */50 * * * *", arg_name="timer", run_on_startup=True)
+@app.timer_trigger(schedule="0 */30 * * * *", arg_name="timer", run_on_startup=True)
 def renew_webhook(timer: func.TimerRequest) -> None:
-    """Keeps the Graph change notification subscription alive. Runs every 50 min."""
+    """Keeps the Graph change notification subscription alive. Runs every 30 min."""
     logger.info("Timer: renewing Graph webhook subscription...")
     try:
         token = _graph_token()

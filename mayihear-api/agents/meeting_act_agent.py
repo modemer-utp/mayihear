@@ -60,9 +60,21 @@ class MeetingActAgent:
 
     def _generate_meeting_act_node(self, state: MeetingActState) -> dict:
         usage_cb = _UsageCallback()
+        template = state.get("acta_template", "").strip()
+        if template:
+            acta_template_block = (
+                "== PLANTILLA PERSONALIZADA — PRIORIDAD MÁXIMA ==\n"
+                "El usuario ha definido las siguientes instrucciones de formato para esta acta. "
+                "Síguelas estrictamente al completar cada campo de la respuesta:\n\n"
+                f"{template}\n\n==\n\n"
+            )
+        else:
+            acta_template_block = ""
+
         result: MeetingActResult = self.chain.invoke(
             {
                 "user_context": state["user_context"] or "No se proporcionó contexto adicional.",
+                "acta_template_block": acta_template_block,
                 "transcript": state["transcript"],
                 "today_date": state["today_date"]
             },
@@ -90,11 +102,12 @@ class MeetingActAgent:
 
         return {"meeting_act_result": result.model_copy(update={"usage": usage})}
 
-    def invoke(self, transcript: str, user_context: str) -> MeetingActResult:
+    def invoke(self, transcript: str, user_context: str, acta_template: str = "") -> MeetingActResult:
         today = date.today().strftime("%d/%m/%Y")
         state = MeetingActState(
             transcript=transcript,
             user_context=user_context,
+            acta_template=acta_template,
             today_date=today
         )
         output = self.graph.invoke(state)

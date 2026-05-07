@@ -9,7 +9,7 @@ import time
 
 RECORDING = r"D:\Proyectos actuales\mayihear-utp\recording.webm"
 OUTPUT    = r"D:\Proyectos actuales\mayihear-utp\recordings\transcripcion_2026-03-09.txt"
-API_BASE  = "http://localhost:8001"
+API_BASE  = "http://localhost:47891"
 
 
 def main():

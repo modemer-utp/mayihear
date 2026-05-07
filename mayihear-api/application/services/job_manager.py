@@ -1,34 +1,37 @@
+import os
 import threading
 import uuid
-from typing import Any, Callable, Optional
+from typing import Callable, Optional
 
-_jobs: dict = {}
-_lock = threading.Lock()
+from infrastructure.database import upsert_job, get_job as db_get_job, list_jobs as db_list_jobs
 
 
-def create_job() -> str:
+def create_job(file_path: str = None, profile_id: str = None) -> str:
     job_id = str(uuid.uuid4())[:8]
-    with _lock:
-        _jobs[job_id] = {
-            "status": "running",
-            "chunks_done": 0,
-            "total_chunks": 0,
-            "text": None,
-            "error": None,
-        }
+    file_name = os.path.basename(file_path) if file_path else None
+    fields = dict(
+        status='running',
+        file_path=file_path,
+        file_name=file_name,
+        chunks_done=0,
+        total_chunks=0,
+    )
+    if profile_id:
+        fields['profile_id'] = profile_id
+    upsert_job(job_id, **fields)
     return job_id
 
 
 def update_job(job_id: str, **kwargs):
-    with _lock:
-        if job_id in _jobs:
-            _jobs[job_id].update(kwargs)
+    upsert_job(job_id, **kwargs)
 
 
 def get_job(job_id: str) -> Optional[dict]:
-    with _lock:
-        job = _jobs.get(job_id)
-        return dict(job) if job else None
+    return db_get_job(job_id)
+
+
+def list_jobs() -> list:
+    return db_list_jobs()
 
 
 def run_in_background(fn: Callable, *args, **kwargs):

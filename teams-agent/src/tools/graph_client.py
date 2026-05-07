@@ -42,6 +42,27 @@ def get_transcript_content(token: str, organizer_email: str, meeting_id: str, tr
     return r.text
 
 
+def get_meeting_details(token: str, organizer_email: str, meeting_id: str) -> dict:
+    """
+    Returns dict with startDateTime, endDateTime, subject from the online meeting.
+    Used to check timing and build display title.
+    """
+    headers = {"Authorization": f"Bearer {token}"}
+    user_id = get_user_id(token, organizer_email)
+    r = requests.get(
+        f"{GRAPH_API}/users/{user_id}/onlineMeetings/{meeting_id}?$select=startDateTime,endDateTime,subject",
+        headers=headers,
+    )
+    if r.status_code != 200:
+        return {}
+    return r.json()
+
+
+def get_meeting_end_time(token: str, organizer_email: str, meeting_id: str) -> str | None:
+    """Returns the meeting's endDateTime (ISO 8601 UTC) or None. Legacy helper."""
+    return get_meeting_details(token, organizer_email, meeting_id).get("endDateTime")
+
+
 def get_meetings(token: str, organizer_email: str) -> list:
     headers = {"Authorization": f"Bearer {token}"}
     r = requests.get(

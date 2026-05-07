@@ -12,9 +12,9 @@ from infrastructure.utilities import secret_manager
 from application.utilities.pricing import compute_cost
 
 # gemini-2.5-pro: best accuracy, up to 9.5h audio, speaker diarization
-# Falls back to gemini-2.0-flash if primary model is unavailable
+# Falls back to gemini-2.5-flash-lite if primary model is unavailable
 TRANSCRIPTION_MODEL = "gemini-2.5-pro"
-TRANSCRIPTION_MODEL_FALLBACK = "gemini-2.0-flash"
+TRANSCRIPTION_MODEL_FALLBACK = "gemini-2.5-flash-lite"
 
 _MAX_RETRIES = 3
 _RETRY_DELAY_SECONDS = 5

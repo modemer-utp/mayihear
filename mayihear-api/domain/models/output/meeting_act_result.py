@@ -26,6 +26,8 @@ class MeetingActResult(BaseModel):
     riesgos: List[str] = []
     pendientes_reunion_anterior: List[str] = []
     proxima_reunion: Optional[str] = None
+    is_freeform: bool = False
+    free_form_text: Optional[str] = None
     usage: Optional[TokenUsage] = None
     processing_time_seconds: Optional[float] = None
 

@@ -15,7 +15,7 @@ import requests
 RECORDING   = r"D:\Proyectos actuales\mayihear-utp\recordings\recording_2026-03-13T18-06-22.webm"
 OUT_DIR     = r"D:\Proyectos actuales\mayihear-utp\recordings"
 BASE_NAME   = "2026-03-13"
-API_BASE    = "http://localhost:8001"
+API_BASE    = "http://localhost:47891"
 
 TRANSCRIPT_FILE = os.path.join(OUT_DIR, f"transcripcion_{BASE_NAME}.txt")
 INSIGHTS_FILE   = os.path.join(OUT_DIR, f"insights_{BASE_NAME}.json")

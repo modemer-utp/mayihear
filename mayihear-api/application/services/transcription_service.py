@@ -42,9 +42,9 @@ class TranscriptionService:
             )
         return result
 
-    def start_transcribe_job(self, file_path: str) -> str:
+    def start_transcribe_job(self, file_path: str, profile_id: str = None) -> str:
         """Creates a background job for transcription. Returns job_id."""
-        job_id = job_manager.create_job()
+        job_id = job_manager.create_job(file_path=file_path, profile_id=profile_id)
         job_manager.run_in_background(self._run_transcribe_job, job_id, file_path)
         return job_id
 

@@ -5,6 +5,7 @@ from domain.models.output.meeting_act_result import MeetingActResult
 class MeetingActState(TypedDict):
     transcript: str
     user_context: str
+    acta_template: str
     today_date: str
 
 
