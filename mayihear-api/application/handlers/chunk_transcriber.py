@@ -82,20 +82,13 @@ def _split_into_chunks(file_path: str, chunk_seconds: int) -> List[str]:
     return chunks
 
 
-def _is_vertex_client(client) -> bool:
-    try:
-        return client._api_client._vertexai
-    except AttributeError:
-        return False
-
-
 def _transcribe_one_chunk(client, chunk_path: str, mime_type: str, chunk_idx: int, total: int) -> tuple:
     """Upload and transcribe a single audio chunk. Returns (text, model_used, usage_metadata)."""
     from google.genai import types as genai_types
     file_size_mb = round(os.path.getsize(chunk_path) / 1024 / 1024, 1)
     print(f"[chunker] Chunk {chunk_idx + 1}/{total}: preparing {file_size_mb} MB...", flush=True)
 
-    is_vertex = _is_vertex_client(client)
+    is_vertex = bool(secret_manager.get_vertex_sa_path())
 
     if is_vertex:
         # Vertex AI: send audio inline as bytes
