@@ -1,6 +1,6 @@
 {
   "name": "mayihear",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Meeting transcription and insights — UTP MVP",
   "main": "main.js",
   "scripts": {
