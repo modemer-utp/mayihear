@@ -61,6 +61,7 @@ def get_vertex_credentials():
     or (None, None) to fall back to AI Studio key.
     """
     path = get_vertex_sa_path()
+    print(f"[Vertex] SA path = '{path}' | file_exists = {os.path.isfile(path) if path else False}", flush=True)
     if not path or not os.path.isfile(path):
         return None, None
     try:
