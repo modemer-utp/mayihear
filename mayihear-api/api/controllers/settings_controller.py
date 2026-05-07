@@ -42,6 +42,7 @@ def update_api_keys(request: ApiKeysRequest):
             transcription_controller._service = None
         if request.vertex_sa_path is not None:
             secret_manager.set_override('VERTEX_SA_PATH', request.vertex_sa_path)
+            transcription_controller._service = None
             insights_controller._service = None
             meeting_act_controller._service = None
         return {"ok": True}
