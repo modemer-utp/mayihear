@@ -29,7 +29,7 @@ Transcripción:
 Responde SOLO con el JSON válido, sin texto adicional ni markdown.
 """
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-2.5-flash-lite"
 
 
 def _get_client():
@@ -58,24 +58,36 @@ REGLAS IMPORTANTES:
 """
 
 
+def _generate_with_retry(contents: str, max_attempts: int = 3) -> str:
+    """Call Gemini with up to max_attempts retries on transient errors."""
+    import time
+    last_err = None
+    for attempt in range(max_attempts):
+        try:
+            response = _get_client().models.generate_content(
+                model=GEMINI_MODEL,
+                contents=contents,
+            )
+            return response.text.strip()
+        except Exception as e:
+            last_err = e
+            if attempt < max_attempts - 1:
+                time.sleep(2 ** attempt)  # 1s, 2s backoff
+    raise last_err
+
+
 def generate_insights_custom(transcript: str, custom_prompt: str) -> str:
     """Generate insights using a user-defined prompt. Returns plain text."""
-    response = _get_client().models.generate_content(
-        model=GEMINI_MODEL,
-        contents=CUSTOM_PROMPT_WRAPPER.format(
+    return _generate_with_retry(
+        CUSTOM_PROMPT_WRAPPER.format(
             custom_prompt=custom_prompt.strip(),
             transcript=transcript,
-        ),
+        )
     )
-    return response.text.strip()
 
 
 def generate_insights(transcript: str) -> dict:
-    response = _get_client().models.generate_content(
-        model=GEMINI_MODEL,
-        contents=INSIGHTS_PROMPT.format(transcript=transcript),
-    )
-    raw = response.text.strip()
+    raw = _generate_with_retry(INSIGHTS_PROMPT.format(transcript=transcript))
     # Strip markdown fences
     raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
     try:
