@@ -377,7 +377,18 @@ _processed_ids_ready = False
 
 # ── Pending transcripts waiting for their callRecord ─────────────────────────
 # organizer_email (lower) → list of {meeting_id, transcript_id, subject, calendar_end_dt, detected_at}
+# Persisted to blob so redeployments don't break the callRecord → transcript link.
 _pending_transcripts: dict = {}
+_pending_transcripts_loaded = False
+
+
+def _load_pending_transcripts_once():
+    global _pending_transcripts, _pending_transcripts_loaded
+    if not _pending_transcripts_loaded:
+        from tools.state_store import load_pending_transcripts
+        _pending_transcripts = load_pending_transcripts()
+        _pending_transcripts_loaded = True
+        logger.info(f"Loaded pending transcripts for {list(_pending_transcripts.keys())}")
 
 
 def _load_processed_ids_once():
@@ -451,7 +462,9 @@ def _validate_and_enqueue(meeting_id: str, transcript_id: str, organizer: str, s
         _processed_meeting_ids.add(meeting_id)
         save_processed_ids(_processed_ids)
 
-        # Register in pending_transcripts so callRecord can override the schedule
+        # Register in pending_transcripts so callRecord can match it after any redeploy
+        from tools.state_store import save_pending_transcripts
+        _load_pending_transcripts_once()
         org_key = organizer.lower()
         calendar_end_dt = (
             datetime.datetime.fromisoformat(end_dt_str.replace("Z", "+00:00"))
@@ -464,6 +477,7 @@ def _validate_and_enqueue(meeting_id: str, transcript_id: str, organizer: str, s
             "calendar_end_dt": calendar_end_dt,
             "detected_at": now,
         })
+        save_pending_transcripts(_pending_transcripts)
 
         _enqueue_meeting(meeting_id, transcript_id, organizer, subject, scheduled_at=scheduled_at)
 
@@ -521,6 +535,9 @@ def _handle_call_record(call_record_id: str):
 
         logger.info(f"callRecord for {organizer_email}: actual end={actual_end_str}")
 
+        # Load from blob in case this is a fresh instance after redeploy
+        _load_pending_transcripts_once()
+
         # Find matching pending transcript by time window
         now = datetime.datetime.now(datetime.timezone.utc)
         pending_list = _pending_transcripts.get(organizer_email, [])
@@ -542,10 +559,12 @@ def _handle_call_record(call_record_id: str):
         subject       = matched["subject"]
         calendar_end  = matched.get("calendar_end_dt")
 
-        # Remove from pending now that it's been claimed
+        # Remove from pending and persist
+        from tools.state_store import save_pending_transcripts
         _pending_transcripts[organizer_email] = [
             e for e in pending_list if e["transcript_id"] != transcript_id
         ]
+        save_pending_transcripts(_pending_transcripts)
 
         # If the meeting ran significantly over the calendar end, the calendar-based
         # SB message may have already fetched a partial transcript — re-queue with the

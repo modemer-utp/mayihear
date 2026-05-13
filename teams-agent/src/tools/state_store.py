@@ -12,6 +12,7 @@ CONTAINER = "mayihear-state"
 CONV_REF_BLOB = "conversation_ref.json"
 PROCESSED_IDS_BLOB = "processed_transcripts.json"
 CONV_REFS_BY_EMAIL_BLOB = "conv_refs_by_email.json"
+PENDING_TRANSCRIPTS_BLOB = "pending_transcripts.json"
 
 
 def _get_container_client():
@@ -84,6 +85,54 @@ def load_conv_ref_for_email(email: str) -> dict | None:
         return data.get(email.lower())
     except Exception:
         return None
+
+
+def save_pending_transcripts(pending: dict):
+    """
+    Persist _pending_transcripts to blob so callRecord can find them after a redeploy.
+    pending: { organizer_email: [{meeting_id, transcript_id, subject, calendar_end_dt, detected_at}] }
+    datetime objects serialised as ISO strings.
+    """
+    try:
+        serialisable = {}
+        for email, entries in pending.items():
+            serialisable[email] = []
+            for e in entries:
+                row = dict(e)
+                for k in ("calendar_end_dt", "detected_at"):
+                    if row.get(k) and hasattr(row[k], "isoformat"):
+                        row[k] = row[k].isoformat()
+                serialisable[email].append(row)
+        container = _get_container_client()
+        container.upload_blob(PENDING_TRANSCRIPTS_BLOB, json.dumps(serialisable), overwrite=True)
+    except Exception as e:
+        logger.warning(f"Could not save pending transcripts: {e}")
+
+
+def load_pending_transcripts() -> dict:
+    """Load _pending_transcripts from blob. Returns {} if not found."""
+    import datetime
+    try:
+        from azure.storage.blob import BlobServiceClient
+        conn_str = os.environ["AzureWebJobsStorage"]
+        client = BlobServiceClient.from_connection_string(conn_str)
+        blob = client.get_blob_client(container=CONTAINER, blob=PENDING_TRANSCRIPTS_BLOB)
+        data = json.loads(blob.download_blob().readall())
+        result = {}
+        for email, entries in data.items():
+            result[email] = []
+            for e in entries:
+                row = dict(e)
+                for k in ("calendar_end_dt", "detected_at"):
+                    if row.get(k) and isinstance(row[k], str):
+                        try:
+                            row[k] = datetime.datetime.fromisoformat(row[k])
+                        except Exception:
+                            row[k] = None
+                result[email].append(row)
+        return result
+    except Exception:
+        return {}
 
 
 def load_conversation_ref() -> dict | None:
