@@ -18,7 +18,7 @@ from botbuilder.schema import ConversationReference
 import pipeline
 from tools.monday import list_boards, create_meeting_item
 from tools.monday_qa import ask_monday
-from tools.llm import generate_insights, format_insights_for_monday
+from tools.llm import generate_insights, format_insights_for_monday, format_insights_for_teams
 from tools.graph import resolve_email_from_aad_id
 from tools.state_store import (
     save_conversation_ref, load_conversation_ref,
@@ -945,10 +945,12 @@ class MayiHearBot(ActivityHandler):
                     )
                     _last_processed.update({**result, "item_id": item_id})
 
+                    teams_text = format_insights_for_teams(result.get("insights", {})) or result["insights_text"]
+                    board_short = board_name.split(" - ")[-1] if " - " in board_name else board_name
                     await ctx.send_activity(MessageFactory.text(
-                        f"✅ **{subject}** publicada en **Actualizaciones** de **{board_name}**\n\n"
-                        f"{result['insights_text']}\n\n"
-                        f"Usa `/regenerar` si quieres cambiar la estructura y volver a publicar."
+                        f"✅ **{subject}** → _{board_short}_\n\n"
+                        f"{teams_text}\n\n"
+                        f"---\n_/regenerar · /cancelar_"
                     ))
                 except Exception as e:
                     logger.exception(f"Pipeline failed for '{subject}': {e}")

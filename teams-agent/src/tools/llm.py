@@ -81,30 +81,63 @@ def generate_insights(transcript: str) -> dict:
 
 
 def format_insights_for_monday(insights: dict) -> str:
-    """Format insights dict into a readable text block for Monday.com long-text column."""
+    """Verbose format for Monday.com long-text column."""
     lines = []
-
     if insights.get("summary"):
         lines.append("📋 RESUMEN")
         for point in insights["summary"]:
             lines.append(f"• {point}")
         lines.append("")
-
     if insights.get("decisions"):
         lines.append("✅ DECISIONES")
         for d in insights["decisions"]:
             lines.append(f"• {d}")
         lines.append("")
-
     if insights.get("action_items"):
         lines.append("🎯 TAREAS")
         for a in insights["action_items"]:
             lines.append(f"• {a}")
         lines.append("")
-
     if insights.get("open_questions"):
         lines.append("❓ PREGUNTAS ABIERTAS")
         for q in insights["open_questions"]:
             lines.append(f"• {q}")
-
     return "\n".join(lines)
+
+
+def format_insights_for_teams(insights: dict) -> str:
+    """
+    Compact, scannable format for Teams chat.
+    - Bold section headers
+    - Max 6 bullets per section (rest collapsed to '...y N más')
+    - Each bullet capped at 120 chars
+    - Proper spacing between sections
+    """
+    MAX_BULLETS = 6
+    MAX_CHARS = 120
+
+    def _bullet(text: str) -> str:
+        return f"• {text[:MAX_CHARS]}{'…' if len(text) > MAX_CHARS else ''}"
+
+    def _section(emoji: str, title: str, items: list) -> str:
+        if not items:
+            return ""
+        visible = items[:MAX_BULLETS]
+        rest = len(items) - MAX_BULLETS
+        lines = [f"**{emoji} {title}**"]
+        lines += [_bullet(i) for i in visible]
+        if rest > 0:
+            lines.append(f"_...y {rest} punto{'s' if rest > 1 else ''} más_")
+        return "\n".join(lines)
+
+    sections = []
+    if insights.get("summary"):
+        sections.append(_section("📋", "Resumen", insights["summary"]))
+    if insights.get("decisions"):
+        sections.append(_section("✅", "Decisiones", insights["decisions"]))
+    if insights.get("action_items"):
+        sections.append(_section("🎯", "Tareas", insights["action_items"]))
+    if insights.get("open_questions"):
+        sections.append(_section("❓", "Preguntas abiertas", insights["open_questions"]))
+
+    return "\n\n".join(s for s in sections if s)

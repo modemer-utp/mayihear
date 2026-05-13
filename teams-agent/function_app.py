@@ -641,16 +641,8 @@ def check_missed_transcripts(catchup_timer: func.TimerRequest) -> None:
                     )
                     continue
 
-                # Build subject with start time for disambiguation
+                # Raw subject only — _validate_and_enqueue appends the start time
                 subject = details.get("subject") or "Reunión Teams"
-                start_dt_str = details.get("startDateTime", "")
-                if start_dt_str:
-                    try:
-                        start_dt = datetime.datetime.fromisoformat(start_dt_str.replace("Z", "+00:00"))
-                        peru_time = start_dt - datetime.timedelta(hours=5)
-                        subject = f"{subject} ({peru_time.strftime('%I:%M %p')})"
-                    except Exception:
-                        pass
 
                 # Mark as processed NOW — before spawning thread — to prevent
                 # race condition where the next 2-min timer fires before the
