@@ -12,7 +12,7 @@ import asyncio
 import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor
-from botbuilder.core import ActivityHandler, TurnContext, MessageFactory
+from botbuilder.core import ActivityHandler, TurnContext, MessageFactory, CardFactory
 from botbuilder.schema import ConversationReference
 
 import pipeline
@@ -31,8 +31,24 @@ logger = logging.getLogger(__name__)
 
 
 def _insights_card(subject: str, board_short: str, insights: dict, insights_text: str) -> object:
-    """Format insights as a well-spaced markdown message for Teams."""
-    lines = [f"**{subject}** — _{board_short}_", ""]
+    """Build an Adaptive Card for structured insights display in Teams."""
+    body = [
+        {
+            "type": "TextBlock",
+            "text": f"✅ {subject}",
+            "weight": "Bolder",
+            "size": "Large",
+            "wrap": True,
+            "color": "Good",
+        },
+        {
+            "type": "TextBlock",
+            "text": f"Publicado en **{board_short}**",
+            "isSubtle": True,
+            "spacing": "None",
+            "wrap": True,
+        },
+    ]
 
     sections = [
         ("📋 Resumen",            insights.get("summary", [])),
@@ -44,15 +60,39 @@ def _insights_card(subject: str, board_short: str, insights: dict, insights_text
     for title, items in sections:
         if not items:
             continue
-        lines.append(f"**{title}**")
+        body.append({
+            "type": "TextBlock",
+            "text": title,
+            "weight": "Bolder",
+            "size": "Medium",
+            "separator": True,
+            "spacing": "Medium",
+        })
         for item in items:
-            lines.append(f"• {item}")
-            lines.append("")   # blank line after each bullet → Teams renders as paragraph break
+            body.append({
+                "type": "TextBlock",
+                "text": f"• {item}",
+                "wrap": True,
+                "spacing": "Small",
+            })
 
-    lines.append("---")
-    lines.append("_/confirmar · /regenerar · /cancelar_")
+    body.append({
+        "type": "TextBlock",
+        "text": "Usa `/regenerar` para regenerar · `/cancelar` para descartar",
+        "isSubtle": True,
+        "separator": True,
+        "spacing": "Medium",
+        "wrap": True,
+        "size": "Small",
+    })
 
-    return MessageFactory.text("\n".join(lines))
+    card = {
+        "type": "AdaptiveCard",
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "version": "1.4",
+        "body": body,
+    }
+    return MessageFactory.attachment(CardFactory.adaptive_card(card))
 
 # ── Global adapter reference (set from function_app.py after adapter is created) ──
 _adapter = None
