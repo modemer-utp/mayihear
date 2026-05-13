@@ -78,7 +78,7 @@ def _insights_card(subject: str, board_short: str, insights: dict, insights_text
 
     body.append({
         "type": "TextBlock",
-        "text": "Usa `/regenerar` para regenerar · `/cancelar` para descartar",
+        "text": "`/confirmar` para publicar · `/regenerar` para regenerar · `/cancelar` para descartar",
         "isSubtle": True,
         "separator": True,
         "spacing": "Medium",
@@ -1025,10 +1025,6 @@ class MayiHearBot(ActivityHandler):
                 await ctx.send_activity(
                     _insights_card(subject, board_short, result.get("insights", {}), result["insights_text"])
                 )
-                await ctx.send_activity(MessageFactory.text(
-                    f"¿Publicar en **{board_short}**?\n"
-                    f"→ `/confirmar` para publicar · `/regenerar` para regenerar · `/cancelar` para descartar"
-                ))
 
             await _adapter.continue_conversation(ref, _callback, os.environ.get("BOT_ID", ""))
             logger.info(f"Insights ready for confirmation — '{subject}' for '{organizer_email}'")
