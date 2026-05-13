@@ -137,13 +137,13 @@ class MayiHearBot(ActivityHandler):
             await self._slash_cancel(turn_context, state, conv_id)
         elif text_lower in ("regenerar", "regenerate", "regenera"):
             await self._slash_regenerate(turn_context, state, conv_id)
+        elif state.get("awaiting_prompt"):
+            # User is actively writing their custom structure — save immediately,
+            # don't let intent checks intercept it (the text may contain "acta", etc.)
+            await self._save_custom_prompt(turn_context, raw, state, conv_id)
         elif text_lower in ("hola", "hi", "hello", "ayuda", "help", "inicio", "start", ""):
             await self._cmd_welcome(turn_context, state)
         elif self._is_prompt_intent(text_lower):
-            # Check estructura BEFORE queue — template content may contain "pendiente"
-            if state.get("awaiting_prompt"):
-                state = {**state, "awaiting_prompt": False}
-                set_conv_state(conv_id, state)
             await self._cmd_prompt_dispatch(turn_context, raw, text_lower, state, conv_id)
         elif self._is_queue_intent(text_lower):
             await self._cmd_natural_queue(turn_context, raw, text_lower, state, conv_id)
@@ -151,9 +151,6 @@ class MayiHearBot(ActivityHandler):
             await self._cmd_past_meetings(turn_context)
         elif self._is_meeting_insights_intent(text_lower):
             await self._cmd_meeting_insights(turn_context, raw, text_lower, state, conv_id)
-        elif state.get("awaiting_prompt"):
-            # Only save as estructura if no other intent matched
-            await self._save_custom_prompt(turn_context, raw, state, conv_id)
         else:
             await self._cmd_ask_monday(turn_context, raw, state)
 
