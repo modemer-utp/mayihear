@@ -387,17 +387,17 @@ class MayiHearBot(ActivityHandler):
             next_pending = queue.pop(0)
             set_conv_state(conv_id, {**state, "pending": next_pending, "pending_queue": queue, "pending_previewed": False})
             await turn_context.send_activity(
-                MessageFactory.text(
-                    f"❌ Cancelado. Los insights de **{pending.get('subject', 'la reunión')}** no se publicaron.\n\n"
-                    f"📝 **Siguiente reunión pendiente: {next_pending.get('subject', 'Reunión')}**\n\n"
-                    f"{next_pending['insights_text']}\n\n"
-                    "Usa `/confirmar` para revisar y publicar · `/regenerar` · `/cancelar`"
-                )
+                MessageFactory.text(f"❌ **{pending.get('subject', 'Reunión')}** descartada.")
+            )
+            np_board = next_pending.get("board_name") or "UTP - Roadmap proyectos - Producto"
+            np_board_short = np_board.split(" - ")[-1] if " - " in np_board else np_board
+            await turn_context.send_activity(
+                _insights_card(next_pending.get("subject", "Reunión"), np_board_short, next_pending.get("insights", {}), next_pending["insights_text"])
             )
         else:
             set_conv_state(conv_id, {**state, "pending": None, "pending_queue": [], "pending_previewed": False})
             await turn_context.send_activity(
-                MessageFactory.text(f"❌ Cancelado. Los insights de **{pending.get('subject', 'la reunión')}** no se publicaron.")
+                MessageFactory.text(f"❌ **{pending.get('subject', 'Reunión')}** descartada.")
             )
 
     async def _slash_regenerate(self, turn_context: TurnContext, state: dict, conv_id: str):
