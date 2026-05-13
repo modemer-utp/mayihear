@@ -401,41 +401,43 @@ class MayiHearBot(ActivityHandler):
             )
 
     async def _slash_regenerate(self, turn_context: TurnContext, state: dict, conv_id: str):
-        # Use last processed meeting (auto-post flow — no pending state)
-        # Use _last_processed if available, otherwise fall back to pending state
-        # (pending has transcript_text and survives redeployments via Table Storage)
         source = _last_processed if _last_processed.get("transcript_text") else state.get("pending")
         if not source or not source.get("transcript_text"):
             await turn_context.send_activity(MessageFactory.text(
                 "No hay ninguna reunión reciente para regenerar. Procesa una reunión primero."
             ))
             return
+
         custom_prompt = state.get("custom_prompt")
         subject = source.get("subject", "Reunión")
         board_id = state.get("selected_board_id") if state.get("board_explicitly_selected") else source.get("board_id") or os.environ.get("MONDAY_BOARD_ID")
         board_name = state.get("selected_board_name") if state.get("board_explicitly_selected") else source.get("board_name") or "UTP - Roadmap proyectos - Producto"
+        board_short = board_name.split(" - ")[-1] if " - " in board_name else board_name
 
         await turn_context.send_activity(MessageFactory.text(
-            "🔄 Regenerando" + (" con tu estructura de acta..." if custom_prompt else "...")
+            "🔄 Regenerando" + (" con tu estructura..." if custom_prompt else "...")
         ))
-        loop = asyncio.get_event_loop()
+
         try:
+            loop = asyncio.get_running_loop()
             result = await loop.run_in_executor(
                 _executor, pipeline.generate,
                 source["transcript_text"], subject, custom_prompt
             )
-            item_id = await loop.run_in_executor(
-                _executor, pipeline.post_to_monday,
-                subject, result["insights_text"], board_id
+
+            # Update pending state with new insights (don't post to Monday yet)
+            updated_pending = {**source, **result}
+            set_conv_state(conv_id, {**state, "pending": updated_pending, "pending_previewed": False})
+            _last_processed.update({**result})
+
+            await turn_context.send_activity(
+                _insights_card(subject, board_short, result.get("insights", {}), result["insights_text"])
             )
-            _last_processed.update({**result, "item_id": item_id})
         except Exception as e:
-            await turn_context.send_activity(MessageFactory.text(f"❌ Error: {e}"))
-            return
-        board_short = board_name.split(" - ")[-1] if " - " in board_name else board_name
-        await turn_context.send_activity(
-            _insights_card(subject, board_short, result.get("insights", {}), result["insights_text"])
-        )
+            logger.exception(f"Regenerate failed for '{subject}': {e}")
+            await turn_context.send_activity(MessageFactory.text(
+                f"❌ Error al regenerar: {str(e)[:300]}\n\nIntenta de nuevo con `/regenerar`."
+            ))
 
     # ── Custom prompt management ───────────────────────────────────────────────
 
