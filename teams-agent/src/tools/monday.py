@@ -10,8 +10,20 @@ _actualizaciones_item_cache: dict = {}
 
 
 def list_boards() -> list:
-    """Returns relevant boards — excludes sub_items_boards and noise."""
-    query = "query { boards(limit: 50, order_by: used_at) { id name type } }"
+    """
+    Returns boards available for publishing.
+    If MONDAY_BOARD_IDS env var is set (comma-separated IDs), only those boards
+    are shown — keeps the list clean in multi-board workspaces.
+    Otherwise falls back to all boards ordered by last used.
+    """
+    whitelist = [b.strip() for b in os.environ.get("MONDAY_BOARD_IDS", "").split(",") if b.strip()]
+
+    if whitelist:
+        ids_gql = "[" + ", ".join(f'"{b}"' for b in whitelist) + "]"
+        query = f"query {{ boards(ids: {ids_gql}) {{ id name type }} }}"
+    else:
+        query = "query { boards(limit: 50, order_by: used_at) { id name type } }"
+
     r = requests.post(MONDAY_API, json={"query": query}, headers=_headers())
     r.raise_for_status()
     return [
