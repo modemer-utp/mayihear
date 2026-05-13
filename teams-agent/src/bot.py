@@ -998,6 +998,7 @@ class MayiHearBot(ActivityHandler):
                     return
 
                 # Store as pending — do NOT post to Monday yet
+                import datetime as _dt
                 pending = {
                     "subject": subject,
                     "insights_text": result["insights_text"],
@@ -1005,16 +1006,33 @@ class MayiHearBot(ActivityHandler):
                     "transcript_text": result["transcript_text"],
                     "board_id": board_id,
                     "board_name": board_name,
+                    "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
                 }
                 queue = list(state.get("pending_queue", []))
                 existing = state.get("pending")
+
+                # Auto-expire pending meetings older than 6 hours — don't block new ones
                 if existing:
-                    # Already reviewing one — add to queue
+                    existing_age_h = 999
+                    try:
+                        created = existing.get("created_at")
+                        if created:
+                            existing_age_h = (_dt.datetime.now(_dt.timezone.utc) - _dt.datetime.fromisoformat(created)).total_seconds() / 3600
+                    except Exception:
+                        pass
+                    if existing_age_h > 6:
+                        # Old pending expired — replace it silently
+                        existing = None
+                        queue = []
+
+                if existing:
+                    # Active pending — add new one to queue
                     queue.append(pending)
-                    set_conv_state(conv_id, {**state, "pending_queue": queue, "pending_previewed": False})
+                    set_conv_state(conv_id, {**state, "pending_queue": queue})
                     await ctx.send_activity(MessageFactory.text(
-                        f"📥 **{subject}** añadida a la cola. "
-                        f"Termina con la reunión actual primero (`/confirmar` · `/cancelar`)."
+                        f"📥 **{subject}** añadida a la cola.\n"
+                        f"Aún tienes pendiente: **{existing.get('subject', '?')}**\n"
+                        f"→ `/confirmar` para publicarla · `/cancelar` para descartarla"
                     ))
                     return
 
