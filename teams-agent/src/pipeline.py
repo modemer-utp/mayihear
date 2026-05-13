@@ -57,14 +57,14 @@ def generate(transcript_text: str, subject: str, custom_prompt: str | None = Non
     return {"subject": subject, "transcript_text": transcript_text, "insights": insights, "insights_text": insights_text}
 
 
-def post_to_monday(subject: str, insights_text: str, board_id: str | None = None) -> str:
+def post_to_monday(subject: str, insights_text: str, board_id: str | None = None, item_id: str | None = None) -> str:
     """
-    Post insights to Monday's Actualizaciones item as an Update.
-    Newest meeting appears first in Monday's Updates feed.
-    Returns the update_id.
+    Post insights as an Update on a Monday item.
+    item_id: specific item to post to (e.g. a project initiative).
+    Falls back to the board's 'Actualizaciones' item if not provided.
     """
     bid = board_id or BOARD_ID
-    update_id = post_meeting_update(bid, subject, insights_text)
+    update_id = post_meeting_update(bid, subject, insights_text, item_id=item_id)
     logger.info(f"Posted meeting update to Monday — update_id={update_id}")
     return update_id
 

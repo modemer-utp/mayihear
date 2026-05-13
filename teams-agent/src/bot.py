@@ -246,24 +246,31 @@ class MayiHearBot(ActivityHandler):
         ))
 
     async def _cmd_show_boards(self, turn_context: TurnContext, conv_id: str, state: dict):
-        loop = asyncio.get_event_loop()
+        from tools.monday import list_board_items
+        board_id = os.environ.get("MONDAY_BOARD_ID", "")
+        loop = asyncio.get_running_loop()
         try:
-            boards = await loop.run_in_executor(_executor, list_boards)
+            items = await loop.run_in_executor(_executor, list_board_items, board_id)
         except Exception as e:
-            await turn_context.send_activity(MessageFactory.text(f"Error al obtener tableros: {e}"))
+            await turn_context.send_activity(MessageFactory.text(f"Error al obtener proyectos: {e}"))
             return
 
-        if not boards:
-            await turn_context.send_activity(MessageFactory.text("No encontré tableros en Monday."))
+        if not items:
+            await turn_context.send_activity(MessageFactory.text("No encontré proyectos en Monday."))
             return
 
-        lines = ["**Tableros disponibles en Monday:**\n"]
-        for i, b in enumerate(boards, 1):
-            marker = " ✅" if b["id"] == (state.get("selected_board_id") or os.environ.get("MONDAY_BOARD_ID")) else ""
-            lines.append(f"**{i}.** {b['name']}{marker}")
-        lines.append("\nUsa `/select <número>` para cambiar de tablero.")
+        selected_item_id = state.get("selected_item_id", "11714533371")  # default: Actualizaciones
+        current_group = None
+        lines = ["**📋 Proyectos — UTP Roadmap Producto**\n", "Elige el proyecto al que pertenece esta reunión:\n"]
+        for i, item in enumerate(items, 1):
+            if item["group"] != current_group:
+                current_group = item["group"]
+                lines.append(f"\n**{current_group}**")
+            marker = " ✅" if item["id"] == selected_item_id else ""
+            lines.append(f"  **{i}.** {item['name']}{marker}")
+        lines.append("\n\nUsa `/select <número>` para elegir el proyecto.")
 
-        set_conv_state(conv_id, {**state, "boards_cache": boards})
+        set_conv_state(conv_id, {**state, "items_cache": items})
         await turn_context.send_activity(MessageFactory.text("\n".join(lines)))
 
     async def _cmd_last_meeting(self, turn_context: TurnContext):
@@ -316,28 +323,27 @@ class MayiHearBot(ActivityHandler):
             )
 
     async def _cmd_select_board(self, turn_context: TurnContext, arg: str, state: dict, conv_id: str):
-        boards = state.get("boards_cache", [])
-        if not boards:
-            await turn_context.send_activity(MessageFactory.text("Primero usa `/boards` para ver la lista de tableros."))
+        items = state.get("items_cache", [])
+        if not items:
+            await turn_context.send_activity(MessageFactory.text("Primero usa `/boards` para ver la lista de proyectos."))
             return
         try:
             idx = int(arg) - 1
-            if 0 <= idx < len(boards):
-                chosen = boards[idx]
+            if 0 <= idx < len(items):
+                chosen = items[idx]
                 set_conv_state(conv_id, {
                     **state,
-                    "selected_board_id": chosen["id"],
-                    "selected_board_name": chosen["name"],
-                    "board_explicitly_selected": True,
+                    "selected_item_id": chosen["id"],
+                    "selected_item_name": chosen["name"],
                 })
                 await turn_context.send_activity(
-                    MessageFactory.text(f"✅ Tablero cambiado a: **{chosen['name']}**")
+                    MessageFactory.text(f"✅ Proyecto seleccionado: **{chosen['name']}**\nLas próximas reuniones se publicarán en este proyecto.")
                 )
                 return
         except ValueError:
             pass
         await turn_context.send_activity(
-            MessageFactory.text(f"Usa un número válido de la lista. Ejemplo: `/select 1`")
+            MessageFactory.text("Usa un número válido de la lista. Ejemplo: `/select 5`")
         )
 
     async def _slash_confirm(self, turn_context: TurnContext, state: dict, conv_id: str):
@@ -346,17 +352,21 @@ class MayiHearBot(ActivityHandler):
             await turn_context.send_activity(MessageFactory.text("No hay ninguna reunión pendiente de confirmar."))
             return
 
-        # board comes from pending (set at processing time) or from user selection
-        board_id   = state.get("selected_board_id") if state.get("board_explicitly_selected") else pending.get("board_id") or os.environ.get("MONDAY_BOARD_ID")
-        board_name = state.get("selected_board_name") if state.get("board_explicitly_selected") else pending.get("board_name") or "UTP - Roadmap proyectos - Producto"
+        board_id   = pending.get("board_id") or os.environ.get("MONDAY_BOARD_ID")
+        board_name = pending.get("board_name") or "UTP - Roadmap proyectos - Producto"
         board_short = board_name.split(" - ")[-1] if " - " in board_name else board_name
 
-        await turn_context.send_activity(MessageFactory.text("⏳ Publicando en Monday..."))
-        loop = asyncio.get_event_loop()
+        # Use selected project item, default to Actualizaciones
+        selected_item_id = state.get("selected_item_id")
+        selected_item_name = state.get("selected_item_name", "Actualizaciones")
+        publish_label = f"{selected_item_name}" if selected_item_id else "Actualizaciones"
+
+        await turn_context.send_activity(MessageFactory.text(f"⏳ Publicando en **{publish_label}**..."))
+        loop = asyncio.get_running_loop()
         try:
             item_id = await loop.run_in_executor(
                 _executor, pipeline.post_to_monday,
-                pending["subject"], pending["insights_text"], board_id
+                pending["subject"], pending["insights_text"], board_id, selected_item_id
             )
         except Exception as e:
             await turn_context.send_activity(MessageFactory.text(f"❌ Error publicando: {e}"))
@@ -372,7 +382,7 @@ class MayiHearBot(ActivityHandler):
             set_conv_state(conv_id, {**state, "pending": None, "pending_queue": [], "pending_previewed": False})
 
         await turn_context.send_activity(
-            MessageFactory.text(f"✅ **{pending['subject']}** publicada en **{board_short}**")
+            MessageFactory.text(f"✅ **{pending['subject']}** publicada en **{publish_label}** · {board_short}")
         )
         if queue:
             np = next_pending

@@ -171,13 +171,40 @@ def find_or_create_actualizaciones_item(board_id: str) -> str:
     return item_id
 
 
-def post_meeting_update(board_id: str, subject: str, insights_text: str) -> str:
+def list_board_items(board_id: str) -> list:
     """
-    Posts meeting insights as an Update (Actualizaciones) on the board's
-    dedicated 'Actualizaciones' item. Returns the update id.
-    Updates are shown newest-first in Monday automatically.
+    Returns all items in the board grouped by group, for project selection.
+    Each entry: {id, name, group}
     """
-    item_id = find_or_create_actualizaciones_item(board_id)
+    query = """
+    query($board_id: ID!) {
+      boards(ids: [$board_id]) {
+        groups { id title }
+        items_page(limit: 100) {
+          items { id name group { id } }
+        }
+      }
+    }
+    """
+    r = requests.post(MONDAY_API, json={"query": query, "variables": {"board_id": board_id}}, headers=_headers())
+    r.raise_for_status()
+    data = r.json()["data"]["boards"][0]
+    group_names = {g["id"]: g["title"] for g in data["groups"]}
+    return [
+        {"id": item["id"], "name": item["name"], "group": group_names.get(item["group"]["id"], "")}
+        for item in data["items_page"]["items"]
+    ]
+
+
+def post_meeting_update(board_id: str, subject: str, insights_text: str, item_id: str | None = None) -> str:
+    """
+    Posts meeting insights as an Update on a Monday item.
+    If item_id is provided, posts directly to that item.
+    Otherwise falls back to the board's 'Actualizaciones' item.
+    Returns the update id.
+    """
+    if not item_id:
+        item_id = find_or_create_actualizaciones_item(board_id)
 
     # Build a nicely formatted update body (HTML supported in Monday updates)
     peru_now = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=5)
