@@ -78,10 +78,18 @@ def _insights_card(subject: str, board_short: str, insights: dict, insights_text
 
     body.append({
         "type": "TextBlock",
-        "text": "`/confirmar` para publicar · `/regenerar` para regenerar · `/cancelar` para descartar",
+        "text": "`/confirmar` publicar · `/regenerar` regenerar · `/cancelar` descartar",
         "isSubtle": True,
         "separator": True,
-        "spacing": "Medium",
+        "spacing": "Small",
+        "wrap": True,
+        "size": "Small",
+    },
+    {
+        "type": "TextBlock",
+        "text": "¿No es lo que esperabas? Escribe `/acta` para cambiar la estructura y luego `/regenerar`.",
+        "isSubtle": True,
+        "spacing": "None",
         "wrap": True,
         "size": "Small",
     })
