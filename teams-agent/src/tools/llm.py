@@ -125,38 +125,17 @@ def format_insights_for_monday(insights: dict) -> str:
 
 
 def format_insights_for_teams(insights: dict) -> str:
-    """
-    Compact, scannable format for Teams chat.
-    - Bold section headers
-    - Max 6 bullets per section (rest collapsed to '...y N más')
-    - Each bullet capped at 120 chars
-    - Proper spacing between sections
-    """
-    MAX_BULLETS = 6
-    MAX_CHARS = 120
-
-    def _bullet(text: str) -> str:
-        return f"• {text[:MAX_CHARS]}{'…' if len(text) > MAX_CHARS else ''}"
-
-    def _section(emoji: str, title: str, items: list) -> str:
-        if not items:
-            return ""
-        visible = items[:MAX_BULLETS]
-        rest = len(items) - MAX_BULLETS
-        lines = [f"**{emoji} {title}**"]
-        lines += [_bullet(i) for i in visible]
-        if rest > 0:
-            lines.append(f"_...y {rest} punto{'s' if rest > 1 else ''} más_")
-        return "\n".join(lines)
-
-    sections = []
-    if insights.get("summary"):
-        sections.append(_section("📋", "Resumen", insights["summary"]))
-    if insights.get("decisions"):
-        sections.append(_section("✅", "Decisiones", insights["decisions"]))
-    if insights.get("action_items"):
-        sections.append(_section("🎯", "Tareas", insights["action_items"]))
-    if insights.get("open_questions"):
-        sections.append(_section("❓", "Preguntas abiertas", insights["open_questions"]))
-
-    return "\n\n".join(s for s in sections if s)
+    """Fallback plain-text format (used when Adaptive Card is not available)."""
+    lines = []
+    for emoji, title, key in [
+        ("📋", "Resumen", "summary"),
+        ("✅", "Decisiones", "decisions"),
+        ("🎯", "Tareas", "action_items"),
+        ("❓", "Preguntas abiertas", "open_questions"),
+    ]:
+        items = insights.get(key, [])
+        if items:
+            lines.append(f"{emoji} **{title}**")
+            lines += [f"• {i}" for i in items]
+            lines.append("")
+    return "\n".join(lines).strip()

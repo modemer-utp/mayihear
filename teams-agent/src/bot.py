@@ -12,7 +12,7 @@ import asyncio
 import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor
-from botbuilder.core import ActivityHandler, TurnContext, MessageFactory
+from botbuilder.core import ActivityHandler, TurnContext, MessageFactory, CardFactory
 from botbuilder.schema import ConversationReference
 
 import pipeline
@@ -28,6 +28,71 @@ from tools.table_state import get_conv_state, set_conv_state
 
 _executor = ThreadPoolExecutor(max_workers=4)
 logger = logging.getLogger(__name__)
+
+
+def _insights_card(subject: str, board_short: str, insights: dict, insights_text: str) -> object:
+    """Build an Adaptive Card for structured insights display in Teams."""
+    body = [
+        {
+            "type": "TextBlock",
+            "text": f"✅ {subject}",
+            "weight": "Bolder",
+            "size": "Large",
+            "wrap": True,
+            "color": "Good",
+        },
+        {
+            "type": "TextBlock",
+            "text": f"Publicado en **{board_short}**",
+            "isSubtle": True,
+            "spacing": "None",
+            "wrap": True,
+        },
+    ]
+
+    sections = [
+        ("📋 Resumen",           insights.get("summary", [])),
+        ("✅ Decisiones",        insights.get("decisions", [])),
+        ("🎯 Tareas",            insights.get("action_items", [])),
+        ("❓ Preguntas abiertas", insights.get("open_questions", [])),
+    ]
+
+    for title, items in sections:
+        if not items:
+            continue
+        body.append({
+            "type": "TextBlock",
+            "text": title,
+            "weight": "Bolder",
+            "size": "Medium",
+            "separator": True,
+            "spacing": "Medium",
+        })
+        for item in items:
+            body.append({
+                "type": "TextBlock",
+                "text": f"• {item}",
+                "wrap": True,
+                "spacing": "Small",
+            })
+
+    body.append({
+        "type": "TextBlock",
+        "text": "Usa `/regenerar` para regenerar · `/cancelar` para descartar",
+        "isSubtle": True,
+        "separator": True,
+        "spacing": "Medium",
+        "wrap": True,
+        "size": "Small",
+    })
+
+    card = {
+        "type": "AdaptiveCard",
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "version": "1.4",
+        "body": body,
+    }
+    return MessageFactory.attachment(CardFactory.adaptive_card(card))
 
 # ── Global adapter reference (set from function_app.py after adapter is created) ──
 _adapter = None
@@ -364,9 +429,10 @@ class MayiHearBot(ActivityHandler):
         except Exception as e:
             await turn_context.send_activity(MessageFactory.text(f"❌ Error: {e}"))
             return
-        await turn_context.send_activity(MessageFactory.text(
-            f"✅ **{subject}** regenerada y publicada en **{board_name}**\n\n{result['insights_text']}"
-        ))
+        board_short = board_name.split(" - ")[-1] if " - " in board_name else board_name
+        await turn_context.send_activity(
+            _insights_card(subject, board_short, result.get("insights", {}), result["insights_text"])
+        )
 
     # ── Custom prompt management ───────────────────────────────────────────────
 
@@ -945,13 +1011,10 @@ class MayiHearBot(ActivityHandler):
                     )
                     _last_processed.update({**result, "item_id": item_id})
 
-                    teams_text = format_insights_for_teams(result.get("insights", {})) or result["insights_text"]
                     board_short = board_name.split(" - ")[-1] if " - " in board_name else board_name
-                    await ctx.send_activity(MessageFactory.text(
-                        f"✅ **{subject}** → _{board_short}_\n\n"
-                        f"{teams_text}\n\n"
-                        f"---\n_/regenerar · /cancelar_"
-                    ))
+                    await ctx.send_activity(
+                        _insights_card(subject, board_short, result.get("insights", {}), result["insights_text"])
+                    )
                 except Exception as e:
                     logger.exception(f"Pipeline failed for '{subject}': {e}")
                     await ctx.send_activity(MessageFactory.text(
