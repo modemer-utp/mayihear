@@ -83,6 +83,23 @@ def get_transcripts(token: str, organizer_email: str, meeting_id: str) -> list:
     return r.json().get("value", [])
 
 
+def get_call_record(token: str, call_record_id: str) -> dict:
+    """
+    Fetch a callRecord by ID.
+    Returns dict with startDateTime, endDateTime, organizer.user.id, joinWebUrl.
+    Requires CallRecords.Read.All application permission.
+    """
+    headers = {"Authorization": f"Bearer {token}"}
+    r = requests.get(
+        f"{GRAPH_API}/communications/callRecords/{call_record_id}",
+        headers=headers,
+        timeout=15,
+    )
+    if r.status_code != 200:
+        return {}
+    return r.json()
+
+
 def register_transcript_webhook(token: str, notification_url: str, organizer_id: str) -> dict:
     """
     Subscribe to transcript change notifications for all meetings of a user.

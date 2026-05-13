@@ -161,7 +161,22 @@ async def graph_webhook(req: func.HttpRequest) -> func.HttpResponse:
             continue
 
         resource_data = notification.get("resourceData", {})
-        resource_url = notification.get("resource", "")  # e.g. /users/{uid}/onlineMeetings/{mid}/transcripts/{tid}
+        resource_url = notification.get("resource", "")
+
+        # ── callRecord notification ───────────────────────────────────────────
+        odata_type = resource_data.get("@odata.type", "")
+        if "#microsoft.graph.callRecord" in odata_type or resource_url.startswith("/communications/callRecords"):
+            call_record_id = resource_data.get("id")
+            if call_record_id:
+                logger.info(f"callRecord notification received: {call_record_id}")
+                threading.Thread(
+                    target=_handle_call_record,
+                    args=(call_record_id,),
+                    daemon=True,
+                ).start()
+            continue
+
+        # ── transcript notification (existing flow) ───────────────────────────
 
         # Primary: from resourceData fields
         meeting_id = resource_data.get("meetingId")
@@ -264,12 +279,16 @@ def _get_organizer_emails() -> list:
 
 
 def _renew_or_create_subscription(token: str):
-    """Renew or create Graph subscriptions for all configured organizers."""
+    """Renew or create Graph subscriptions: per-user transcripts + tenant-wide callRecords."""
     for email in _get_organizer_emails():
         try:
             _renew_or_create_subscription_for(token, email)
         except Exception:
-            logger.exception(f"Failed to renew subscription for {email}")
+            logger.exception(f"Failed to renew transcript subscription for {email}")
+    try:
+        _renew_or_create_callrecord_subscription(token)
+    except Exception:
+        logger.exception("Failed to renew callRecords subscription")
 
 
 def _renew_or_create_subscription_for(token: str, organizer: str):
@@ -312,10 +331,53 @@ def _renew_or_create_subscription_for(token: str, organizer: str):
     logger.info(f"Webhook subscription created for {organizer} → expires {expiry}")
 
 
+def _renew_or_create_callrecord_subscription(token: str):
+    """
+    Create or renew a single tenant-wide callRecords subscription.
+    Fires when any call in the tenant ends — we filter by organizer in _handle_call_record.
+    Max expiry for callRecords is 4320 minutes (~3 days), renewed every 30 min by the timer.
+    """
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    expiry = (
+        datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=4319)
+    ).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+    subs = requests.get(f"{GRAPH_API}/subscriptions", headers=headers).json().get("value", [])
+    for sub in subs:
+        if sub.get("resource") == "/communications/callRecords":
+            r = requests.patch(
+                f"{GRAPH_API}/subscriptions/{sub['id']}",
+                json={"expirationDateTime": expiry},
+                headers=headers,
+            )
+            if r.status_code == 200:
+                logger.info(f"callRecords subscription renewed → expires {expiry}")
+                return
+            logger.warning(f"callRecords renew failed ({r.status_code}) — recreating")
+            requests.delete(f"{GRAPH_API}/subscriptions/{sub['id']}", headers=headers)
+            break
+
+    body = {
+        "changeType": "created",
+        "notificationUrl": WEBHOOK_URL,
+        "lifecycleNotificationUrl": WEBHOOK_URL,
+        "resource": "/communications/callRecords",
+        "expirationDateTime": expiry,
+        "clientState": CLIENT_STATE,
+    }
+    r = requests.post(f"{GRAPH_API}/subscriptions", json=body, headers=headers)
+    r.raise_for_status()
+    logger.info(f"callRecords subscription created → expires {expiry}")
+
+
 # ── Processed IDs — deduplicate webhook notifications within a process lifetime ──
 _processed_ids: set = set()          # transcript IDs
 _processed_meeting_ids: set = set()  # meeting IDs — prevents dual-transcript duplicates
 _processed_ids_ready = False
+
+# ── Pending transcripts waiting for their callRecord ─────────────────────────
+# organizer_email (lower) → list of {meeting_id, transcript_id, subject, calendar_end_dt, detected_at}
+_pending_transcripts: dict = {}
 
 
 def _load_processed_ids_once():
@@ -388,10 +450,131 @@ def _validate_and_enqueue(meeting_id: str, transcript_id: str, organizer: str, s
         _processed_ids.add(transcript_id)
         _processed_meeting_ids.add(meeting_id)
         save_processed_ids(_processed_ids)
+
+        # Register in pending_transcripts so callRecord can override the schedule
+        org_key = organizer.lower()
+        calendar_end_dt = (
+            datetime.datetime.fromisoformat(end_dt_str.replace("Z", "+00:00"))
+            if end_dt_str else None
+        )
+        _pending_transcripts.setdefault(org_key, []).append({
+            "meeting_id": meeting_id,
+            "transcript_id": transcript_id,
+            "subject": subject,
+            "calendar_end_dt": calendar_end_dt,
+            "detected_at": now,
+        })
+
         _enqueue_meeting(meeting_id, transcript_id, organizer, subject, scheduled_at=scheduled_at)
 
     except Exception:
         logger.exception(f"_validate_and_enqueue failed for '{subject}'")
+
+
+def _handle_call_record(call_record_id: str):
+    """
+    Process a callRecord notification to get the actual meeting end time.
+    Matches the callRecord to a pending transcript (stored by _validate_and_enqueue)
+    and schedules processing with the real endDateTime instead of the calendar one.
+
+    Handles two cases:
+    - Normal meeting (ended on time): callRecord may arrive before the calendar-based
+      SB message fires → preempts it with a more accurate schedule (+3 min).
+    - Meeting ran over: callRecord arrives after calendar-based processing already ran
+      with partial transcript → clears the dedup flag and re-queues at actual end +3 min.
+    """
+    import datetime
+    from tools.graph_client import get_token as _gc_token, get_call_record
+    from tools.graph import resolve_email_from_aad_id
+
+    try:
+        token = _gc_token()
+        record = get_call_record(token, call_record_id)
+        if not record:
+            logger.warning(f"callRecord {call_record_id}: could not fetch — skipping")
+            return
+
+        actual_end_str = record.get("endDateTime")
+        actual_start_str = record.get("startDateTime")
+        organizer_aad_id = record.get("organizer", {}).get("user", {}).get("id", "")
+
+        if not actual_end_str or not organizer_aad_id:
+            logger.info(f"callRecord {call_record_id}: missing end time or organizer — skipping")
+            return
+
+        actual_end_dt = datetime.datetime.fromisoformat(actual_end_str.replace("Z", "+00:00"))
+        actual_start_dt = (
+            datetime.datetime.fromisoformat(actual_start_str.replace("Z", "+00:00"))
+            if actual_start_str else None
+        )
+
+        # Resolve organizer AAD ID → email
+        organizer_email = resolve_email_from_aad_id(organizer_aad_id)
+        if not organizer_email:
+            logger.info(f"callRecord {call_record_id}: could not resolve organizer — skipping")
+            return
+
+        organizer_email = organizer_email.lower()
+        if organizer_email not in [e.lower() for e in _get_organizer_emails()]:
+            logger.info(f"callRecord {call_record_id}: organizer {organizer_email} not monitored — skipping")
+            return
+
+        logger.info(f"callRecord for {organizer_email}: actual end={actual_end_str}")
+
+        # Find matching pending transcript by time window
+        now = datetime.datetime.now(datetime.timezone.utc)
+        pending_list = _pending_transcripts.get(organizer_email, [])
+        matched = None
+        for entry in pending_list:
+            detected = entry["detected_at"]
+            window_start = (actual_start_dt - datetime.timedelta(minutes=10)) if actual_start_dt else (detected - datetime.timedelta(hours=2))
+            window_end = actual_end_dt + datetime.timedelta(minutes=15)
+            if window_start <= detected <= window_end:
+                matched = entry
+                break
+
+        if not matched:
+            logger.info(f"callRecord {call_record_id}: no pending transcript found for {organizer_email} — skipping")
+            return
+
+        meeting_id   = matched["meeting_id"]
+        transcript_id = matched["transcript_id"]
+        subject       = matched["subject"]
+        calendar_end  = matched.get("calendar_end_dt")
+
+        # Remove from pending now that it's been claimed
+        _pending_transcripts[organizer_email] = [
+            e for e in pending_list if e["transcript_id"] != transcript_id
+        ]
+
+        # If the meeting ran significantly over the calendar end, the calendar-based
+        # SB message may have already fetched a partial transcript — re-queue with the
+        # full transcript now available.
+        ran_over = (
+            calendar_end is not None and
+            actual_end_dt > calendar_end + datetime.timedelta(minutes=5)
+        )
+        if ran_over and transcript_id in _processed_ids:
+            logger.info(
+                f"callRecord: '{subject}' ran {int((actual_end_dt - calendar_end).total_seconds() // 60)} min "
+                f"over schedule — clearing dedup and re-queuing for full transcript"
+            )
+            _processed_ids.discard(transcript_id)
+            _processed_meeting_ids.discard(meeting_id)
+        elif transcript_id in _processed_ids:
+            logger.info(f"callRecord: '{subject}' already processed on time — no action needed")
+            return
+
+        # Schedule at actual end + 3 min (Teams needs ~3 min to flush final VTT after call ends)
+        scheduled_at = actual_end_dt + datetime.timedelta(minutes=3)
+        if scheduled_at <= now:
+            scheduled_at = now + datetime.timedelta(minutes=1)
+
+        logger.info(f"callRecord trigger: queuing '{subject}' at {scheduled_at.isoformat()}")
+        _enqueue_meeting(meeting_id, transcript_id, organizer_email, subject, scheduled_at=scheduled_at)
+
+    except Exception:
+        logger.exception(f"_handle_call_record failed for {call_record_id}")
 
 
 # ── Timer: fallback transcript check every 2 min ─────────────────────────────
