@@ -1049,18 +1049,11 @@ class MayiHearBot(ActivityHandler):
             return f"Auto-posted '{subject}'"
 
         else:
-            # No stored ref → post silently
-            logger.warning(f"No conversation reference for '{organizer_email}' — posting silently")
-            result = await loop.run_in_executor(
-                _executor, pipeline.generate,
-                transcript_data["transcript_text"], subject, None
-            )
-            item_id = await loop.run_in_executor(
-                _executor, pipeline.post_to_monday,
-                subject, result["insights_text"], None
-            )
-            _last_processed.update({**result, "item_id": item_id})
-            return f"✅ Published '{subject}' → Monday item {item_id}"
+            # No conversation reference — can't send card to user, skip silently.
+            # Publishing without confirmation would cause duplicates when the ref
+            # is found on retry. User can use /regenerar next time they open the bot.
+            logger.warning(f"No conversation reference for '{organizer_email}' — skipping '{subject}' (no ref to send confirmation)")
+            return f"Skipped '{subject}' — no conversation reference to send confirmation card"
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
