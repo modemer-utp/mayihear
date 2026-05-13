@@ -261,14 +261,17 @@ class MayiHearBot(ActivityHandler):
 
         selected_item_id = state.get("selected_item_id", "11714533371")  # default: Actualizaciones
         current_group = None
-        lines = ["**📋 Proyectos — UTP Roadmap Producto**\n", "Elige el proyecto al que pertenece esta reunión:\n"]
+        lines = ["**📋 Proyectos — UTP Roadmap**", "", "Elige el proyecto al que pertenece esta reunión:"]
         for i, item in enumerate(items, 1):
             if item["group"] != current_group:
                 current_group = item["group"]
-                lines.append(f"\n**{current_group}**")
+                lines.append("")
+                lines.append(f"**{current_group}**")
+                lines.append("")
             marker = " ✅" if item["id"] == selected_item_id else ""
-            lines.append(f"  **{i}.** {item['name']}{marker}")
-        lines.append("\n\nUsa `/select <número>` para elegir el proyecto.")
+            lines.append(f"**{i}.** {item['name']}{marker}")
+        lines.append("")
+        lines.append("_Usa /select <número> para elegir el proyecto_")
 
         set_conv_state(conv_id, {**state, "items_cache": items})
         await turn_context.send_activity(MessageFactory.text("\n".join(lines)))
@@ -382,7 +385,7 @@ class MayiHearBot(ActivityHandler):
             set_conv_state(conv_id, {**state, "pending": None, "pending_queue": [], "pending_previewed": False})
 
         await turn_context.send_activity(
-            MessageFactory.text(f"✅ **{pending['subject']}** publicada en **{publish_label}** · {board_short}")
+            MessageFactory.text(f"✅ **{pending['subject']}** publicada en **{publish_label}**")
         )
         if queue:
             np = next_pending
