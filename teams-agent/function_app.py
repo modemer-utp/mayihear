@@ -332,16 +332,20 @@ def _validate_and_enqueue(meeting_id: str, transcript_id: str, organizer: str, s
     Called after a Graph webhook notification or by the fallback timer.
 
     Guard rule: endDateTime is the ONLY reliable signal.
-    - endDateTime in the past  → meeting is over → enqueue immediately
-    - endDateTime in the future → meeting still scheduled to run → schedule SB for endDateTime + 1 min
     - endDateTime unknown       → schedule 10 min from now as safe fallback
+    - endDateTime in future     → meeting still running → schedule at endDateTime + TRANSCRIPT_BUFFER
+    - endDateTime just passed   → meeting ended recently → schedule at endDateTime + TRANSCRIPT_BUFFER
+    - endDateTime long past     → safe to process soon → schedule 2 min from now
 
-    We never use transcript content to decide timing — Teams writes live content
-    during the meeting, so content being present does NOT mean the meeting ended.
+    TRANSCRIPT_BUFFER = 5 min: Teams takes ~5 min after meeting end to finalize the
+    full transcript. Fetching at +1 min captures only what was transcribed in that
+    first minute, losing the rest of the meeting.
     """
     import datetime
     from tools.state_store import save_processed_ids
     from tools.graph_client import get_token as _gc_token, get_meeting_details
+
+    TRANSCRIPT_BUFFER = datetime.timedelta(minutes=5)
 
     try:
         token = _gc_token()
@@ -365,15 +369,20 @@ def _validate_and_enqueue(meeting_id: str, transcript_id: str, organizer: str, s
             logger.info(f"Meeting '{subject}': no endDateTime — scheduling in 10 min")
         else:
             end_dt = datetime.datetime.fromisoformat(end_dt_str.replace("Z", "+00:00"))
-            if end_dt <= now:
-                # Scheduled end is in the past — meeting is over
-                scheduled_at = None
-                logger.info(f"Meeting '{subject}': ended at {end_dt_str} — enqueuing now")
-            else:
-                # Scheduled end is in the future — meeting is still running
-                scheduled_at = end_dt + datetime.timedelta(minutes=1)
+            ideal = end_dt + TRANSCRIPT_BUFFER  # always wait buffer after scheduled end
+            if ideal > now:
+                # Either meeting is still running, or it just ended and Teams hasn't finalized yet
+                scheduled_at = ideal
                 logger.info(
-                    f"Meeting '{subject}': still active until {end_dt_str} — scheduling SB at {scheduled_at.isoformat()}"
+                    f"Meeting '{subject}': scheduling at {ideal.isoformat()} "
+                    f"(endDateTime {end_dt_str} + {TRANSCRIPT_BUFFER.seconds // 60} min buffer)"
+                )
+            else:
+                # Meeting ended long enough ago — process in 2 min as a minimal safety margin
+                scheduled_at = now + datetime.timedelta(minutes=2)
+                logger.info(
+                    f"Meeting '{subject}': ended at {end_dt_str}, buffer already elapsed — "
+                    f"scheduling in 2 min"
                 )
 
         _processed_ids.add(transcript_id)
@@ -431,7 +440,7 @@ def check_missed_transcripts(catchup_timer: func.TimerRequest) -> None:
                 if not tid or tid in _processed_ids or mid in _processed_meeting_ids:
                     continue  # already handled
 
-                # Guard: only process if meeting has ended
+                # Guard: only process if meeting has ended AND transcript buffer has elapsed
                 from tools.graph_client import get_meeting_details as _gmd
                 details = _gmd(token, organizer, mid)
                 end_dt_str = details.get("endDateTime", "")
@@ -441,9 +450,11 @@ def check_missed_transcripts(catchup_timer: func.TimerRequest) -> None:
                     continue
 
                 end_dt = datetime.datetime.fromisoformat(end_dt_str.replace("Z", "+00:00"))
-                if end_dt > now:
+                transcript_ready_at = end_dt + datetime.timedelta(minutes=5)
+                if transcript_ready_at > now:
                     logger.info(
-                        f"Catchup [{organizer}]: meeting still active until {end_dt_str} — skipping"
+                        f"Catchup [{organizer}]: waiting for transcript finalization until "
+                        f"{transcript_ready_at.isoformat()} — skipping"
                     )
                     continue
 
