@@ -579,7 +579,7 @@ def _handle_call_record(call_record_id: str):
 
 # ── Timer: fallback transcript check every 2 min ─────────────────────────────
 
-@app.timer_trigger(schedule="0 */2 * * * *", arg_name="catchup_timer", run_on_startup=True)
+@app.timer_trigger(schedule="0 */2 * * * *", arg_name="catchup_timer", run_on_startup=False)
 def check_missed_transcripts(catchup_timer: func.TimerRequest) -> None:
     """
     Fallback for when Graph webhook misses a notification (e.g. subscription gap on redeploy).
