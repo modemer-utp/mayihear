@@ -324,24 +324,11 @@ class MayiHearBot(ActivityHandler):
             await turn_context.send_activity(MessageFactory.text("No hay ninguna reunión pendiente de confirmar."))
             return
 
-        board_name = state.get("selected_board_name") if state.get("board_explicitly_selected") else "UTP - Roadmap proyectos - Producto"
+        # board comes from pending (set at processing time) or from user selection
+        board_id   = state.get("selected_board_id") if state.get("board_explicitly_selected") else pending.get("board_id") or os.environ.get("MONDAY_BOARD_ID")
+        board_name = state.get("selected_board_name") if state.get("board_explicitly_selected") else pending.get("board_name") or "UTP - Roadmap proyectos - Producto"
+        board_short = board_name.split(" - ")[-1] if " - " in board_name else board_name
 
-        # First /confirm → show preview and ask for explicit approval
-        if not state.get("pending_previewed"):
-            set_conv_state(conv_id, {**state, "pending_previewed": True})
-            await turn_context.send_activity(
-                MessageFactory.text(
-                    f"📋 **Vista previa — {pending.get('subject', 'Reunión')}**\n\n"
-                    f"{pending['insights_text']}\n\n"
-                    f"---\n"
-                    f"Se publicará en **{board_name}**.\n"
-                    f"¿Confirmas? → `/confirmar` para publicar · `/regenerar` para regenerar · `/cancelar` para descartar"
-                )
-            )
-            return
-
-        # Second /confirm → publish
-        board_id = state.get("selected_board_id") if state.get("board_explicitly_selected") else os.environ.get("MONDAY_BOARD_ID")
         await turn_context.send_activity(MessageFactory.text("⏳ Publicando en Monday..."))
         loop = asyncio.get_event_loop()
         try:
@@ -354,7 +341,7 @@ class MayiHearBot(ActivityHandler):
             return
         _last_processed.update({**pending, "item_id": item_id})
 
-        # Advance queue — show next preview if any
+        # Advance queue
         queue = list(state.get("pending_queue", []))
         if queue:
             next_pending = queue.pop(0)
@@ -363,18 +350,18 @@ class MayiHearBot(ActivityHandler):
             set_conv_state(conv_id, {**state, "pending": None, "pending_queue": [], "pending_previewed": False})
 
         await turn_context.send_activity(
-            MessageFactory.text(f"✅ **{pending['subject']}** publicada en **{board_name}** → item `{item_id}`")
+            MessageFactory.text(f"✅ **{pending['subject']}** publicada en **{board_short}**")
         )
         if queue:
-            next_pending_item = queue[0] if queue else state.get("pending_queue", [{}])[0] if state.get("pending_queue") else None
-            # next_pending was already popped above
+            np = next_pending
+            np_board_short = (np.get("board_name") or board_name).split(" - ")[-1]
             await turn_context.send_activity(
-                MessageFactory.text(
-                    f"📝 **Siguiente reunión pendiente: {next_pending.get('subject', 'Reunión')}**\n\n"
-                    f"{next_pending['insights_text']}\n\n"
-                    "Usa `/confirmar` para revisar y publicar · `/regenerar` · `/cancelar`"
-                )
+                _insights_card(np.get("subject", "Reunión"), np_board_short, np.get("insights", {}), np["insights_text"])
             )
+            await turn_context.send_activity(MessageFactory.text(
+                f"📥 Siguiente: **{np.get('subject', 'Reunión')}**\n"
+                f"→ `/confirmar` · `/regenerar` · `/cancelar`"
+            ))
 
     async def _slash_cancel(self, turn_context: TurnContext, state: dict, conv_id: str):
         pending = state.get("pending")
@@ -998,32 +985,53 @@ class MayiHearBot(ActivityHandler):
                 await ctx.send_activity(MessageFactory.text(f"⏳ Procesando **{subject}**..."))
 
                 try:
-                    # Generate insights
                     result = await loop.run_in_executor(
                         _executor, pipeline.generate,
                         transcript_data["transcript_text"], subject, custom_prompt
-                    )
-
-                    # Auto-post to Monday
-                    item_id = await loop.run_in_executor(
-                        _executor, pipeline.post_to_monday,
-                        subject, result["insights_text"], board_id
-                    )
-                    _last_processed.update({**result, "item_id": item_id})
-
-                    board_short = board_name.split(" - ")[-1] if " - " in board_name else board_name
-                    await ctx.send_activity(
-                        _insights_card(subject, board_short, result.get("insights", {}), result["insights_text"])
                     )
                 except Exception as e:
                     logger.exception(f"Pipeline failed for '{subject}': {e}")
                     await ctx.send_activity(MessageFactory.text(
                         f"❌ Error procesando **{subject}**: {str(e)[:200]}\n\n"
-                        f"Usa `/regenerar` para reintentar cuando la reunión haya terminado."
+                        f"Usa `/regenerar` para reintentar."
                     ))
+                    return
+
+                # Store as pending — do NOT post to Monday yet
+                pending = {
+                    "subject": subject,
+                    "insights_text": result["insights_text"],
+                    "insights": result.get("insights", {}),
+                    "transcript_text": result["transcript_text"],
+                    "board_id": board_id,
+                    "board_name": board_name,
+                }
+                queue = list(state.get("pending_queue", []))
+                existing = state.get("pending")
+                if existing:
+                    # Already reviewing one — add to queue
+                    queue.append(pending)
+                    set_conv_state(conv_id, {**state, "pending_queue": queue, "pending_previewed": False})
+                    await ctx.send_activity(MessageFactory.text(
+                        f"📥 **{subject}** añadida a la cola. "
+                        f"Termina con la reunión actual primero (`/confirmar` · `/cancelar`)."
+                    ))
+                    return
+
+                set_conv_state(conv_id, {**state, "pending": pending, "pending_previewed": False})
+                _last_processed.update({**result})
+
+                board_short = board_name.split(" - ")[-1] if " - " in board_name else board_name
+                await ctx.send_activity(
+                    _insights_card(subject, board_short, result.get("insights", {}), result["insights_text"])
+                )
+                await ctx.send_activity(MessageFactory.text(
+                    f"¿Publicar en **{board_short}**?\n"
+                    f"→ `/confirmar` para publicar · `/regenerar` para regenerar · `/cancelar` para descartar"
+                ))
 
             await _adapter.continue_conversation(ref, _callback, os.environ.get("BOT_ID", ""))
-            logger.info(f"Auto-posted '{subject}' for '{organizer_email}'")
+            logger.info(f"Insights ready for confirmation — '{subject}' for '{organizer_email}'")
             return f"Auto-posted '{subject}'"
 
         else:
