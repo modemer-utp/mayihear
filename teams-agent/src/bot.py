@@ -260,21 +260,48 @@ class MayiHearBot(ActivityHandler):
             return
 
         selected_item_id = state.get("selected_item_id", "11714533371")  # default: Actualizaciones
+
+        body = [
+            {"type": "TextBlock", "text": "📋 Proyectos — UTP Roadmap", "weight": "Bolder", "size": "Large"},
+            {"type": "TextBlock", "text": "Elige el proyecto al que pertenece esta reunión:", "isSubtle": True, "spacing": "None", "wrap": True},
+        ]
+
         current_group = None
-        lines = ["**📋 Proyectos — UTP Roadmap**", "", "Elige el proyecto al que pertenece esta reunión:"]
         for i, item in enumerate(items, 1):
             if item["group"] != current_group:
                 current_group = item["group"]
-                lines.append("")
-                lines.append(f"**{current_group}**")
-                lines.append("")
+                body.append({
+                    "type": "TextBlock",
+                    "text": current_group,
+                    "weight": "Bolder",
+                    "separator": True,
+                    "spacing": "Medium",
+                })
             marker = " ✅" if item["id"] == selected_item_id else ""
-            lines.append(f"**{i}.** {item['name']}{marker}")
-        lines.append("")
-        lines.append("_Usa /select <número> para elegir el proyecto_")
+            body.append({
+                "type": "TextBlock",
+                "text": f"**{i}.** {item['name']}{marker}",
+                "wrap": True,
+                "spacing": "Small",
+            })
 
+        body.append({
+            "type": "TextBlock",
+            "text": "Usa `/select <número>` para elegir el proyecto",
+            "isSubtle": True,
+            "separator": True,
+            "spacing": "Medium",
+            "size": "Small",
+        })
+
+        card = {
+            "type": "AdaptiveCard",
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.4",
+            "body": body,
+        }
         set_conv_state(conv_id, {**state, "items_cache": items})
-        await turn_context.send_activity(MessageFactory.text("\n".join(lines)))
+        await turn_context.send_activity(MessageFactory.attachment(CardFactory.adaptive_card(card)))
 
     async def _cmd_last_meeting(self, turn_context: TurnContext):
         if _last_processed:
