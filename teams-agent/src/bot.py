@@ -84,8 +84,8 @@ def _insights_card(subject: str, board_short: str, insights: dict, insights_text
         "spacing": "Small",
         "wrap": True,
         "size": "Small",
-    },
-    {
+    })
+    body.append({
         "type": "TextBlock",
         "text": "¿No es lo que esperabas? Escribe `/acta` para cambiar la estructura y luego `/regenerar`.",
         "isSubtle": True,
