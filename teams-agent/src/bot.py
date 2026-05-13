@@ -931,24 +931,31 @@ class MayiHearBot(ActivityHandler):
 
                 await ctx.send_activity(MessageFactory.text(f"⏳ Procesando **{subject}**..."))
 
-                # Generate insights
-                result = await loop.run_in_executor(
-                    _executor, pipeline.generate,
-                    transcript_data["transcript_text"], subject, custom_prompt
-                )
+                try:
+                    # Generate insights
+                    result = await loop.run_in_executor(
+                        _executor, pipeline.generate,
+                        transcript_data["transcript_text"], subject, custom_prompt
+                    )
 
-                # Auto-post to Monday
-                item_id = await loop.run_in_executor(
-                    _executor, pipeline.post_to_monday,
-                    subject, result["insights_text"], board_id
-                )
-                _last_processed.update({**result, "item_id": item_id})
+                    # Auto-post to Monday
+                    item_id = await loop.run_in_executor(
+                        _executor, pipeline.post_to_monday,
+                        subject, result["insights_text"], board_id
+                    )
+                    _last_processed.update({**result, "item_id": item_id})
 
-                await ctx.send_activity(MessageFactory.text(
-                    f"✅ **{subject}** publicada en **Actualizaciones** de **{board_name}**\n\n"
-                    f"{result['insights_text']}\n\n"
-                    f"Usa `/regenerar` si quieres cambiar la estructura y volver a publicar."
-                ))
+                    await ctx.send_activity(MessageFactory.text(
+                        f"✅ **{subject}** publicada en **Actualizaciones** de **{board_name}**\n\n"
+                        f"{result['insights_text']}\n\n"
+                        f"Usa `/regenerar` si quieres cambiar la estructura y volver a publicar."
+                    ))
+                except Exception as e:
+                    logger.exception(f"Pipeline failed for '{subject}': {e}")
+                    await ctx.send_activity(MessageFactory.text(
+                        f"❌ Error procesando **{subject}**: {str(e)[:200]}\n\n"
+                        f"Usa `/regenerar` para reintentar cuando la reunión haya terminado."
+                    ))
 
             await _adapter.continue_conversation(ref, _callback, os.environ.get("BOT_ID", ""))
             logger.info(f"Auto-posted '{subject}' for '{organizer_email}'")
