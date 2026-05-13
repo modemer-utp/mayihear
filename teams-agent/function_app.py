@@ -339,7 +339,7 @@ def _renew_or_create_callrecord_subscription(token: str):
     """
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     expiry = (
-        datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=4319)
+        datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=4229)
     ).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
     subs = requests.get(f"{GRAPH_API}/subscriptions", headers=headers).json().get("value", [])
