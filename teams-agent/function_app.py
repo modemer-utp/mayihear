@@ -407,7 +407,7 @@ def _validate_and_enqueue(meeting_id: str, transcript_id: str, organizer: str, s
     from tools.state_store import save_processed_ids
     from tools.graph_client import get_token as _gc_token, get_meeting_details
 
-    TRANSCRIPT_BUFFER = datetime.timedelta(minutes=5)
+    TRANSCRIPT_BUFFER = datetime.timedelta(minutes=2)
 
     try:
         token = _gc_token()
@@ -633,7 +633,7 @@ def check_missed_transcripts(catchup_timer: func.TimerRequest) -> None:
                     continue
 
                 end_dt = datetime.datetime.fromisoformat(end_dt_str.replace("Z", "+00:00"))
-                transcript_ready_at = end_dt + datetime.timedelta(minutes=5)
+                transcript_ready_at = end_dt + datetime.timedelta(minutes=2)
                 if transcript_ready_at > now:
                     logger.info(
                         f"Catchup [{organizer}]: waiting for transcript finalization until "
