@@ -56,25 +56,36 @@ def _insights_card(subject: str, board_short: str, insights: dict, insights_text
         ("🎯 Tareas",             insights.get("action_items", [])),
         ("❓ Preguntas abiertas",  insights.get("open_questions", [])),
     ]
+    has_structured = any(items for _, items in sections)
 
-    for title, items in sections:
-        if not items:
-            continue
+    if has_structured:
+        for title, items in sections:
+            if not items:
+                continue
+            body.append({
+                "type": "TextBlock",
+                "text": title,
+                "weight": "Bolder",
+                "size": "Medium",
+                "separator": True,
+                "spacing": "Medium",
+            })
+            for item in items:
+                body.append({
+                    "type": "TextBlock",
+                    "text": f"• {item}",
+                    "wrap": True,
+                    "spacing": "Small",
+                })
+    else:
+        # Custom prompt → free-form text, render as a single block
         body.append({
             "type": "TextBlock",
-            "text": title,
-            "weight": "Bolder",
-            "size": "Medium",
+            "text": insights_text,
+            "wrap": True,
             "separator": True,
             "spacing": "Medium",
         })
-        for item in items:
-            body.append({
-                "type": "TextBlock",
-                "text": f"• {item}",
-                "wrap": True,
-                "spacing": "Small",
-            })
 
     body.append({
         "type": "TextBlock",
