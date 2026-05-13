@@ -39,7 +39,7 @@ def get_transcript_content(token: str, organizer_email: str, meeting_id: str, tr
         headers=headers,
     )
     r.raise_for_status()
-    return r.text
+    return r.content.decode('utf-8')
 
 
 def get_meeting_details(token: str, organizer_email: str, meeting_id: str) -> dict:
