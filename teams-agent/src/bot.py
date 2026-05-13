@@ -131,6 +131,12 @@ class MayiHearBot(ActivityHandler):
 
         if raw.startswith("/"):
             await self._handle_slash(turn_context, raw, state, conv_id)
+        elif text_lower in ("confirmar", "confirm", "sí", "si", "yes"):
+            await self._slash_confirm(turn_context, state, conv_id)
+        elif text_lower in ("cancelar", "cancel", "no"):
+            await self._slash_cancel(turn_context, state, conv_id)
+        elif text_lower in ("regenerar", "regenerate", "regenera"):
+            await self._slash_regenerate(turn_context, state, conv_id)
         elif text_lower in ("hola", "hi", "hello", "ayuda", "help", "inicio", "start", ""):
             await self._cmd_welcome(turn_context, state)
         elif self._is_prompt_intent(text_lower):
@@ -396,7 +402,9 @@ class MayiHearBot(ActivityHandler):
 
     async def _slash_regenerate(self, turn_context: TurnContext, state: dict, conv_id: str):
         # Use last processed meeting (auto-post flow — no pending state)
-        source = _last_processed if _last_processed else None
+        # Use _last_processed if available, otherwise fall back to pending state
+        # (pending has transcript_text and survives redeployments via Table Storage)
+        source = _last_processed if _last_processed.get("transcript_text") else state.get("pending")
         if not source or not source.get("transcript_text"):
             await turn_context.send_activity(MessageFactory.text(
                 "No hay ninguna reunión reciente para regenerar. Procesa una reunión primero."
@@ -404,8 +412,8 @@ class MayiHearBot(ActivityHandler):
             return
         custom_prompt = state.get("custom_prompt")
         subject = source.get("subject", "Reunión")
-        board_id = state.get("selected_board_id") if state.get("board_explicitly_selected") else os.environ.get("MONDAY_BOARD_ID")
-        board_name = state.get("selected_board_name") if state.get("board_explicitly_selected") else "UTP - Roadmap proyectos - Producto"
+        board_id = state.get("selected_board_id") if state.get("board_explicitly_selected") else source.get("board_id") or os.environ.get("MONDAY_BOARD_ID")
+        board_name = state.get("selected_board_name") if state.get("board_explicitly_selected") else source.get("board_name") or "UTP - Roadmap proyectos - Producto"
 
         await turn_context.send_activity(MessageFactory.text(
             "🔄 Regenerando" + (" con tu estructura de acta..." if custom_prompt else "...")
