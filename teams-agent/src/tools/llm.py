@@ -76,8 +76,27 @@ def generate_insights(transcript: str) -> dict:
         contents=INSIGHTS_PROMPT.format(transcript=transcript),
     )
     raw = response.text.strip()
+    # Strip markdown fences
     raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-    return json.loads(raw)
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        # Gemini sometimes returns truncated JSON — attempt to salvage by finding
+        # the last complete array and closing the object
+        import re
+        fixed = raw
+        # Remove any trailing incomplete entry (unmatched quote or partial string)
+        fixed = re.sub(r',\s*"[^"]*$', '', fixed)   # trailing incomplete key
+        fixed = re.sub(r',\s*"[^"]*":\s*"[^"]*$', '', fixed)  # incomplete value
+        # Close any open arrays and the root object
+        open_arrays = fixed.count('[') - fixed.count(']')
+        open_braces = fixed.count('{') - fixed.count('}')
+        fixed += ']' * max(open_arrays, 0) + '}' * max(open_braces, 0)
+        try:
+            return json.loads(fixed)
+        except json.JSONDecodeError:
+            # Final fallback: return the raw text as a summary bullet
+            return {"summary": [raw[:2000]], "decisions": [], "action_items": [], "open_questions": []}
 
 
 def format_insights_for_monday(insights: dict) -> str:
